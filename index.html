@@ -21,7 +21,7 @@
 <!-- (browsers only honor them as real HTTP response headers). If this site is -->
 <!-- deployed behind a web server, also send: -->
 <!-- Content-Security-Policy: frame-ancestors 'self'  (and/or X-Frame-Options: SAMEORIGIN) -->
-<meta content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.supabase.in; object-src 'none'; base-uri 'self'; form-action 'self';" http-equiv="Content-Security-Policy"/>
+<meta content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: http://localhost:3000 http://127.0.0.1:3000; connect-src 'self' https://*.supabase.co https://*.supabase.in; object-src 'none'; base-uri 'self'; form-action 'self';" http-equiv="Content-Security-Policy"/>
 <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="auth-locked">
