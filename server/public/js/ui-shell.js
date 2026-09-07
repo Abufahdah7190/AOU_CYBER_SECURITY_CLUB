@@ -7,6 +7,15 @@
   };
   window.setTimeout(finishBoot, reduceMotion ? 0 : 620);
 
+  // The radar is a visual affordance, not live security telemetry. CSS owns its
+  // motion; this tiny visibility hook avoids animating while the tab is hidden.
+  const syncRadarVisibility = () => {
+    body.classList.toggle('radar-paused', document.hidden || window.innerWidth <= 760 || reduceMotion);
+  };
+  document.addEventListener('visibilitychange', syncRadarVisibility);
+  window.addEventListener('resize', syncRadarVisibility, { passive: true });
+  syncRadarVisibility();
+
   const toggle = document.getElementById('mobile-nav-toggle');
   const nav = document.getElementById('primary-nav');
   const moreMenu = document.getElementById('more-menu');

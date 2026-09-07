@@ -3060,3 +3060,92 @@ html[dir="rtl"] .about-card li { text-align:right!important; }
 @media (max-width:900px) { .lms-header { grid-template-columns:1fr max-content; }.lms-course-heading { grid-column:1/-1; grid-row:1; }.lms-back { grid-row:2; }.lms-progress-box { grid-row:2; }.course-language { grid-row:2; }.lms-shell { grid-template-columns:1fr!important; }.lms-sidebar { position:static; }.student-overview { grid-template-columns:1fr; }.profile-dashboard-head { grid-template-columns:1fr max-content; }.profile-dashboard-head > div { grid-column:1/-1; grid-row:1; }.profile-dashboard-head .btn:first-child { grid-row:2; }.profile-dashboard-head .btn:last-child { grid-row:2; } }
 @media (max-width:600px) { .topbar::after,.lms-header::after,.profile-dashboard-head::after { display:none; }.lms-header { padding:18px 16px 22px; }.lms-progress-box { grid-column:1/-1; }.course-language { grid-column:1/-1; grid-row:3; }.lms-shell { padding:22px 14px!important; }.lms-lesson-card { padding:23px 18px!important; }.profile-dashboard { padding:28px 14px!important; }.profile-dashboard-head { gap:14px; }.student-overview { padding:22px!important; }.student-stats { grid-template-columns:1fr!important; }.verify-page,.auth-page { padding:16px; }.verify-card { padding:30px 20px!important; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } [data-soc-tilt] { transform:none!important; transition:none!important; } }
+
+/* Living radar: deliberately decorative, never a claim of live threat data.
+   It remains CSS-only so the SOC shell stays quiet and inexpensive to render. */
+.console-orbit {
+  isolation:isolate;
+  overflow:hidden;
+  background:radial-gradient(circle at center,rgba(8,72,100,.16),transparent 62%);
+}
+.console-orbit::before {
+  content:""; position:absolute; z-index:0; inset:0; border-radius:inherit;
+  background:linear-gradient(90deg,transparent calc(50% - .5px),rgba(61,216,255,.17) 50%,transparent calc(50% + .5px)),
+             linear-gradient(0deg,transparent calc(50% - .5px),rgba(61,216,255,.1) 50%,transparent calc(50% + .5px));
+  pointer-events:none;
+}
+.orbit-sweep {
+  position:absolute; z-index:1; inset:-1px; border-radius:50%; pointer-events:none;
+  transform:rotate(-90deg); transform-origin:50% 50%;
+  background:conic-gradient(from 0deg,rgba(73,230,255,.42) 0deg,rgba(73,230,255,.14) 16deg,rgba(73,230,255,.025) 37deg,transparent 52deg 360deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 33%,#000 33.8% 100%);
+  mask:radial-gradient(circle,transparent 0 33%,#000 33.8% 100%);
+  filter:drop-shadow(0 0 8px rgba(64,227,255,.26));
+  animation:radar-sweep 8s linear infinite;
+}
+.orbit-sweep::after {
+  content:""; position:absolute; top:50%; left:50%; width:50%; height:1px;
+  transform-origin:0 50%; background:linear-gradient(90deg,rgba(104,244,255,.7),transparent);
+  box-shadow:0 0 8px rgba(64,227,255,.45);
+}
+.orbit-range { position:absolute; z-index:1; border:1px solid rgba(65,216,255,.16); border-radius:50%; pointer-events:none; }
+.orbit-range-one { inset:17%; }
+.orbit-range-two { inset:31%; border-color:rgba(65,216,255,.22); }
+.orbit-core { z-index:3; }
+.orbit-node { z-index:4; animation:radar-node-pulse 3.6s ease-in-out infinite; }
+.orbit-node.n2 { animation-delay:1.15s; }
+.orbit-node.n3 { animation-delay:2.2s; }
+.orbit-node.n1::after,.orbit-node.n2::after,.orbit-node.n3::after { content:""; position:absolute; inset:-7px; border:1px solid rgba(76,244,184,.2); border-radius:50%; opacity:0; animation:radar-detection 7.5s ease-out infinite; }
+.orbit-node.n2::after { animation-delay:2.35s; }.orbit-node.n3::after { animation-delay:4.8s; }
+@keyframes radar-sweep { to { transform:rotate(270deg); } }
+@keyframes radar-node-pulse { 0%,100% { opacity:.72; transform:scale(.86); } 48% { opacity:1; transform:scale(1.15); box-shadow:0 0 18px 3px var(--good); } }
+@keyframes radar-detection { 0%,82%,100% { opacity:0; transform:scale(.35); } 87% { opacity:.62; } 98% { opacity:0; transform:scale(2.6); } }
+body.radar-paused .orbit-sweep,body.radar-paused .orbit-node,body.radar-paused .orbit-node::after { animation-play-state:paused; }
+
+/* The moving scanner is intentionally absent where attention or battery budget
+   is more important than atmosphere. */
+@media (max-width:760px),(prefers-reduced-motion:reduce) {
+  .orbit-sweep,.orbit-node,.orbit-node::after { animation:none!important; }
+  .orbit-sweep { opacity:.3; }
+}
+
+/* Ominous SOC atmosphere: the texture is intentionally almost imperceptible
+   behind content. It gives the system a physical-screen character without
+   compromising Arabic/English text contrast or adding a runtime dependency. */
+.app::after {
+  content:""; position:fixed; z-index:-1; inset:0; pointer-events:none; opacity:.1;
+  background-image:
+    repeating-linear-gradient(180deg,rgba(163,235,255,.16) 0 1px,transparent 1px 4px),
+    radial-gradient(circle at 22% 19%,rgba(255,255,255,.5) 0 .45px,transparent .65px),
+    radial-gradient(circle at 73% 61%,rgba(103,217,255,.45) 0 .35px,transparent .6px);
+  background-size:auto,7px 7px,11px 11px;
+  mix-blend-mode:screen;
+}
+.secure-grid { animation:soc-grid-drift 30s linear infinite; }
+@keyframes soc-grid-drift { from { background-position:0 0,0 0; } to { background-position:52px 26px,26px 52px; } }
+
+/* A short signal disturbance is reserved for actionable course/challenge
+   cards. It never touches form controls or normal reading surfaces. */
+@media (hover:hover) and (pointer:fine) {
+  .course-card:hover h3,.ctf-card:hover .ctf-name,.game-card:hover h3 {
+    animation:soc-signal-glitch .64s steps(2,end) 1 both;
+  }
+  .course-card:hover,.ctf-card:hover,.game-card:hover {
+    animation:soc-card-pulse .7s ease-out 1 both;
+  }
+}
+@keyframes soc-signal-glitch {
+  0% { text-shadow:none; transform:translateX(0); }
+  22% { text-shadow:2px 0 rgba(89,220,255,.72),-2px 0 rgba(157,107,255,.48); transform:translateX(1px); }
+  43% { text-shadow:-1px 0 rgba(89,220,255,.62),1px 0 rgba(157,107,255,.4); transform:translateX(-1px); }
+  100% { text-shadow:0 0 12px rgba(89,220,255,.18); transform:translateX(0); }
+}
+@keyframes soc-card-pulse { 0% { box-shadow:inherit; } 48% { box-shadow:0 0 0 1px rgba(89,220,255,.38),0 0 28px rgba(54,206,255,.17); } 100% { box-shadow:inherit; } }
+body.radar-paused .secure-grid { animation-play-state:paused; }
+
+@media (max-width:760px),(prefers-reduced-motion:reduce) {
+  .app::after { display:none; }
+  .secure-grid { animation:none!important; }
+  .course-card:hover h3,.ctf-card:hover .ctf-name,.game-card:hover h3,
+  .course-card:hover,.ctf-card:hover,.game-card:hover { animation:none!important; }
+}
