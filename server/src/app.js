@@ -12,6 +12,7 @@ const env = require('./config/env');
 const authRoutes = require('./routes/auth.routes');
 const learningRoutes = require('./routes/learning.routes');
 const userRoutes = require('./routes/user.routes');
+const publicRoutes = require('./routes/public.routes');
 const { generalLimiter } = require('./middleware/rateLimit');
 const { errorHandler, notFoundHandler } = require('./middleware/errors');
 
@@ -98,6 +99,7 @@ app.use('/api', generalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/learning', learningRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/public', publicRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true, env: env.NODE_ENV }));
 

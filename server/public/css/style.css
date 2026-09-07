@@ -2482,6 +2482,7 @@ body.booting .secure-boot-screen { display:grid; }.boot-mark { position:relative
 /* 360 gateway: keep the unauthenticated visit intentionally focused. */
 body.auth-locked { background:#040b19; }
 body.auth-locked .app-head,
+body.auth-locked .platform-status,
 body.auth-locked .primary-nav,
 body.auth-locked .mobile-nav-toggle,
 body.auth-locked .mode-toggle,
@@ -2899,6 +2900,37 @@ body:not(.auth-locked)::after { width:min(34vw,480px); height:min(56vh,650px); i
 @supports (animation-timeline:auto) { .reveal-on-scroll { opacity:0; transform:translateY(14px); transition:opacity .42s ease var(--reveal-delay,0ms),transform .42s cubic-bezier(.2,.75,.25,1) var(--reveal-delay,0ms); }.reveal-on-scroll.is-revealed { opacity:1; transform:translateY(0); } }
 @media (max-width:760px) { body:not(.auth-locked)::before { background-size:72px 72px,72px 72px,auto,auto; opacity:.34; } body:not(.auth-locked)::after { display:none; }.topbar.is-condensed .topbar-inner { min-height:58px; }.secure-hero { box-shadow:0 18px 44px rgba(0,0,0,.25); }.certificate-sheet-image::after { inset:20px; } }
 @media (prefers-reduced-motion:reduce) { .topbar,.btn,.primary-nav .tab,.more-menu-trigger,.org-arrow-btn,.reveal-on-scroll { transition:none!important; }.reveal-on-scroll { opacity:1!important; transform:none!important; }.course-card,.about-card,.event-card,.ctf-card,.game-card { transform:none!important; } }
+
+/* Bilingual command bar: logical sizing keeps the language control clear of
+   account/name content at every direction and breakpoint. */
+.topbar-inner { column-gap:clamp(8px,1.4vw,18px); }
+.actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; min-inline-size:0; }
+.lang-switcher { position:relative; display:inline-flex; align-items:stretch; inline-size:max-content; min-inline-size:148px; min-block-size:38px; padding:3px; isolation:isolate; overflow:hidden; direction:ltr; border-radius:10px; }
+.lang-switcher-thumb { display:none; }
+.lang-btn { position:relative; z-index:1; flex:1 1 0; min-inline-size:0; padding:6px 10px; border-radius:7px; text-align:center; white-space:nowrap; transform:none!important; }
+.lang-btn.active { background:rgba(39,216,255,.19)!important; box-shadow:inset 0 0 0 1px rgba(89,220,255,.28),0 0 16px rgba(39,216,255,.12); }
+.topbar-account { min-inline-size:0; max-inline-size:180px; }
+.topbar-account-trigger { min-inline-size:0; max-inline-size:100%; }
+#header-profile-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.more-menu { display:flex; align-items:center; gap:3px; position:relative; }
+.security-lab-trigger { display:inline-flex; align-items:center; gap:7px; min-height:34px; padding:7px 10px; color:#dffaff; border:1px solid rgba(89,220,255,.32); border-radius:7px; background:rgba(89,220,255,.08); font:800 11px/1 inherit; white-space:nowrap; cursor:pointer; }
+.security-lab-trigger:hover,.security-lab-trigger:focus-visible { border-color:var(--cyber-cyan); background:rgba(89,220,255,.15); box-shadow:0 0 16px rgba(89,220,255,.14); outline:none; }
+.security-lab-scan { position:relative; inline-size:12px; block-size:12px; border:1px solid currentColor; border-radius:50%; }
+.security-lab-scan::after { content:""; position:absolute; inset:2px; border-radius:50%; background:currentColor; box-shadow:0 0 8px currentColor; }
+.more-menu.is-scanning .security-lab-scan { animation:lab-scan .7s ease-out 1; }
+@keyframes lab-scan { 50% { transform:scale(1.7); opacity:.2; } }
+.security-lab-label { color:var(--cyber-cyan)!important; border-block-end:1px solid rgba(89,220,255,.17); padding-block-end:8px; margin-block-end:2px!important; }
+.platform-status { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:9px; max-inline-size:1180px; margin:0 auto 14px; padding:9px 14px; color:#bcd4e8; border:1px solid rgba(89,220,255,.16); border-radius:8px; background:rgba(8,22,43,.48); font:700 11px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.03em; }
+.platform-status-dot { inline-size:7px; block-size:7px; border-radius:50%; background:#50e3a4; box-shadow:0 0 10px rgba(80,227,164,.7); }
+.platform-status-separator { color:rgba(89,220,255,.45); }
+html[dir="ltr"] .primary-nav .tab,html[dir="ltr"] .more-menu-panel,html[dir="ltr"] .about-card,html[dir="ltr"] .about-card li { text-align:left; direction:ltr; }
+html[dir="rtl"] .primary-nav .tab,html[dir="rtl"] .more-menu-panel,html[dir="rtl"] .about-card,html[dir="rtl"] .about-card li { text-align:right; direction:rtl; }
+.about-card ul { padding-inline-start:1.35rem!important; padding-inline-end:0!important; }
+html[dir="rtl"] .about-card ul { padding-inline-start:1.35rem!important; padding-inline-end:0!important; }
+@media (max-width:1120px) { .topbar-inner { grid-template-columns:max-content minmax(0,1fr) max-content; } .site-brand > span:last-child { display:none; } .lang-switcher { min-inline-size:132px; } .lang-btn { padding-inline:7px; } .security-lab-trigger { padding-inline:8px; } }
+@media (max-width:760px) { .topbar-inner { grid-template-columns:minmax(0,1fr) max-content; } .actions { grid-column:2; grid-row:1; } .topbar-account { max-inline-size:42px; } .lang-switcher { min-inline-size:112px; min-block-size:34px; } .lang-btn { padding-inline:5px; font-size:10px; } .topbar-inner > .primary-nav { grid-column:1/-1; grid-row:2; } .primary-nav { overflow:visible; } .security-lab-trigger { font-size:10px; padding:8px; } }
+@media (max-width:520px) { .topbar-inner { grid-template-columns:minmax(0,1fr) max-content; } .actions { gap:4px; } .lang-switcher { min-inline-size:104px; } .lang-btn { font-size:9px; } .security-lab-trigger { flex:1 1 auto; justify-content:center; } .more-menu { min-inline-size:0; } .more-menu-trigger { padding-inline:7px; } }
+@media (prefers-reduced-motion:reduce) { .more-menu.is-scanning .security-lab-scan { animation:none; } }
 
 /* ========================================================================
    SOC SYSTEM / phase 2

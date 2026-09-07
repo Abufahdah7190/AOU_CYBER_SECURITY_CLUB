@@ -26,9 +26,14 @@
   },
   "navigation": {
     "menu": "القائمة",
+    "securityLab": "مختبر الأمن",
     "more": "المزيد",
     "explore": "استكشف المنصة",
     "access": "الدخول"
+  },
+  "status": {
+    "activeMembers": "أعضاء نشطون: {count}",
+    "issuedCertificates": "شهادات صادرة: {count}"
   },
   "home": {
     "title": "تعريف النادي وأهدافه",

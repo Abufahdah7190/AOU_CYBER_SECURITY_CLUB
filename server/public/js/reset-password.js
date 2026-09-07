@@ -4,6 +4,8 @@
   const message = document.getElementById('reset-message');
   const API_BASE = (window.CYBERCLUB_API_BASE || '').replace(/\/$/, '');
   const token = new URLSearchParams(window.location.search).get('token');
+  const en = () => window.i18n?.lang === 'en';
+  const text = (key) => ({ saving: en() ? 'Saving…' : 'جارٍ الحفظ...', save: en() ? 'Save new password' : 'حفظ كلمة المرور الجديدة', invalid: en() ? 'The reset link is invalid or missing its token.' : 'رابط إعادة التعيين غير صالح أو لا يحتوي على رمز.', mismatch: en() ? 'Password confirmation does not match.' : 'تأكيد كلمة المرور غير مطابق.', failed: en() ? 'Password reset could not be completed.' : 'تعذر إعادة تعيين كلمة المرور.', success: en() ? 'Your password was changed. You can now sign in.' : 'تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.' }[key]);
 
   function showMessage(text, type) {
     message.textContent = text;
@@ -13,16 +15,16 @@
   function setBusy(busy) {
     const button = form.querySelector('button[type="submit"]');
     button.disabled = busy;
-    button.textContent = busy ? 'جارٍ الحفظ...' : 'حفظ كلمة المرور الجديدة';
+    button.textContent = busy ? text('saving') : text('save');
   }
 
   form.addEventListener('submit', async function (event) {
     event.preventDefault();
     if (!form.reportValidity()) return;
-    if (!token) return showMessage('رابط إعادة التعيين غير صالح أو لا يحتوي على رمز.', 'error');
+    if (!token) return showMessage(text('invalid'), 'error');
     const newPassword = document.getElementById('new-password').value;
     const confirmation = document.getElementById('confirm-password').value;
-    if (newPassword !== confirmation) return showMessage('تأكيد كلمة المرور غير مطابق.', 'error');
+    if (newPassword !== confirmation) return showMessage(text('mismatch'), 'error');
     setBusy(true);
     try {
       const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
@@ -32,13 +34,14 @@
         body: JSON.stringify({ token, newPassword }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error((data.error || 'تعذر إعادة تعيين كلمة المرور.') + (Array.isArray(data.details) ? ` ${data.details.join(' ')}` : ''));
+      if (!response.ok) throw new Error(text('failed'));
       form.reset();
-      showMessage('تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.', 'success');
+      showMessage(text('success'), 'success');
     } catch (error) {
       showMessage(error.message, 'error');
     } finally {
       setBusy(false);
     }
   });
+  document.addEventListener('languagechange', () => { if (!form.querySelector('button[type="submit"]').disabled) setBusy(false); });
 })();

@@ -144,5 +144,6 @@
     document.addEventListener('auth:ready', loadState);
     loadState();
   }
+  document.addEventListener('languagechange', render);
   document.addEventListener('DOMContentLoaded', init);
 })();

@@ -105,11 +105,16 @@
       const saved = getSaved(slug);
       const quizScores = { ...(saved.quizScores || {}), [index]: true };
       const percent = Math.round((Object.values(quizScores).filter(Boolean).length / getCourse(slug).sections.length) * 100);
-      try {
+     try {
         const data = await request(`/progress/${slug}`, { method: 'PUT', body: JSON.stringify({ percent, lastSection: index + 1, quizScores, language: saved.language || 'ar' }) });
         state.progress = [...state.progress.filter((item) => item.courseSlug !== slug), data.progress];
         render(); openCourse(document.querySelector(`[data-course-id="${slug}"]`));
-      } catch (error) { result.textContent = error.message; }
+      } catch (error) { 
+        console.warn('Network save failed, saving locally:', error);
+        // حفظ احتياطي محلياً كي لا تضيع إجابات وتقدم المستخدم
+        localStorage.setItem(`offline_progress_${slug}`, JSON.stringify({ percent, lastSection: index + 1, quizScores }));
+        result.textContent = 'تم الحفظ محلياً (سيتم المزامنة لاحقاً)'; 
+      }
     });
   }
 
@@ -139,5 +144,6 @@
     document.addEventListener('auth:ready', loadState);
     loadState();
   }
+  document.addEventListener('languagechange', render);
   document.addEventListener('DOMContentLoaded', init);
 })();

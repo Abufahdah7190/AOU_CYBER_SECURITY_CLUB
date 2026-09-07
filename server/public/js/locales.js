@@ -13,6 +13,7 @@ window.LOCALES = {
     },
     "tab": {
       "home": "الرئيسية",
+      "learning": "الدورات",
       "ourEvents": "فعاليتنا",
       "challenges": "التحديات",
       "securityTips": "نصائح أمنية",
@@ -24,6 +25,17 @@ window.LOCALES = {
       "cybermap": "خريطة الهجمات",
       "securityInfo": "معلومات الأمان",
       "learningResources": "مصادر التعلم السيبرانية"
+    },
+    "navigation": {
+      "menu": "القائمة",
+      "securityLab": "مختبر الأمن",
+      "more": "المزيد",
+      "explore": "استكشف المنصة",
+      "access": "الدخول"
+    },
+    "status": {
+      "activeMembers": "أعضاء نشطون: {count}",
+      "issuedCertificates": "شهادات صادرة: {count}"
     },
     "home": {
       "title": "تعريف النادي وأهدافه",
@@ -568,6 +580,7 @@ window.LOCALES = {
     },
     "tab": {
       "home": "Home",
+      "learning": "Courses",
       "ourEvents": "Our Events",
       "challenges": "Challenges",
       "securityTips": "Security Tips",
@@ -579,6 +592,17 @@ window.LOCALES = {
       "cybermap": "Attack Map",
       "securityInfo": "Security Info",
       "learningResources": "Cyber Learning Resources"
+    },
+    "navigation": {
+      "menu": "Menu",
+      "securityLab": "Security Lab",
+      "more": "More",
+      "explore": "Explore the platform",
+      "access": "Access"
+    },
+    "status": {
+      "activeMembers": "Active members: {count}",
+      "issuedCertificates": "Certificates issued: {count}"
     },
     "home": {
       "title": "Club Introduction and Goals",
@@ -1111,9 +1135,3 @@ window.LOCALES = {
     }
   }
 };
-// Navigation labels are kept here as well as in locales/*.json because this
-// file is the browser-ready locale bundle used by the static deployment.
-window.LOCALES.ar.tab.learning = 'الدورات';
-window.LOCALES.en.tab.learning = 'Courses';
-window.LOCALES.ar.navigation = { menu: 'القائمة', more: 'المزيد', explore: 'استكشف المنصة', access: 'الدخول' };
-window.LOCALES.en.navigation = { menu: 'Menu', more: 'More', explore: 'Explore the platform', access: 'Access' };

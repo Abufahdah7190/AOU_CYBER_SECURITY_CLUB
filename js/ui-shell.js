@@ -11,7 +11,35 @@
   const nav = document.getElementById('primary-nav');
   const moreMenu = document.getElementById('more-menu');
   const moreTrigger = document.getElementById('more-menu-trigger');
+  const securityLabTrigger = document.getElementById('security-lab-trigger');
   const morePanel = document.getElementById('more-menu-panel');
+  const statusStrip = document.getElementById('platform-status');
+  let publicStatus = null;
+
+  const interpolate = (key, count) => {
+    const template = window.i18n?.t(key, '') || '';
+    return template.replace('{count}', new Intl.NumberFormat(document.documentElement.lang === 'en' ? 'en' : 'ar-SA').format(count));
+  };
+  const renderPublicStatus = () => {
+    if (!statusStrip || !publicStatus?.available) return;
+    const members = document.getElementById('platform-status-members');
+    const certificates = document.getElementById('platform-status-certificates');
+    if (members) members.textContent = interpolate('status.activeMembers', publicStatus.activeMembers);
+    if (certificates) certificates.textContent = interpolate('status.issuedCertificates', publicStatus.issuedCertificates);
+    statusStrip.hidden = false;
+  };
+  const loadPublicStatus = async () => {
+    if (!statusStrip) return;
+    try {
+      const response = await fetch('/api/public/status', { headers: { Accept: 'application/json' }, cache: 'force-cache' });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.available || !Number.isInteger(data.activeMembers) || !Number.isInteger(data.issuedCertificates)) return;
+      publicStatus = data;
+      renderPublicStatus();
+    } catch (_) { /* Optional public metadata stays absent on network failure. */ }
+  };
+  document.addEventListener('languagechange', renderPublicStatus);
+  loadPublicStatus();
   // Keep visual enhancement work event-driven: one observer and a rAF-scrolled
   // class, never a continuous animation loop. Content is readable before reveal.
   const installVisualEnhancements = () => {
@@ -88,12 +116,17 @@
     toggle?.setAttribute('aria-expanded', String(open));
     if (open) nav.querySelector('.tab')?.focus();
   };
-  const setMoreMenu = (open, { focus = false } = {}) => {
+  const setMoreMenu = (open, { focus = false, lab = false } = {}) => {
     if (!moreMenu || !moreTrigger || !morePanel) return;
     moreMenu.classList.toggle('is-open', open);
+    moreMenu.classList.toggle('is-scanning', open && lab);
     moreTrigger.setAttribute('aria-expanded', String(open));
+    securityLabTrigger?.setAttribute('aria-expanded', String(open));
     morePanel.hidden = !open;
-    if (open && focus) morePanel.querySelector('[role="menuitem"]')?.focus();
+    if (open && focus) {
+      const firstTool = morePanel.querySelector('[data-tab="link"], [role="menuitem"]');
+      firstTool?.focus();
+    }
   };
   toggle?.addEventListener('click', () => {
     const willOpen = !body.classList.contains('nav-open');
@@ -104,6 +137,11 @@
     const willOpen = morePanel.hidden;
     setMenu(false);
     setMoreMenu(willOpen);
+  });
+  securityLabTrigger?.addEventListener('click', () => {
+    const willOpen = morePanel.hidden;
+    setMenu(false);
+    setMoreMenu(willOpen, { focus: willOpen, lab: true });
   });
   nav.addEventListener('click', (event) => {
     if (event.target.closest('.tab')) {

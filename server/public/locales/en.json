@@ -26,9 +26,14 @@
   },
   "navigation": {
     "menu": "Menu",
+    "securityLab": "Security Lab",
     "more": "More",
     "explore": "Explore the platform",
     "access": "Access"
+  },
+  "status": {
+    "activeMembers": "Active members: {count}",
+    "issuedCertificates": "Certificates issued: {count}"
   },
   "home": {
     "title": "Club Introduction and Goals",

@@ -276,7 +276,7 @@
         result.textContent = lang === 'ar' ? 'اكتمل التقدم، لكن تعذر إصدار الشهادة الآن. أعد تحميل الصفحة وحاول مرة أخرى.' : 'Progress was completed, but the certificate could not be issued. Reload and try again.';
       }
     } catch (error) {
-      if (result) result.textContent = `${lang === 'ar' ? 'تعذر حفظ التقدم. ' : 'Could not save progress. '}${error.message}`;
+      if (result) result.textContent = lang === 'ar' ? 'تعذر حفظ التقدم. حاول مرة أخرى.' : 'Progress could not be saved. Please try again.';
       return;
     } finally {
       isCompleting = false;
@@ -304,5 +304,8 @@
   $('previous-lesson').addEventListener('click', () => { if (current > 0) { current -= 1; render(); } });
   $('complete-lesson').addEventListener('click', completeLesson);
   document.querySelectorAll('[data-course-lang]').forEach((button) => button.addEventListener('click', () => { lang = button.dataset.courseLang; localStorage.setItem('club-lang', lang); render(); }));
+  // The page-level language control is shared with the rest of the platform.
+  // Re-render only the view; course/progress data remains untouched.
+  document.addEventListener('languagechange', (event) => { const next = event.detail?.lang; if (next === 'ar' || next === 'en') { lang = next; localStorage.setItem('club-lang', lang); render(); } });
   init();
 })();
