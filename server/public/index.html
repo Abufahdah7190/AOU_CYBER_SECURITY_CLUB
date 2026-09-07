@@ -27,12 +27,33 @@
 <body class="auth-locked">
 <script>document.body.classList.add('booting');</script>
 <div class="secure-boot-screen" aria-live="polite" aria-label="Initializing secure environment"><div class="boot-mark"><span></span><span></span><span></span></div><p>CYBERCLUB / INITIALIZING</p><small>SECURE ENVIRONMENT · AOU RIYADH</small></div>
-<div class="topbar">
+<div class="topbar" data-gateway-masthead>
 <div class="topbar-inner">
-<a class="site-brand" href="#tab-home" aria-label="نادي الأمن السيبراني"><span class="site-brand-mark">C</span><span><b>CYBERCLUB</b><small>AOU · RIYADH</small></span></a>
-<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span></span><span></span><span></span><b>القائمة</b></button>
+<a class="site-brand" href="#tab-auth" aria-label="نادي الأمن السيبراني"><span class="site-brand-mark">C</span><span><b>CYBERCLUB</b><small>AOU · RIYADH</small></span></a>
+<button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span></span><span></span><span></span><b data-i18n="navigation.menu">القائمة</b></button>
 <nav class="primary-nav" id="primary-nav" aria-label="التنقل الرئيسي">
-<button class="tab active" type="button" data-tab="home" aria-controls="tab-home">الرئيسية</button><button class="tab" type="button" data-tab="our-events" aria-controls="tab-our-events">فعاليتنا</button><button class="tab" type="button" data-tab="challenges" aria-controls="tab-challenges">التحديات</button><button class="tab" type="button" data-tab="learning" aria-controls="tab-learning">الدورات</button><button class="tab" type="button" data-tab="security-tips" aria-controls="tab-security-tips">نصائح أمنية</button><button class="tab" type="button" data-tab="link" aria-controls="tab-link">الكاشف السيبراني</button><button class="tab" type="button" data-tab="pw" aria-controls="tab-pw">مدقّق كلمات المرور</button><button class="tab" type="button" data-tab="games" aria-controls="tab-games">ألعاب</button><button class="tab" type="button" data-tab="quiz" aria-controls="tab-quiz">اختبار</button><button class="tab" type="button" data-tab="simulator" aria-controls="tab-simulator">المحاكي</button><button class="tab" type="button" data-tab="cybermap" aria-controls="tab-cybermap">خريطة الهجمات</button><button class="tab" type="button" data-tab="security-info" aria-controls="tab-security-info">معلومات الأمان</button><button class="tab" type="button" data-tab="learning-resources" aria-controls="tab-learning-resources">مصادر التعلّم</button><button class="tab auth-tab" type="button" data-tab="auth" aria-controls="tab-auth">الدخول</button>
+<div class="primary-nav-links" role="list">
+<button class="tab active" type="button" data-i18n="tab.home" data-tab="home" aria-controls="tab-home">الرئيسية</button>
+<button class="tab" type="button" data-i18n="tab.learning" data-tab="learning" aria-controls="tab-learning">الدورات</button>
+<button class="tab" type="button" data-i18n="tab.ourEvents" data-tab="our-events" aria-controls="tab-our-events">فعاليتنا</button>
+<button class="tab" type="button" data-i18n="tab.challenges" data-tab="challenges" aria-controls="tab-challenges">التحديات</button>
+</div>
+<div class="more-menu" id="more-menu">
+<button class="more-menu-trigger" id="more-menu-trigger" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="more-menu-panel"><span data-i18n="navigation.more">المزيد</span><span aria-hidden="true" class="more-menu-chevron">⌄</span></button>
+<div class="more-menu-panel" id="more-menu-panel" role="menu" hidden>
+<p class="more-menu-label" data-i18n="navigation.explore">استكشف المنصة</p>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.securityTips" data-tab="security-tips" aria-controls="tab-security-tips">نصائح أمنية</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.link" data-tab="link" aria-controls="tab-link">الكاشف السيبراني</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.pw" data-tab="pw" aria-controls="tab-pw">مدقّق كلمات المرور</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.games" data-tab="games" aria-controls="tab-games">ألعاب</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.quiz" data-tab="quiz" aria-controls="tab-quiz">اختبار</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.simulator" data-tab="simulator" aria-controls="tab-simulator">المحاكي</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.cybermap" data-tab="cybermap" aria-controls="tab-cybermap">خريطة الهجمات</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.securityInfo" data-tab="security-info" aria-controls="tab-security-info">معلومات الأمان</button>
+<button class="tab" role="menuitem" type="button" data-i18n="tab.learningResources" data-tab="learning-resources" aria-controls="tab-learning-resources">مصادر التعلّم</button>
+<button class="tab auth-tab" role="menuitem" type="button" data-i18n="navigation.access" data-tab="auth" aria-controls="tab-auth">الدخول</button>
+</div>
+</div>
 </nav>
 <div class="actions">
 <div class="topbar-account" data-account-menu hidden>
@@ -85,47 +106,47 @@
 <div class="panel-wrap">
 <section class="panel auth-panel" id="tab-auth" style="display:block">
   <div class="auth-shell">
-    <div class="auth-heading"><span class="auth-kicker">CYBERCLUB ACCOUNT</span><h2>حسابك في نادي الأمن السيبراني</h2><p>سجّل الدخول لمتابعة حسابك، أو أنشئ حسابًا جديدًا للانضمام إلى المنصة.</p></div>
+    <div class="auth-heading"><span class="auth-kicker" data-i18n="auth.kicker">CYBERCLUB / SECURE ACCESS</span><h2 data-i18n="auth.title">بوابة نادي الأمن السيبراني</h2><p data-i18n="auth.subtitle">سجّل الدخول إلى مسارك التعليمي، أو أنشئ حسابك الجامعي للانضمام إلى المنصة.</p></div>
     <div class="auth-card" data-auth-card>
       <aside class="auth-welcome" aria-live="polite">
         <span class="auth-welcome-mark" aria-hidden="true">◈</span>
         <p class="auth-welcome-eyebrow">CYBERCLUB / AOU</p>
-        <h3 data-auth-welcome-title>مرحبًا بعودتك</h3>
-        <p data-auth-welcome-copy>سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.</p>
-        <span class="auth-welcome-status"><i aria-hidden="true"></i> حماية الحساب مفعّلة</span>
+        <h3 data-auth-welcome-title data-i18n="auth.welcomeBack">مرحبًا بعودتك</h3>
+        <p data-auth-welcome-copy data-i18n="auth.welcomeBackCopy">سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.</p>
+        <span class="auth-welcome-status"><i aria-hidden="true"></i><span data-i18n="auth.protected">حماية الحساب مفعّلة</span></span>
       </aside>
       <div class="auth-form-stage">
     <div class="auth-switcher" role="tablist" aria-label="اختيار نوع العملية">
-      <button class="auth-switch active" id="auth-login-tab" type="button" role="tab" aria-selected="true" aria-controls="login-form" data-auth-view="login">تسجيل الدخول</button>
-      <button class="auth-switch" id="auth-register-tab" type="button" role="tab" aria-selected="false" aria-controls="register-form" tabindex="-1" data-auth-view="register">إنشاء حساب</button>
+      <button class="auth-switch active" id="auth-login-tab" type="button" role="tab" aria-selected="true" aria-controls="login-form" data-auth-view="login" data-i18n="auth.login">تسجيل الدخول</button>
+      <button class="auth-switch" id="auth-register-tab" type="button" role="tab" aria-selected="false" aria-controls="register-form" tabindex="-1" data-auth-view="register" data-i18n="auth.register">إنشاء حساب</button>
     </div>
     <div class="auth-message" id="auth-message" role="status" aria-live="polite"></div>
     <form class="auth-form" id="login-form" role="tabpanel" aria-labelledby="auth-login-tab" novalidate>
-      <div class="auth-field"><label for="login-email">البريد الإلكتروني</label><input id="login-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa"></div>
-      <div class="auth-field"><label for="login-password">كلمة المرور</label><input id="login-password" name="password" type="password" autocomplete="current-password" required></div>
-      <button class="btn primary auth-submit" type="submit">دخول آمن</button>
-      <button class="auth-link" type="button" data-auth-forgot-open>نسيت كلمة المرور؟</button>
+      <div class="auth-field"><label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="login-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa"></div>
+      <div class="auth-field"><label for="login-password" data-i18n="auth.password">كلمة المرور</label><input id="login-password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary auth-submit" type="submit" data-i18n="auth.secureLogin">دخول آمن</button>
+      <button class="auth-link" type="button" data-auth-forgot-open data-i18n="auth.forgot">نسيت كلمة المرور؟</button>
     </form>
     <form class="auth-form" id="forgot-form" hidden novalidate>
-      <div class="auth-form-intro"><h3>استعادة كلمة المرور</h3><p>أدخل بريدك الإلكتروني الجامعي وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p></div>
-      <div class="auth-field"><label for="forgot-email">البريد الإلكتروني</label><input id="forgot-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
-      <button class="btn primary auth-submit" type="submit">إرسال رابط الاستعادة</button>
-      <button class="auth-link" type="button" data-auth-forgot-back>العودة إلى تسجيل الدخول</button>
+      <div class="auth-form-intro"><h3 data-i18n="auth.recoveryFormTitle">استعادة كلمة المرور</h3><p data-i18n="auth.recoveryFormCopy">أدخل بريدك الإلكتروني الجامعي وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p></div>
+      <div class="auth-field"><label for="forgot-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="forgot-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" data-i18n-title="auth.universityEmailTitle" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
+      <button class="btn primary auth-submit" type="submit" data-i18n="auth.sendRecovery">إرسال رابط الاستعادة</button>
+      <button class="auth-link" type="button" data-auth-forgot-back data-i18n="auth.backToLogin">العودة إلى تسجيل الدخول</button>
     </form>
     <form class="auth-form" id="register-form" role="tabpanel" aria-labelledby="auth-register-tab" hidden novalidate>
       <div class="auth-grid">
-        <div class="auth-field"><label for="register-first-name">الاسم الأول</label><input id="register-first-name" name="firstName" type="text" autocomplete="given-name" required minlength="2"></div>
-        <div class="auth-field"><label for="register-last-name">اسم العائلة</label><input id="register-last-name" name="lastName" type="text" autocomplete="family-name" required minlength="2"></div>
+        <div class="auth-field"><label for="register-first-name" data-i18n="auth.firstName">الاسم الأول</label><input id="register-first-name" name="firstName" type="text" autocomplete="given-name" required minlength="2"></div>
+        <div class="auth-field"><label for="register-last-name" data-i18n="auth.lastName">اسم العائلة</label><input id="register-last-name" name="lastName" type="text" autocomplete="family-name" required minlength="2"></div>
       </div>
-      <div class="auth-field"><label for="register-email">البريد الإلكتروني</label><input id="register-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
+      <div class="auth-field"><label for="register-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="register-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" data-i18n-title="auth.universityEmailTitle" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
       <div class="auth-grid">
-        <div class="auth-field"><label for="register-phone">رقم الهاتف</label><input id="register-phone" name="phone" type="tel" autocomplete="tel" required placeholder="05xxxxxxxx"></div>
-        <div class="auth-field auth-choice-field"><label for="register-major">التخصص</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">⌘</span><select id="register-major" name="major" required><option value="">اختر تخصصك الأكاديمي</option><option>علوم الحاسب</option><option>أمن الشبكات</option><option>تقنية المعلومات والحوسبة</option><option>الحوسبة والأعمال</option><option>تطوير الويب</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help">يساعدنا ذلك على تخصيص مسارك التعليمي.</small></div>
+        <div class="auth-field"><label for="register-phone" data-i18n="auth.phone">رقم الهاتف</label><input id="register-phone" name="phone" type="tel" autocomplete="tel" required placeholder="05xxxxxxxx"></div>
+        <div class="auth-field auth-choice-field"><label for="register-major" data-i18n="auth.major">التخصص</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">⌘</span><select id="register-major" name="major" required><option value="" data-i18n="auth.chooseMajor">اختر تخصصك الأكاديمي</option><option data-i18n="auth.majorCs">علوم الحاسب</option><option data-i18n="auth.majorNetwork">أمن الشبكات</option><option data-i18n="auth.majorIt">تقنية المعلومات والحوسبة</option><option data-i18n="auth.majorBusiness">الحوسبة والأعمال</option><option data-i18n="auth.majorWeb">تطوير الويب</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help" data-i18n="auth.majorHelp">يساعدنا ذلك على تخصيص مسارك التعليمي.</small></div>
       </div>
-      <div class="auth-field auth-choice-field"><label for="register-gender">الجنس</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">◉</span><select id="register-gender" name="gender" required><option value="">اختر الجنس</option><option value="male">ذكر</option><option value="female">أنثى</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help">تُستخدم هذه المعلومة لملفك الشخصي فقط.</small></div>
-      <div class="auth-field"><label for="register-password">كلمة المرور</label><input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="10"><small>10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.</small></div>
-      <div class="auth-field"><label for="register-password-confirm">تأكيد كلمة المرور</label><input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" required minlength="10"></div>
-      <button class="btn primary auth-submit" type="submit">إنشاء الحساب</button>
+      <div class="auth-field auth-choice-field"><label for="register-gender" data-i18n="auth.gender">الجنس</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">◉</span><select id="register-gender" name="gender" required><option value="" data-i18n="auth.chooseGender">اختر الجنس</option><option value="male" data-i18n="auth.male">ذكر</option><option value="female" data-i18n="auth.female">أنثى</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help" data-i18n="auth.genderHelp">تُستخدم هذه المعلومة لملفك الشخصي فقط.</small></div>
+      <div class="auth-field"><label for="register-password" data-i18n="auth.password">كلمة المرور</label><input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="10"><small data-i18n="auth.passwordHelp">10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.</small></div>
+      <div class="auth-field"><label for="register-password-confirm" data-i18n="auth.confirmPassword">تأكيد كلمة المرور</label><input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" required minlength="10"></div>
+      <button class="btn primary auth-submit" type="submit" data-i18n="auth.createAccount">إنشاء الحساب</button>
     </form>
     <div class="auth-user" id="auth-user" hidden><p>تم تسجيل الدخول باسم <strong id="auth-user-name"></strong>.</p><button class="btn ghost" id="logout-button" type="button">تسجيل الخروج</button></div>
       </div>
@@ -1108,7 +1129,6 @@
     </footer>
 </div>
 <!-- Three.js and Globe.gl -->
-<script src="js/vendor/globe.gl.min.js"></script>
 <script src="js/locales.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
@@ -1118,7 +1138,6 @@
 <script src="js/link-analysis.js"></script>
 <script src="js/file-analysis.js"></script>
 <script src="js/script.js"></script>
-<script src="js/globe-assets.js"></script>
 <script src="js/email-domain-suggest.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/learning.js"></script>

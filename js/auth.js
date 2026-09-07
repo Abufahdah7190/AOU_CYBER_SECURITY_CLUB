@@ -9,12 +9,13 @@
   const AUTH_URL = `${API_BASE}/api/auth`;
   const $ = (selector) => document.querySelector(selector);
   const UNIVERSITY_EMAIL_PATTERN = /^[^\s@]+@(aou\.edu\.sa|aou\.edu)$/i;
-  const UNIVERSITY_EMAIL_MESSAGE = 'الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي';
+  const tr = (key, fallback) => window.i18n?.t(key, fallback) || fallback;
+  const universityEmailMessage = () => tr('auth.universityEmailTitle', 'الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي');
 
   function validateUniversityEmailField(input) {
     const value = String(input?.value || '').trim();
     const isValid = !value || UNIVERSITY_EMAIL_PATTERN.test(value);
-    input?.setCustomValidity(isValid ? '' : UNIVERSITY_EMAIL_MESSAGE);
+    input?.setCustomValidity(isValid ? '' : universityEmailMessage());
     return isValid;
   }
 
@@ -22,7 +23,7 @@
     const input = form?.querySelector('input[name="email"]');
     if (!input || validateUniversityEmailField(input)) return true;
     input.closest('.auth-field')?.classList.add('field-invalid');
-    setMessage(UNIVERSITY_EMAIL_MESSAGE, 'error');
+    setMessage(universityEmailMessage(), 'error');
     input.focus();
     return false;
   }
@@ -56,7 +57,7 @@
     try { data = await response.json(); } catch (_) { /* empty response */ }
     if (!response.ok) {
       const details = Array.isArray(data.details) ? ` ${data.details.join(' ')}` : '';
-      throw new Error((data.error || 'تعذر تنفيذ الطلب.') + details);
+      throw new Error((data.error || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.')) + details);
     }
     return data;
   }
@@ -70,13 +71,13 @@
     if (!button) return;
     button.disabled = busy;
     button.dataset.originalText ||= button.textContent;
-    button.textContent = busy ? 'جارٍ التنفيذ...' : button.dataset.originalText;
+    button.textContent = busy ? tr('auth.working', 'جارٍ التنفيذ...') : button.dataset.originalText;
   }
 
   // These two panels are public footer forms (suggestions / join us) that
   // must stay reachable whether or not the visitor is logged in, so the
   // auth lock/unlock logic below skips them instead of forcing display:none.
-  const PUBLIC_PANEL_IDS = ['tab-contact', 'join-form-section'];
+  const PUBLIC_PANEL_IDS = [];
 
   function unlockSite() {
     document.body.classList.remove('auth-locked');
@@ -170,10 +171,10 @@
     });
     const welcomeTitle = document.querySelector('[data-auth-welcome-title]');
     const welcomeCopy = document.querySelector('[data-auth-welcome-copy]');
-    if (welcomeTitle) welcomeTitle.textContent = login ? 'مرحبًا بعودتك' : 'ابدأ رحلتك معنا';
+    if (welcomeTitle) welcomeTitle.textContent = login ? tr('auth.welcomeBack', 'مرحبًا بعودتك') : tr('auth.welcomeNew', 'ابدأ رحلتك معنا');
     if (welcomeCopy) welcomeCopy.textContent = login
-      ? 'سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.'
-      : 'أنشئ حسابك الجامعي وانضم إلى مجتمع النادي السيبراني.';
+      ? tr('auth.welcomeBackCopy', 'سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.')
+      : tr('auth.welcomeNewCopy', 'أنشئ حسابك الجامعي وانضم إلى مجتمع النادي السيبراني.');
     setMessage('');
   }
 
@@ -204,8 +205,8 @@
     document.querySelector('.auth-switcher').hidden = true;
     const welcomeTitle = document.querySelector('[data-auth-welcome-title]');
     const welcomeCopy = document.querySelector('[data-auth-welcome-copy]');
-    if (welcomeTitle) welcomeTitle.textContent = 'استعد الوصول لحسابك';
-    if (welcomeCopy) welcomeCopy.textContent = 'سنرسل رابطًا آمنًا إلى بريدك الجامعي لإعادة تعيين كلمة المرور.';
+    if (welcomeTitle) welcomeTitle.textContent = tr('auth.recoverTitle', 'استعد الوصول لحسابك');
+    if (welcomeCopy) welcomeCopy.textContent = tr('auth.recoverCopy', 'سنرسل رابطًا آمنًا إلى بريدك الجامعي لإعادة تعيين كلمة المرور.');
     setMessage('');
     $('#forgot-email')?.focus();
   }
@@ -254,10 +255,9 @@
     }
   }
 
-  function redirectToProfile() {
-    if (window.location.pathname.endsWith('/index.html') || window.location.pathname === '/') {
-      window.location.assign('profile.html');
-    }
+  function openPlatform() {
+    document.querySelector('[data-tab="home"]')?.click();
+    window.location.hash = 'tab-home';
   }
 
   async function handleLogin(event) {
@@ -269,8 +269,8 @@
     try {
       const data = await request('/login', { method: 'POST', body: JSON.stringify(formData(form)) });
       showUser(data.user);
-      setMessage('تم تسجيل الدخول بنجاح. جارٍ فتح ملفك الشخصي...', 'success');
-      window.setTimeout(redirectToProfile, 120);
+      setMessage(tr('auth.loginSuccess', 'تم تسجيل الدخول بنجاح. جارٍ فتح المنصة...'), 'success');
+      window.setTimeout(openPlatform, 120);
     } catch (error) {
       setMessage(error.message, 'error');
     } finally {
@@ -284,7 +284,7 @@
     const emptyFields = requiredFields.filter((field) => !String(field.value || '').trim());
     emptyFields.forEach((field) => field.closest('.auth-field')?.classList.add('field-invalid'));
     if (emptyFields.length) {
-      setMessage('يرجى تعبئة جميع الحقول المطلوبة قبل إنشاء الحساب.', 'error');
+      setMessage(tr('auth.requiredFields', 'يرجى تعبئة جميع الحقول المطلوبة قبل إنشاء الحساب.'), 'error');
       emptyFields[0].focus();
       return false;
     }
@@ -298,7 +298,7 @@
     if (!validateRegisterFields(form)) return;
     const values = formData(form);
     if (values.password !== values.passwordConfirm) {
-      setMessage('تأكيد كلمة المرور غير مطابق.', 'error');
+      setMessage(tr('auth.passwordMismatch', 'تأكيد كلمة المرور غير مطابق.'), 'error');
       $('#register-password-confirm')?.focus();
       return;
     }
@@ -308,8 +308,8 @@
     try {
       const data = await request('/register', { method: 'POST', body: JSON.stringify(values) });
       showUser(data.user);
-      setMessage('تم إنشاء الحساب وتسجيل الدخول بنجاح. جارٍ فتح ملفك الشخصي...', 'success');
-      window.setTimeout(redirectToProfile, 120);
+      setMessage(tr('auth.registerSuccess', 'تم إنشاء الحساب وتسجيل الدخول بنجاح. جارٍ فتح المنصة...'), 'success');
+      window.setTimeout(openPlatform, 120);
     } catch (error) {
       setMessage(error.message, 'error');
     } finally {
@@ -323,7 +323,7 @@
     try {
       await request('/logout', { method: 'POST', body: '{}' });
       showForms();
-      setMessage('تم تسجيل الخروج بنجاح.', 'success');
+      setMessage(tr('auth.logoutSuccess', 'تم تسجيل الخروج بنجاح.'), 'success');
     } catch (error) {
       setMessage(error.message, 'error');
     } finally {
@@ -382,6 +382,10 @@
       switchView('login');
     });
     loadCurrentUser();
+    document.addEventListener('languagechange', () => {
+      const active = document.querySelector('[data-auth-view].active');
+      if (active) switchView(active.dataset.authView);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAuth);

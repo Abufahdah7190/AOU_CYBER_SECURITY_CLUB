@@ -46,21 +46,30 @@
     { bytes: [0x89, 0x50, 0x4e, 0x47], format: 'PNG image', kind: 'image' },
   ];
 
-  function readSignature(file) {
+  // One bounded read serves both signature and entropy checks. This avoids
+  // scheduling two FileReader operations for the same upload.
+  function readSample(file) {
     return new Promise((resolve) => {
+      const sampleSize = Math.min(file.size, 256 * 1024);
       const reader = new FileReader();
       reader.onload = () => {
         const bytes = new Uint8Array(reader.result);
+        let signature = null;
         for (const sig of SIGNATURES) {
           if (sig.bytes.every((b, i) => bytes[i] === b)) {
-            resolve(sig);
-            return;
+            signature = sig;
+            break;
           }
         }
-        resolve(null);
+        if (!bytes.length) return resolve({ signature, entropy: 0 });
+        const counts = new Uint32Array(256);
+        for (let i = 0; i < bytes.length; i++) counts[bytes[i]]++;
+        let entropy = 0;
+        for (let i = 0; i < 256; i++) if (counts[i]) { const p = counts[i] / bytes.length; entropy -= p * Math.log2(p); }
+        resolve({ signature, entropy });
       };
-      reader.onerror = () => resolve(null);
-      reader.readAsArrayBuffer(file.slice(0, 16));
+      reader.onerror = () => resolve({ signature: null, entropy: 0 });
+      reader.readAsArrayBuffer(file.slice(0, sampleSize));
     });
   }
 
@@ -72,30 +81,6 @@
    * its real payload) pushes entropy close to the theoretical maximum of 8.
    * Reads up to 256KB so large files stay fast to analyze in the browser.
    */
-  function readEntropy(file) {
-    return new Promise((resolve) => {
-      const sampleSize = Math.min(file.size, 256 * 1024);
-      const reader = new FileReader();
-      reader.onload = () => {
-        const bytes = new Uint8Array(reader.result);
-        if (bytes.length === 0) {
-          resolve(0);
-          return;
-        }
-        const counts = new Array(256).fill(0);
-        for (let i = 0; i < bytes.length; i++) counts[bytes[i]]++;
-        let entropy = 0;
-        for (let i = 0; i < 256; i++) {
-          if (counts[i] === 0) continue;
-          const p = counts[i] / bytes.length;
-          entropy -= p * Math.log2(p);
-        }
-        resolve(entropy);
-      };
-      reader.onerror = () => resolve(0);
-      reader.readAsArrayBuffer(file.slice(0, sampleSize));
-    });
-  }
 
   function getExtensionParts(filename) {
     const parts = filename.split('.');
@@ -132,8 +117,7 @@
 
     const isTooLarge = file.size > 25 * 1024 * 1024;
 
-    const signature = await readSignature(file);
-    const entropy = await readEntropy(file);
+    const { signature, entropy } = await readSample(file);
     // A mismatch worth flagging: the file's real binary signature is an
     // executable format, but the extension doesn't say so (extension lied,
     // or was stripped/renamed).

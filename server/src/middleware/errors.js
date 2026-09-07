@@ -26,14 +26,15 @@ function handleValidation(req, res, next) {
  * معلومات حساسة في responses") — those go to the server log only.
  */
 function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
-  console.error('Unhandled error:', err);
-  const databaseError = Boolean(err && (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === '57P01' || /^08/.test(String(err.code || ''))));
+  const tlsError = Boolean(err && (err.code === 'DEPTH_ZERO_SELF_SIGNED_CERT' || err.code === 'SELF_SIGNED_CERT_IN_CHAIN' || /self-signed certificate|certificate verify failed|unable to verify/i.test(String(err.message || ''))));
+  console.error('Unhandled request error:', { code: err && err.code, name: err && err.name, tlsError });
+  const databaseError = Boolean(tlsError || (err && (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === '57P01' || /^08/.test(String(err.code || '')))));
   const browserPage = req.method === 'GET' && !req.path.startsWith('/api') && (req.headers.accept || '').includes('text/html');
   if (databaseError && browserPage && res.app.locals.maintenancePage) {
     return res.status(503).sendFile(res.app.locals.maintenancePage);
   }
   if (databaseError && req.path.startsWith('/api')) {
-    return res.status(503).json({ error: 'الخدمة غير متاحة مؤقتًا بسبب مشكلة في قاعدة البيانات' });
+    return res.status(503).json({ error: tlsError ? 'تعذر الاتصال الآمن بقاعدة البيانات مؤقتًا. تحقق من إعداد DATABASE_URL ثم أعد المحاولة.' : 'الخدمة غير متاحة مؤقتًا بسبب مشكلة في قاعدة البيانات' });
   }
 
   // Postgres unique_violation (duplicate email etc.) surfaced generically

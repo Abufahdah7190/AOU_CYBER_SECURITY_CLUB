@@ -61,9 +61,30 @@
   let ratePerSecond = 0;
   let rateCounter = 0;
   let initialized = false;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let dependenciesPromise = null;
 
   const activeArcs = [];
   const activePoints = [];
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const found = document.querySelector(`script[src="${src}"]`);
+      if (found) return found.dataset.ready === 'true' ? resolve() : found.addEventListener('load', resolve, { once: true });
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = () => { script.dataset.ready = 'true'; resolve(); };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadDependencies() {
+    dependenciesPromise ||= loadScript('js/vendor/globe.gl.min.js')
+      .then(() => loadScript('js/globe-assets.js'));
+    return dependenciesPromise;
+  }
 
   function pickTwoDistinctCities() {
     const a = CITIES[Math.floor(Math.random() * CITIES.length)];
@@ -251,7 +272,7 @@
       // behavior once autoRotate is enabled). Drag-to-rotate, scroll/pinch
       // zoom, and touch are all provided automatically by these controls.
       const controls = world.controls();
-      controls.autoRotate = true;
+      controls.autoRotate = !reducedMotion && !paused && !document.hidden;
       controls.autoRotateSpeed = 0.35;
       controls.enableZoom = true;
       controls.enablePan = false;
@@ -274,7 +295,7 @@
 
       window.addEventListener('resize', resizeGlobe);
 
-      scheduleNextAttack();
+      if (!reducedMotion && !document.hidden) scheduleNextAttack();
     } catch (err) {
       console.error('[attack-map] Failed to initialize the 3D globe:', err);
       if (container) {
@@ -301,7 +322,9 @@
     if (!container) return;
     initialized = true;
     wireControls();
-    buildGlobe();
+    loadDependencies().then(buildGlobe).catch(() => {
+      if (container) container.innerHTML = '<p class="globe-load-error">تعذر تحميل خريطة الهجمات. حاول مرة أخرى لاحقًا.</p>';
+    });
   }
 
   // The globe container lives inside a `display:none` panel until the user
@@ -326,5 +349,12 @@
     if (panel && panel.style.display !== 'none') {
       requestAnimationFrame(() => requestAnimationFrame(initOnce));
     }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!world) return;
+    const hidden = document.hidden;
+    world.controls().autoRotate = !hidden && !paused && !reducedMotion;
+    if (hidden && attackTimer) clearTimeout(attackTimer);
+    if (!hidden && !paused && !reducedMotion) scheduleNextAttack();
   });
 })();
