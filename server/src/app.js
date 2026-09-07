@@ -60,7 +60,11 @@ app.use(
         scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:'],
+        // Certificate previews are SVGs served by the API.  Allow the known
+        // local development origins as well as the configured public origin
+        // so previews do not turn into broken images when the frontend and
+        // API are run on separate local ports.
+        imgSrc: ["'self'", 'data:', 'blob:', env.FRONTEND_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
         connectSrc: ["'self'", 'https://*.supabase.co', 'https://*.supabase.in'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
