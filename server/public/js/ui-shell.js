@@ -12,6 +12,76 @@
   const moreMenu = document.getElementById('more-menu');
   const moreTrigger = document.getElementById('more-menu-trigger');
   const morePanel = document.getElementById('more-menu-panel');
+  // Keep visual enhancement work event-driven: one observer and a rAF-scrolled
+  // class, never a continuous animation loop. Content is readable before reveal.
+  const installVisualEnhancements = () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      let scheduled = false;
+      const syncHeader = () => {
+        topbar.classList.toggle('is-condensed', window.scrollY > 20);
+        scheduled = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!scheduled) {
+          scheduled = true;
+          window.requestAnimationFrame(syncHeader);
+        }
+      }, { passive: true });
+      syncHeader();
+    }
+    if (reduce || !('IntersectionObserver' in window)) return;
+    const revealTargets = document.querySelectorAll(
+      '.panel:not(#tab-auth), .secure-hero, .home-mission > .card, .about-card, .provider-course-group, .certificates-card, .student-overview, .profile-layout > .card, .dashboard-certificates'
+    );
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: .08, rootMargin: '0px 0px -20px' });
+    revealTargets.forEach((element, index) => {
+      element.classList.add('reveal-on-scroll');
+      element.style.setProperty('--reveal-delay', `${Math.min(index % 5, 4) * 45}ms`);
+      observer.observe(element);
+    });
+
+    // One delegated pointer handler gives the dense SOC cards a quiet depth cue
+    // without a render loop. It is unavailable to touch devices and reduced
+    // motion users, and it also covers cards that course/catalogue scripts add
+    // after this shell has initialized.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let pendingCard = null;
+      let pendingPoint = null;
+      let pointerFrame = 0;
+      const applyTilt = () => {
+        pointerFrame = 0;
+        if (!pendingCard || !pendingPoint) return;
+        const rect = pendingCard.getBoundingClientRect();
+        const x = (pendingPoint.clientX - rect.left) / rect.width - .5;
+        const y = (pendingPoint.clientY - rect.top) / rect.height - .5;
+        pendingCard.style.setProperty('--soc-tilt-x', `${(-y * 2).toFixed(2)}deg`);
+        pendingCard.style.setProperty('--soc-tilt-y', `${(x * 2).toFixed(2)}deg`);
+      };
+      document.addEventListener('pointermove', (event) => {
+        const card = event.target.closest('.course-card,.about-card,.event-card,.ctf-card,.game-card,.provider-course-group');
+        if (!card) return;
+        card.setAttribute('data-soc-tilt', '');
+        pendingCard = card;
+        pendingPoint = event;
+        if (!pointerFrame) pointerFrame = window.requestAnimationFrame(applyTilt);
+      }, { passive: true });
+      document.addEventListener('pointerout', (event) => {
+        const card = event.target.closest?.('[data-soc-tilt]');
+        if (!card || card.contains(event.relatedTarget)) return;
+        card.style.removeProperty('--soc-tilt-x');
+        card.style.removeProperty('--soc-tilt-y');
+      }, { passive: true });
+    }
+  };
+  installVisualEnhancements();
   if (!nav) return;
   const setMenu = (open) => {
     body.classList.toggle('nav-open', open);

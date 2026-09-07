@@ -2873,3 +2873,158 @@ html[dir="rtl"] .about-card li { direction: rtl; text-align: right; }
 @media (prefers-reduced-motion: reduce) {
   .primary-nav .tab, .more-menu-trigger, .more-menu-chevron { transition: none; }
 }
+
+/* Phase 1 — low-cost cyber-glass atmosphere. No canvas, library, or render loop. */
+:root { --cyber-cyan:#59dcff; --cyber-violet:#9d6bff; --cyber-edge:rgba(109,220,255,.23); --cyber-glass:linear-gradient(135deg,rgba(10,27,57,.76),rgba(5,12,30,.88)); }
+body:not(.auth-locked)::before, body:not(.auth-locked)::after { content:""; position:fixed; z-index:-1; pointer-events:none; }
+body:not(.auth-locked)::before { inset:0; opacity:.62; background:linear-gradient(90deg,transparent 49.75%,rgba(89,220,255,.055) 50%,transparent 50.25%) 0 0/96px 96px,linear-gradient(0deg,transparent 49.75%,rgba(89,220,255,.045) 50%,transparent 50.25%) 0 0/96px 96px,radial-gradient(circle at 14% 16%,rgba(89,220,255,.42) 0 1px,transparent 1.6px),radial-gradient(circle at 84% 72%,rgba(157,107,255,.32) 0 1px,transparent 1.7px); }
+body:not(.auth-locked)::after { width:min(34vw,480px); height:min(56vh,650px); inset-inline-end:-12vw; top:15vh; opacity:.45; background:repeating-linear-gradient(180deg,transparent 0 15px,rgba(90,220,255,.16) 16px 17px,transparent 18px 33px); mask-image:linear-gradient(180deg,transparent,#000 20%,#000 74%,transparent); transform:skewX(-15deg); }
+.topbar { transition:min-height .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease; }
+.topbar.is-condensed { background:rgba(2,9,25,.94); border-bottom-color:rgba(89,220,255,.34); box-shadow:0 10px 25px rgba(0,0,0,.18); }
+.topbar.is-condensed .topbar-inner { min-height:54px; }
+.secure-hero { border-color:rgba(91,217,255,.36)!important; box-shadow:0 28px 80px rgba(0,0,0,.28),inset 0 1px 0 rgba(220,250,255,.08); }
+.secure-hero::before { opacity:.8!important; background:linear-gradient(120deg,transparent 0 36%,rgba(89,220,255,.065) 37% 37.2%,transparent 38% 68%,rgba(157,107,255,.055) 69% 69.2%,transparent 70%)!important; }
+.secure-boot,.auth-kicker { letter-spacing:.13em; text-shadow:0 0 18px rgba(89,220,255,.27); }
+.secure-dot { filter:drop-shadow(0 0 6px rgba(89,220,255,.8)); }
+.console-orbit { box-shadow:0 0 0 1px rgba(89,220,255,.13),0 0 30px rgba(31,162,255,.12); }
+.btn,.primary-nav .tab,.more-menu-trigger,.org-arrow-btn { transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease,background-color .17s ease,color .17s ease; }
+.btn:hover:not(:disabled),.btn:focus-visible,.primary-nav .tab:focus-visible,.more-menu-trigger:focus-visible,.org-arrow-btn:focus-visible { box-shadow:0 0 0 3px rgba(89,220,255,.13),0 0 20px rgba(89,220,255,.15); }
+.btn:hover:not(:disabled) { transform:translateY(-2px); }
+.btn:focus-visible,.primary-nav .tab:focus-visible,.more-menu-trigger:focus-visible,.org-arrow-btn:focus-visible { outline:2px solid var(--cyber-cyan); outline-offset:3px; }
+.card,.game-card,.provider-course-group,.student-overview,.lms-lesson-card,.verify-card,.certificate-options-sheet { border-color:var(--cyber-edge); background:var(--cyber-glass); }
+@media (hover:hover) and (pointer:fine) { .course-card,.about-card,.event-card,.ctf-card,.game-card { transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)); will-change:transform; } .course-card:hover,.about-card:hover,.event-card:hover,.ctf-card:hover,.game-card:hover { --tilt-x:1.1deg; --tilt-y:-1.1deg; border-color:rgba(89,220,255,.46)!important; box-shadow:0 18px 38px rgba(0,0,0,.28),0 0 22px rgba(40,176,255,.10)!important; } }
+.certificate-render,.course-certificate-preview,.verify-certificate-image,.profile-certificate-thumb { position:relative; border:1px solid rgba(125,228,255,.52); box-shadow:0 15px 36px rgba(0,0,0,.42),0 0 26px rgba(98,202,255,.18); }
+.certificate-sheet-image { position:relative; }.certificate-sheet-image::after { content:""; position:absolute; inset:20px; pointer-events:none; border:1px solid rgba(140,236,255,.48); mix-blend-mode:screen; background:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.24) 47%,transparent 60%); opacity:.46; }
+.reveal-on-scroll { opacity:1; transform:translateY(0); }
+@supports (animation-timeline:auto) { .reveal-on-scroll { opacity:0; transform:translateY(14px); transition:opacity .42s ease var(--reveal-delay,0ms),transform .42s cubic-bezier(.2,.75,.25,1) var(--reveal-delay,0ms); }.reveal-on-scroll.is-revealed { opacity:1; transform:translateY(0); } }
+@media (max-width:760px) { body:not(.auth-locked)::before { background-size:72px 72px,72px 72px,auto,auto; opacity:.34; } body:not(.auth-locked)::after { display:none; }.topbar.is-condensed .topbar-inner { min-height:58px; }.secure-hero { box-shadow:0 18px 44px rgba(0,0,0,.25); }.certificate-sheet-image::after { inset:20px; } }
+@media (prefers-reduced-motion:reduce) { .topbar,.btn,.primary-nav .tab,.more-menu-trigger,.org-arrow-btn,.reveal-on-scroll { transition:none!important; }.reveal-on-scroll { opacity:1!important; transform:none!important; }.course-card,.about-card,.event-card,.ctf-card,.game-card { transform:none!important; } }
+
+/* ========================================================================
+   SOC SYSTEM / phase 2
+   The platform is deliberately built from static layers: no canvas, no
+   background timers and no image requests.  It is also used by every inner
+   page, so the student journey feels like one continuous secure console.
+   ======================================================================== */
+:root {
+  --soc-0:#030712;
+  --soc-1:#061226;
+  --soc-panel:rgba(6, 18, 38, .78);
+  --soc-panel-strong:rgba(7, 20, 43, .95);
+  --soc-line:rgba(104, 220, 255, .19);
+  --soc-line-bright:rgba(77, 220, 255, .52);
+  --soc-cyan:#06b6d4;
+  --soc-green:#10b981;
+  --soc-violet:#8b5cf6;
+  --soc-ink:#edf9ff;
+  --soc-muted:#9bb1c7;
+}
+html { background:var(--soc-0); scroll-behavior:smooth; }
+body:not(.auth-locked), body.lms-page, body.profile-page, body:has(.verify-page), body:has(.auth-page) {
+  min-height:100vh;
+  color:var(--soc-ink);
+  background-color:var(--soc-0);
+  background-image:
+    radial-gradient(900px 560px at 108% -10%, rgba(6,182,212,.15), transparent 62%),
+    radial-gradient(680px 440px at -10% 88%, rgba(16,185,129,.085), transparent 68%),
+    linear-gradient(90deg, rgba(85,208,255,.027) 1px, transparent 1px),
+    linear-gradient(rgba(85,208,255,.027) 1px, transparent 1px);
+  background-size:auto,auto,48px 48px,48px 48px;
+}
+/* Technical corner treatment: sharper than a generic rounded card. */
+.card,.panel,.game-card,.provider-course-group,.student-overview,.lms-lesson-card,.verify-card,.certificate-options-sheet {
+  position:relative;
+  border:1px solid var(--soc-line)!important;
+  border-radius:3px 17px 3px 17px!important;
+  background:linear-gradient(140deg, rgba(12,30,59,.78), rgba(3,12,28,.9))!important;
+  box-shadow:inset 0 1px 0 rgba(230,251,255,.055), 0 18px 45px rgba(0,0,0,.22)!important;
+}
+.card::before,.panel::before,.game-card::before,.provider-course-group::before,.student-overview::before,.lms-lesson-card::before,.verify-card::before {
+  content:""; position:absolute; inset:7px; pointer-events:none; opacity:.56;
+  border:1px solid rgba(123,230,255,.07);
+  clip-path:polygon(0 0, calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
+}
+.card > *,.panel > *,.game-card > *,.provider-course-group > *, .student-overview > *, .lms-lesson-card > *, .verify-card > * { position:relative; }
+.topbar::after,.lms-header::after,.profile-dashboard-head::after {
+  content:"SYSTEM ONLINE // AOU SECURITY OPERATIONS"; position:absolute; inset-block-end:-10px; inset-inline-start:clamp(16px,5vw,70px); z-index:2;
+  padding:2px 8px; color:rgba(116,229,255,.62); border:1px solid rgba(73,205,255,.18); background:var(--soc-0);
+  font:700 8px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.14em;
+}
+.topbar { position:sticky; top:0; z-index:50; border-bottom:1px solid rgba(91,214,255,.16); }
+.topbar-inner { max-width:1440px; }
+.site-brand-mark { color:var(--soc-cyan)!important; box-shadow:inset 0 0 0 1px rgba(99,228,255,.55),0 0 22px rgba(6,182,212,.25)!important; }
+.primary-nav .tab.active { background:linear-gradient(118deg,#06b6d4,#3b82f6)!important; }
+.more-menu-panel { border-color:var(--soc-line-bright); background:linear-gradient(150deg,rgba(6,25,52,.98),rgba(2,8,22,.99)); }
+.lang-switcher { border-color:rgba(6,182,212,.36)!important; }
+.lang-btn.active { background:rgba(6,182,212,.2)!important; color:#dffaff!important; }
+
+/* Main public modules receive an asymmetric operations layout rather than
+   repeated equal cards. Existing DOM and translation hooks remain untouched. */
+.app { position:relative; isolation:isolate; }
+.app::before { content:""; position:fixed; z-index:-1; inset:0; pointer-events:none; opacity:.18;
+  background:radial-gradient(circle at 22% 20%,rgba(64,237,255,.9) 0 1px,transparent 1.5px) 0 0/92px 92px,
+             radial-gradient(circle at 80% 73%,rgba(16,185,129,.7) 0 1px,transparent 1.5px) 0 0/128px 128px; }
+.secure-hero { overflow:hidden; border-radius:3px 28px 3px 28px!important; }
+.secure-hero::after { content:""; position:absolute; width:42%; aspect-ratio:1; inset-inline-end:-8%; inset-block-start:-28%; opacity:.42; pointer-events:none;
+  background:repeating-radial-gradient(circle,transparent 0 18px,rgba(77,220,255,.14) 19px 20px,transparent 21px 38px); }
+.home-mission { align-items:stretch; }
+.home-mission > .card:first-child { background:linear-gradient(135deg,rgba(6,71,89,.59),rgba(5,17,39,.86))!important; }
+.home-mission > .card:last-child { border-inline-start-color:var(--soc-green)!important; }
+.about-card { background:linear-gradient(145deg,rgba(12,34,64,.82),rgba(3,13,30,.92))!important; }
+.about-card:nth-child(3) { border-inline-start:3px solid var(--soc-violet)!important; }
+.about-card li::marker { color:var(--soc-green); }
+html[dir="ltr"] .about-card li { text-align:left!important; }
+html[dir="rtl"] .about-card li { text-align:right!important; }
+
+/* Course catalogue, events, games and tools: operational rails make data
+   scannable without inventing product metrics. */
+.course-card,.event-card,.ctf-card,.game-card { overflow:hidden; border-radius:3px 14px 3px 14px!important; }
+.course-card::after,.event-card::after,.ctf-card::after,.game-card::after { content:""; position:absolute; inset-inline:0; inset-block-start:0; height:2px; background:linear-gradient(90deg,var(--soc-cyan),transparent 70%); opacity:.82; }
+.course-card:nth-child(3n+2)::after,.event-card:nth-child(3n+2)::after { background:linear-gradient(90deg,var(--soc-green),transparent 70%); }
+.course-card:nth-child(3n)::after,.ctf-card:nth-child(3n)::after { background:linear-gradient(90deg,var(--soc-violet),transparent 70%); }
+.progress-track,.course-progress-track { overflow:hidden; background:rgba(150,210,238,.1)!important; }
+.progress-track > span,.course-progress-track > span,#course-progress-bar { background:linear-gradient(90deg,var(--soc-cyan),var(--soc-green))!important; box-shadow:0 0 13px rgba(6,182,212,.45); }
+
+/* LMS is a desktop control room, with lesson content held in a readable
+   document column. No background detail runs behind the student’s text. */
+.lms-page { background-color:var(--soc-0); }
+.lms-header { position:relative; display:grid; grid-template-columns:max-content minmax(0,1fr) minmax(180px,.48fr) max-content; gap:clamp(14px,2vw,32px); align-items:center; max-width:1440px; margin:0 auto; padding:24px clamp(18px,4vw,60px) 30px; border-bottom:1px solid var(--soc-line); background:linear-gradient(100deg,rgba(4,18,39,.96),rgba(7,18,38,.78)); }
+.lms-course-heading h1,.profile-dashboard-head h1 { color:var(--soc-ink); letter-spacing:-.02em; }
+.lms-progress-box { padding:14px 16px; border:1px solid var(--soc-line); border-radius:3px 13px 3px 13px; background:rgba(2,12,29,.56); }
+.lms-progress-box strong { color:var(--soc-cyan); text-shadow:0 0 16px rgba(6,182,212,.35); }
+.lms-shell { max-width:1440px; grid-template-columns:minmax(230px,.31fr) minmax(0,1fr)!important; gap:clamp(16px,2.4vw,34px)!important; padding:clamp(26px,4vw,54px) clamp(16px,4vw,60px)!important; }
+.lms-sidebar { align-self:start; position:sticky; top:86px; border:1px solid var(--soc-line); border-radius:3px 16px 3px 16px; background:rgba(4,17,37,.79); box-shadow:inset 0 1px rgba(255,255,255,.04); }
+.lms-sidebar-title { border-bottom:1px solid rgba(104,220,255,.14); }
+.lms-main { min-width:0; max-width:900px; }
+.lms-breadcrumb { color:var(--soc-muted); font:700 10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.1em; }
+.lms-lesson-card { padding:clamp(22px,4vw,50px)!important; line-height:1.9; }
+.lms-lesson-card h1,.lms-lesson-card h2,.lms-lesson-card h3 { color:#e9fbff; }
+.lms-bottom-nav { gap:12px; }
+
+/* Profile reframed as a student status console. */
+.profile-page { background-color:var(--soc-0); }
+.profile-dashboard { max-width:1320px!important; padding:clamp(26px,5vw,70px) clamp(16px,4vw,56px)!important; }
+.profile-dashboard-head { position:relative; display:grid; grid-template-columns:max-content minmax(0,1fr) max-content; gap:22px; align-items:center; padding:0 0 34px; border-bottom:1px solid var(--soc-line); }
+.student-overview { display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,.9fr); gap:30px; margin-top:28px; padding:clamp(22px,3vw,38px)!important; }
+.profile-avatar.large { border-color:var(--soc-cyan)!important; box-shadow:0 0 0 8px rgba(6,182,212,.07),0 0 26px rgba(6,182,212,.25); }
+.student-stats { gap:10px!important; }
+.student-stats > div { border:1px solid rgba(105,222,255,.14); border-radius:3px 12px 3px 12px; background:rgba(0,9,24,.45); }
+.student-stats strong { color:var(--soc-cyan); }
+.profile-layout { gap:18px!important; margin-top:18px!important; }
+.profile-form { padding:clamp(20px,3vw,34px)!important; }
+.profile-icon { color:var(--soc-cyan)!important; border-color:var(--soc-line)!important; background:rgba(6,182,212,.08)!important; }
+
+/* Entry / verification surfaces remain deliberately quiet and readable. */
+.verify-page,.auth-page { min-height:100vh; display:grid; place-items:center; padding:clamp(20px,5vw,70px); background:radial-gradient(600px 380px at 88% 10%,rgba(6,182,212,.16),transparent 68%),radial-gradient(520px 360px at 10% 100%,rgba(139,92,246,.12),transparent 70%),var(--soc-0); }
+.verify-card { width:min(100%,610px)!important; padding:clamp(28px,5vw,58px)!important; text-align:center; }
+.verify-card::after { content:"CERTIFICATE AUTHENTICITY CHECK"; display:block; margin-top:24px; color:var(--soc-muted); font:700 9px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.16em; }
+.verify-logo { filter:drop-shadow(0 0 18px rgba(6,182,212,.22)); }
+.auth-page .auth-panel { max-width:700px; border-radius:3px 20px 3px 20px!important; }
+
+@media (hover:hover) and (pointer:fine) {
+  [data-soc-tilt] { transform:perspective(900px) rotateX(var(--soc-tilt-x,0deg)) rotateY(var(--soc-tilt-y,0deg)); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+  [data-soc-tilt]:hover { border-color:var(--soc-line-bright)!important; box-shadow:0 20px 42px rgba(0,0,0,.32),0 0 25px rgba(6,182,212,.09)!important; }
+}
+@media (max-width:900px) { .lms-header { grid-template-columns:1fr max-content; }.lms-course-heading { grid-column:1/-1; grid-row:1; }.lms-back { grid-row:2; }.lms-progress-box { grid-row:2; }.course-language { grid-row:2; }.lms-shell { grid-template-columns:1fr!important; }.lms-sidebar { position:static; }.student-overview { grid-template-columns:1fr; }.profile-dashboard-head { grid-template-columns:1fr max-content; }.profile-dashboard-head > div { grid-column:1/-1; grid-row:1; }.profile-dashboard-head .btn:first-child { grid-row:2; }.profile-dashboard-head .btn:last-child { grid-row:2; } }
+@media (max-width:600px) { .topbar::after,.lms-header::after,.profile-dashboard-head::after { display:none; }.lms-header { padding:18px 16px 22px; }.lms-progress-box { grid-column:1/-1; }.course-language { grid-column:1/-1; grid-row:3; }.lms-shell { padding:22px 14px!important; }.lms-lesson-card { padding:23px 18px!important; }.profile-dashboard { padding:28px 14px!important; }.profile-dashboard-head { gap:14px; }.student-overview { padding:22px!important; }.student-stats { grid-template-columns:1fr!important; }.verify-page,.auth-page { padding:16px; }.verify-card { padding:30px 20px!important; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } [data-soc-tilt] { transform:none!important; transition:none!important; } }
