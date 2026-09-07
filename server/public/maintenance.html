@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>الموقع تحت الصيانة | نادي الأمن السيبراني</title>
+  <style>
+    :root { color-scheme: dark; --bg: #0d1117; --panel: rgba(17, 29, 41, .86); --text: #e6edf3; --muted: #a8b7c5; --cyan: #39d9ff; --green: #37e89b; }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body { min-height: 100vh; display: grid; place-items: center; padding: 24px; overflow: hidden; background: radial-gradient(circle at 50% 38%, rgba(0, 209, 255, .13), transparent 34%), linear-gradient(135deg, #0d1117 0%, #09131e 55%, #071b1d 100%); color: var(--text); font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; }
+    body::before, body::after { content: ""; position: fixed; width: 280px; height: 280px; border: 1px solid rgba(55, 232, 155, .16); border-radius: 50%; pointer-events: none; }
+    body::before { top: -150px; right: -100px; box-shadow: 0 0 70px rgba(55, 232, 155, .1); }
+    body::after { bottom: -180px; left: -120px; border-color: rgba(57, 217, 255, .16); box-shadow: 0 0 70px rgba(57, 217, 255, .1); }
+    .maintenance-card { position: relative; width: min(100%, 680px); padding: clamp(34px, 7vw, 68px) clamp(24px, 7vw, 72px); border: 1px solid rgba(57, 217, 255, .25); border-radius: 24px; background: linear-gradient(145deg, rgba(17, 29, 41, .94), rgba(10, 24, 31, .82)); box-shadow: 0 24px 80px rgba(0, 0, 0, .42), 0 0 0 1px rgba(55, 232, 155, .06) inset, 0 0 36px rgba(0, 209, 255, .08); text-align: center; }
+    .brand-mark { width: 68px; height: 68px; display: grid; place-items: center; margin: 0 auto 24px; border: 1px solid rgba(55, 232, 155, .5); border-radius: 18px; color: var(--green); font-size: 30px; font-weight: 800; box-shadow: 0 0 24px rgba(55, 232, 155, .17); }
+    .eyebrow { margin: 0 0 14px; color: var(--cyan); font-size: 12px; font-weight: 800; letter-spacing: .18em; }
+    h1 { margin: 0; color: #f4fbff; font-size: clamp(29px, 6vw, 48px); line-height: 1.35; }
+    .message { max-width: 520px; margin: 22px auto 10px; color: var(--muted); font-size: clamp(16px, 2.8vw, 20px); line-height: 2; }
+    .thanks { margin: 22px 0 0; color: var(--green); font-size: 16px; font-weight: 700; }
+    .signature { margin: 32px 0 0; color: #d4e3ed; font-size: 15px; font-weight: 700; }
+    @media (max-width: 480px) { body { padding: 16px; } .maintenance-card { border-radius: 20px; } .message { line-height: 1.9; } }
+  </style>
+</head>
+<body>
+  <main class="maintenance-card" role="main" aria-labelledby="maintenance-title">
+    <div class="brand-mark" aria-hidden="true">&lt;/&gt;</div>
+    <p class="eyebrow">CYBER SECURITY CLUB</p>
+    <h1 id="maintenance-title">الموقع تحت الصيانة</h1>
+    <p class="message">نعمل حالياً على بعض التحديثات والإصلاحات عشان نخلي التجربة لكم أفضل</p>
+    <p class="thanks">شكراً لتفهمكم وصبركم</p>
+    <p class="signature">- نادي الأمن السيبراني -</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: aou-cyberclub
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix server --no-audit --no-fund
+    startCommand: node server/src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+# Deploy the repository as this Node service, not as a separate static site.
+# Express serves /css, /js, /assets and /locales before the document fallback.
+# If a separate Render Static Site is retained, do not add a catch-all rewrite
+# from /* to /index.html without excluding /css/*, /js/*, /assets/* and
+# /locales/*. Otherwise CSS and JS requests receive text/html.

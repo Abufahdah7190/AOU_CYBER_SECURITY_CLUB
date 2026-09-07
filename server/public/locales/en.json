@@ -1,0 +1,506 @@
+{
+  "language": {
+    "ar": "العربية",
+    "en": "English"
+  },
+  "common": {
+    "clubName": "Cybersecurity Club at Arab Open University - Riyadh Branch",
+    "modeToggle": "Toggle Theme",
+    "clubLogo": "Cybersecurity Club",
+    "pageTitle": "Cybersecurity Club - Tools & Awareness Platform"
+  },
+  "tab": {
+    "home": "Home",
+    "ourEvents": "Our Events",
+    "challenges": "Challenges",
+    "securityTips": "Security Tips",
+    "link": "Cyber Detector",
+    "pw": "Password Checker",
+    "games": "Cyber Games",
+    "quiz": "Cyber Security Quiz",
+    "simulator": "Hacking Simulator",
+    "cybermap": "Attack Map",
+    "securityInfo": "Security Info",
+    "learningResources": "Cyber Learning Resources"
+  },
+  "home": {
+    "title": "Club Introduction and Goals",
+    "about": "The Cybersecurity Club is one of the student clubs at the Arab Open University, aiming to raise awareness of the importance of cybersecurity and spread a culture of safe and responsible technology use among students. The club seeks to empower students to develop their information security skills through workshops, training courses, and technical projects that keep pace with the digital age. We aspire to build a pioneering technical community capable of innovation and collaboration, and to offer specialized events and competitions that enhance knowledge and practical application.",
+    "vision": {
+      "title": "Our Vision",
+      "text": "Leading awareness and cyber-empowerment initiatives within the university, and making a lasting impact on safe digital behavior."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "text": "Providing practical content and interactive learning experiences that raise students' competence and support talent in information security."
+    },
+    "goals": {
+      "title": "Our Goals",
+      "items": [
+        "Raise cybersecurity awareness within the university.",
+        "Empower students practically through training and applied content.",
+        "Build a collaborative technical community that shares knowledge."
+      ]
+    },
+    "offer": {
+      "title": "What We Offer",
+      "items": [
+        "Specialized workshops and courses.",
+        "Technical projects and educational tools.",
+        "CTF competitions, challenges, and interactive activities."
+      ]
+    },
+    "values": {
+      "title": "Our Values",
+      "items": [
+        "Commitment to digital security as a standard for every activity we run.",
+        "Cooperation and knowledge-sharing among club members and the university community.",
+        "Innovation and continuous improvement of awareness tools and methods.",
+        "Digital responsibility and respect for users' privacy and security.",
+        "Transparency in presenting risks and explaining how to prevent them.",
+        "Serving the university community and promoting a cybersecurity culture for everyone."
+      ]
+    },
+    "commitment": {
+      "title": "Our Commitment",
+      "items": [
+        "We are committed to spreading cybersecurity awareness in a simple, clear way.",
+        "We guide individuals toward safe and responsible digital behavior.",
+        "We provide awareness content that helps people understand and avoid risks.",
+        "We strive to build a more aware and digitally secure university community."
+      ]
+    },
+    "structure": {
+      "title": "Club's Main Structure",
+      "club": "Cybersecurity Club",
+      "leader": "Club Leader",
+      "leaderName": "Ahmed Qaradi",
+      "vice": "Vice President",
+      "viceName": "Basel Al-Rashidi",
+      "dept1": "Activities and Events Department",
+      "dept1Name": "Baysan Al-Buraim",
+      "dept2": "Design and Content Department",
+      "dept2Name": "Fatima Al-Jafri",
+      "dept3": "Projects Department",
+      "dept3Name": "Omar Al-Najjar",
+      "dept4": "Public Relations and Admissions Department",
+      "dept4Name": "Yousef Al-Rawi"
+    },
+    "arrowLabelLeader": "Show Leader",
+    "arrowLabelVice": "Show Vice President",
+    "arrowLabelDepts": "Show Departments"
+  },
+  "linkChecker": {
+    "title": "Suspicious Link Detector",
+    "scanBtn": "Scan Link",
+    "clearBtn": "Clear",
+    "sampleLinksTitle": "Quick test links:",
+    "sample1": "googIe.com (I instead of l)",
+    "sample2": "IP as host (192.168.0.1)",
+    "sample3": "subdomain trick",
+    "sample4": "Odd TLD",
+    "note": "Note: this is an awareness tool that may be improved in the future - don't rely on it as a complete security scan.",
+    "whatChecks": "What the scanner checks (quickly):",
+    "quickTipsTitle": "Quick tips:",
+    "placeholder": "e.g.: https://secure-bank-login.example.update-account.net",
+    "checks": [
+      "Presence of an IP address instead of a domain",
+      "Words like \"login\", \"verify\", \"account\"",
+      "A large number of subdomains",
+      "Unusually long URL length",
+      "Character similarity (homograph)",
+      "Unusual domain ending (TLD) such as .info or .xyz"
+    ],
+    "quickTips": [
+      "Don't enter sensitive data anywhere except an official site, and verify the domain.",
+      "Check the certificate (browser lock icon) and the domain name carefully.",
+      "Use a password manager to verify matches."
+    ]
+  },
+  "fileScanner": {
+    "title": "Suspicious File Detector",
+    "desc": "Upload the file or image and it will be analyzed for safety.",
+    "dropHere": "Drop the file here",
+    "orClick": "or click to choose a file from your device",
+    "chooseBtn": "Choose a File",
+    "startScanBtn": "Start Full Scan"
+  },
+  "securityTips": {
+    "title": "Security Tips",
+    "intro": "Stay digitally safe with these quick guidelines.",
+    "categoryPasswords": "Passwords",
+    "categoryBrowser": "Browser & Email",
+    "categoryDevices": "Devices & Networks",
+    "categoryGeneral": "General Practices",
+    "passwordsTips": [
+      "Use a strong password made up of upper and lower case letters, numbers, and symbols.",
+      "Don't reuse the same password across more than one account.",
+      "Use a password manager to keep your passwords secure.",
+      "Enable two-factor authentication (2FA) on all your important accounts.",
+      "Make sure to log out of your accounts when using someone else's device.",
+      "If you feel your account has been compromised, change your password immediately and enable 2FA."
+    ],
+    "browserTips": [
+      "Avoid clicking unknown or suspicious links.",
+      "Scan files with antivirus software before downloading them.",
+      "Don't share your personal information on untrusted websites.",
+      "Beware of texts or emails asking for sensitive data.",
+      "Make sure the site starts with HTTPS before logging in or paying.",
+      "Use a separate email address for your important accounts."
+    ],
+    "devicesTips": [
+      "Use a VPN when connecting to public Wi-Fi networks.",
+      "Turn off Bluetooth and Wi-Fi when you don't need them.",
+      "Enable automatic device lock when not in use.",
+      "Keep a regular backup of your important files.",
+      "Review app permissions on your device periodically."
+    ],
+    "generalTips": [
+      "Keep your operating system and apps continuously updated.",
+      "Don't use pirated apps or apps from unofficial sources.",
+      "Don't leave your device unattended in public places."
+    ]
+  },
+  "ourEvents": {
+    "title": "Our Events",
+    "subtitle": "Our Events",
+    "intro": "The Cybersecurity Club is keen to hold quality events and initiatives that enrich knowledge and support the student community. Some of the club's notable events and participations:",
+    "workshopsTitle": "Workshops",
+    "communityTitle": "Community Participation & Events",
+    "workshops": [
+      "Delivered a workshop on the Internet of Things and its relation to cybersecurity",
+      "Delivered a digital footprint workshop",
+      "Delivered a workshop introducing virtual and augmented reality (VR/AR)",
+      "Delivered a cybersecurity awareness workshop"
+    ],
+    "community": [
+      "Club participation in National Day events",
+      "Visit to the book fair",
+      "Club participation in the student clubs forum"
+    ]
+  },
+  "passwordChecker": {
+    "label": "Password",
+    "lengthLabel": "Length",
+    "lowercase": "Lowercase letters",
+    "uppercase": "Uppercase letters",
+    "digits": "Numbers",
+    "symbols": "Symbols",
+    "arabic": "Arabic",
+    "generateBtn": "Suggest a Strong Password",
+    "generatePhraseBtn": "Strong Passphrase",
+    "show": "Show",
+    "copy": "Copy",
+    "clear": "Clear",
+    "hint": "Enter a password to see its rating.",
+    "guessesLabel": "Average guesses",
+    "scoreLabel": "Strength score (out of 100)",
+    "timeLabel": "Estimated crack time under these scenarios:",
+    "suggestionsTitle": "Suggestions to improve your password",
+    "howTitle": "How do we calculate this?",
+    "howDesc": "We estimate the size of the character set used (Latin lower/upper, digits, symbols, Arabic),\n then: entropy = length × log₂(pool). We use 2^(entropy−1) as an average estimate of the number of guesses.",
+    "debugPlaceholder": "Results will appear here.",
+    "generalTipsTitle": "General Tips",
+    "quickCheckTitle": "Quick Checks",
+    "footer": "Results are estimates for awareness purposes only. For real security, use advanced tools (such as zxcvbn) and a password manager.",
+    "generateBtnTitle": "Suggest a strong password",
+    "generatePhraseBtnTitle": "Suggest a strong passphrase",
+    "placeholder": "Type your password here...",
+    "generalTips": [
+      "Length matters more than complexity — use a long passphrase.",
+      "Don't reuse the same password across multiple sites.",
+      "Use a password manager to store long, complex passwords."
+    ]
+  },
+  "games": {
+    "title": "Cyber Games",
+    "intro": "Light games that explain security concepts in a fun way",
+    "ghost": {
+      "title": "Cyber Ghost",
+      "desc": "Block the ghost with your shield to win and prevent the breach.",
+      "score": "Score: 0"
+    },
+    "bow": {
+      "title": "Cyber Bow",
+      "desc": "Move the arrow within the platform, then click to launch it at the target.",
+      "note": "Click on the area to shoot the arrow, and move your mouse or finger to adjust its height.",
+      "feedback": "Try hitting the center."
+    },
+    "defense": {
+      "title": "Multi-Layer Defense",
+      "desc": "Choose the right defensive layer for each network threat.",
+      "scenario1": "A vulnerability was discovered in the mail server.",
+      "patch": "Urgent Update",
+      "isolate": "Isolate the Service",
+      "monitor": "Deep Monitoring",
+      "backup": "Restore Backup",
+      "feedback": "Choose the best step to handle the current situation."
+    },
+    "link": {
+      "title": "Spot the Fake Link",
+      "desc": "Which of the following links is the real, safe one?",
+      "task": "Task: find the real Google login link",
+      "score": "Score: 0",
+      "newGame": "New Game"
+    },
+    "packet": {
+      "title": "Packet Filter",
+      "desc": "Move the wall to block malicious red packets, and let safe green packets pass.",
+      "score": "Score: 0"
+    },
+    "whack": {
+      "title": "Whack the Malware",
+      "desc": "Click malware quickly before it disappears, and avoid clicking safe files.",
+      "score": "Score: 0"
+    }
+  },
+  "quiz": {
+    "title": "Cyber Security Quiz",
+    "questionNumber": "Question 1",
+    "categoryGeneral": "General Security",
+    "q1": "What is the best way to protect your account from being hacked?",
+    "optionA": "A",
+    "q1a": "Use two-factor authentication and a strong password",
+    "optionB": "B",
+    "q1b": "Use the same password for all accounts",
+    "optionC": "C",
+    "q1c": "Write the password on a sticky note",
+    "optionD": "D",
+    "q1d": "Share the password with friends",
+    "correct": "Correct answer!",
+    "q1Explain": "Two-factor authentication adds an extra layer of protection, and a strong password makes hacking harder.",
+    "next": "New Question",
+    "restart": "Restart",
+    "correctLabel": "Correct answers:",
+    "totalLabel": "Total questions:",
+    "percentageLabel": "Percentage:"
+  },
+  "simulator": {
+    "title": "Interactive Hacking Simulator",
+    "intro": "Try simple attacks to understand how they work and how to defend against them",
+    "phishing": {
+      "title": "Phishing Attack",
+      "desc": "Simulates an attempt to steal login credentials via a fake link"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "start": "Start Simulation",
+    "bruteforce": {
+      "title": "Brute Force Attack",
+      "desc": "Simulates an attempt to crack a password through repeated attempts"
+    },
+    "social": {
+      "title": "Social Engineering",
+      "desc": "Simulates an attempt to obtain sensitive information through psychological manipulation"
+    },
+    "ddos": {
+      "title": "Denial of Service Attack (DDoS)",
+      "desc": "Simulates an attack that disrupts services by flooding a server with requests"
+    },
+    "malware": {
+      "title": "Malware Spread",
+      "desc": "Simulates how viruses and malicious software spread across a network"
+    },
+    "gameTitle": "Attack Simulation",
+    "close": "Close"
+  },
+  "cybermap": {
+    "title": "Cyber Attack Map (Simulation)",
+    "totalAttacks": "Total Attacks",
+    "attacksPerSecond": "Attacks/sec",
+    "reset": "Reset",
+    "pause": "Pause",
+    "legendDDoS": "Red arrow: DDoS attacks",
+    "legendExploits": "Turquoise arrow: Exploit attempts",
+    "legendMalware": "Green arrow: Malware/spread",
+    "legendPhishing": "Orange arrow: Phishing/social engineering",
+    "note": "Note: this is an educational visual simulation, not real data."
+  },
+  "events": {
+    "title": "Upcoming Events",
+    "workshop1": "Beginner Penetration Testing Workshop",
+    "workshop1Date": "Date: Coming soon • Location: Club headquarters",
+    "workshop1Desc": "Hands-on content on penetration testing fundamentals and tools.",
+    "ctf": "Mini CTF Competition",
+    "ctfDate": "Date: Coming soon • Location: Online",
+    "ctfDesc": "Real-world challenges in cryptography, reverse engineering, and forensics."
+  },
+  "challenges": {
+    "title": "Challenges",
+    "rePanel": "Reverse Engineering Challenge Board",
+    "intro": "Write the solution for each challenge and check your answer instantly. Everything is static, with no backend.",
+    "shuffle": "Random"
+  },
+  "learningResources": {
+    "t1": "Cyber Learning Resources",
+    "t2": "Comprehensive Learning Resources",
+    "t3": "We offer a distinguished collection of educational resources and references to develop your cybersecurity skills. These resources include training courses, books, practical tools, and hands-on exercises.",
+    "t4": "Online Learning Platforms",
+    "t5": "Specialized Cisco Courses",
+    "t6": "Featured Cisco Courses:",
+    "t7": "Cybersecurity Essentials",
+    "t8": "Course Link",
+    "t9": "Network Defense",
+    "t10": "Course Link",
+    "t11": "Cyber Threat Management",
+    "t12": "Course Link",
+    "t13": "Introduction to Cybersecurity",
+    "t14": "Course Link",
+    "t15": "Junior Cybersecurity Analyst",
+    "t16": "Career Path Link",
+    "t17": "Ethical Hacker",
+    "t18": "Course Link",
+    "t19": "Other Platforms",
+    "t20": "Other Recommended Platforms:",
+    "t21": "- Advanced cybersecurity courses from global universities",
+    "t22": "- Specialized programs in information security and cryptography",
+    "t23": "- A variety of affordable courses for beginners and advanced learners",
+    "t24": "- Interactive training on hacking and defending systems",
+    "t25": "- Practical challenges to test security skills",
+    "t26": "- Specialized courses in Linux and network security",
+    "t27": "Books & References",
+    "t28": "- How intruders operate and how to defend against them",
+    "t29": "- Cryptography and security fundamentals",
+    "t30": "- Web application security",
+    "t31": "- Network security fundamentals",
+    "t32": "- Using the Metasploit tool",
+    "t33": "- A guide to getting started in cybersecurity",
+    "t34": "Tools & Practical Demos",
+    "t35": "- Network traffic analysis",
+    "t36": "- Web application security testing",
+    "t37": "- Scanning networks and open ports",
+    "t38": "- Penetration testing and exploitation",
+    "t39": "- Cracking hashed passwords",
+    "t40": "- Scanning and analyzing web vulnerabilities",
+    "t41": "Useful Sites & Resources",
+    "t42": "- Open Web Application Security Project",
+    "t43": "- A standard security framework",
+    "t44": "- Security vulnerability database",
+    "t45": "- Open-source security projects",
+    "t46": "- Advanced security articles",
+    "t47": "- Channels specialized in cybersecurity",
+    "t48": "Standards & Certifications",
+    "t49": "- A globally recognized comprehensive security certification",
+    "t50": "- Specialist in ethical penetration testing",
+    "t51": "- Advanced security certification",
+    "t52": "- Information security management standards",
+    "t53": "- Certified security analyst",
+    "t54": "- Advanced security fundamentals",
+    "t55": "Recommended Learning Paths",
+    "t56": "For Beginners:",
+    "t57": "Start by learning the basics through Coursera and TryHackMe",
+    "t58": "For Intermediate Learners:",
+    "t59": "Move on to HackTheBox and specialized courses such as CEH",
+    "t60": "For Advanced Learners:",
+    "t61": "Focus on OSCP and real-world hacking practice and research",
+    "t62": "Continuous Learning:",
+    "t63": "Follow the latest vulnerabilities on SecurityFocus and Medium",
+    "t64": "Community:",
+    "t65": "Join Capture The Flag (CTF) groups and security conferences",
+    "t66": "Practical Application:",
+    "t67": "Contribute to open-source projects on GitHub",
+    "t68": "Important Tips for Effective Learning",
+    "t69": "Hands-On Practice First:",
+    "t70": "Don't rely on theory alone — try things yourself with safe tools.",
+    "t71": "Persistence and Patience:",
+    "t72": "Cybersecurity is a complex field; don't expect quick results.",
+    "t73": "Keeping Up with Developments:",
+    "t74": "Read security news daily to stay current with new vulnerabilities.",
+    "t75": "Ethics First:",
+    "t76": "Use your knowledge ethically and legally only.",
+    "t77": "Communication and Collaboration:",
+    "t78": "Share your knowledge with others and meet fellow learners.",
+    "t79": "Certifications as Tools:",
+    "t80": "Certifications matter, but knowledge and skills are the real foundation."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "messageLabel": "Message",
+    "submitBtn": "Send",
+    "resetBtn": "Clear"
+  },
+  "securityInfo": {
+    "t1": "Complete Security Guide",
+    "t2": "How Do Viruses Spread?",
+    "t3": "Email",
+    "t4": "Malicious attachments or suspicious links",
+    "t5": "Don't open attachments from unknown senders",
+    "t6": "Verify the sender's address is correct",
+    "t7": "Use antivirus software",
+    "t8": "USB Devices",
+    "t9": "Spreading viruses via removable devices",
+    "t10": "Scan devices before use",
+    "t11": "Don't use devices from untrusted sources",
+    "t12": "Enable automatic protection",
+    "t13": "The Internet",
+    "t14": "Malicious sites or suspicious downloads",
+    "t15": "Avoid suspicious websites",
+    "t16": "Don't download from untrusted sources",
+    "t17": "Use an up-to-date browser",
+    "t18": "Social Networks",
+    "t19": "Malicious links or deceptive messages",
+    "t20": "Don't click suspicious links",
+    "t21": "Verify links before opening them",
+    "t22": "Don't share personal information",
+    "t23": "Signs Your Device Has Been Hacked",
+    "t24": "Unusual Slowness",
+    "t25": "The device runs very slowly, even for simple tasks",
+    "t26": "Unexpected Charges",
+    "t27": "Charges on your credit card or phone bill",
+    "t28": "Encrypted Files",
+    "t29": "Your files have turned into strange symbols",
+    "t30": "Strange Messages",
+    "t31": "Friends receive messages from your account",
+    "t32": "Unusual Screen",
+    "t33": "Error messages or unfamiliar screens",
+    "t34": "Unusual Activity",
+    "t35": "High internet or processor usage",
+    "t36": "Protection & Prevention",
+    "t37": "Regular Updates",
+    "t38": "Keep your system and apps updated regularly",
+    "t39": "Antivirus Software",
+    "t40": "Use trusted antivirus software",
+    "t41": "Backups",
+    "t42": "Keep backups of important data",
+    "t43": "Security Awareness",
+    "t44": "Learn how to recognize threats"
+  },
+  "courses": {
+    "title": "Courses",
+    "intro": "Choose a learning path and continue your cybersecurity journey.",
+    "foundation": "Foundation Path",
+    "foundationDesc": "Security awareness, digital safety, and network basics",
+    "professional": "Professional Path",
+    "professionalDesc": "Defense, analysis, and secure application development",
+    "advanced": "Advanced Path",
+    "advancedDesc": "Ethical testing, cloud security, and security operations",
+    "open": "Open course",
+    "continue": "Continue learning",
+    "lessons": "lessons",
+    "hours": "hours",
+    "levelEasy": "Beginner",
+    "levelMedium": "Intermediate",
+    "levelHard": "Advanced",
+    "courses": {
+      "cyber-basics": "Introduction to Cybersecurity",
+      "digital-literacy": "Digital Safety Awareness",
+      "network-defense": "Network Security Fundamentals",
+      "digital-forensics": "Digital Forensics",
+      "secure-coding": "Web Application Security and OWASP",
+      "ethical-hacking": "Ethical Hacking",
+      "cloud-security": "Cloud Security Essentials",
+      "soc-analyst": "Threat Intelligence and SOC Analysis"
+    }
+  },
+  "footer": {
+    "suggestions": "Suggestions & Inquiries",
+    "joinUs": "Join Us",
+    "followUs": "Follow Us",
+    "copyright": "© Cyber Security Club — Arab Open University"
+  }
+}
