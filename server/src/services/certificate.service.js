@@ -52,7 +52,20 @@ const COURSE_TITLES = Object.freeze({
 });
 
 function courseTitleFor(courseSlug, language, fallback) {
-  return COURSE_TITLES[courseSlug]?.[normalizeLanguage(language)] || String(fallback || courseSlug);
+  const normalizedLanguage = normalizeLanguage(language);
+  const normalizedSlug = String(courseSlug || '').trim().toLowerCase();
+  const direct = COURSE_TITLES[normalizedSlug];
+  if (direct) return direct[normalizedLanguage];
+
+  // Older certificates in the database may have been created before the
+  // current canonical slug set. Match their known Arabic/English display
+  // title as a safe compatibility path, so reissuing always switches both
+  // the certificate language and the course title together.
+  const normalizedFallback = String(fallback || '').trim().toLocaleLowerCase();
+  const matched = Object.values(COURSE_TITLES).find((titles) =>
+    [titles.ar, titles.en].some((title) => title.toLocaleLowerCase() === normalizedFallback)
+  );
+  return matched?.[normalizedLanguage] || String(fallback || courseSlug);
 }
 
 function escapeXml(str) {

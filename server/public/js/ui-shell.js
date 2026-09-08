@@ -9,11 +9,19 @@
 
   // The radar is a visual affordance, not live security telemetry. CSS owns its
   // motion; this tiny visibility hook avoids animating while the tab is hidden.
+  let radarInView = true;
   const syncRadarVisibility = () => {
-    body.classList.toggle('radar-paused', document.hidden || window.innerWidth <= 760 || reduceMotion);
+    body.classList.toggle('radar-paused', document.hidden || window.innerWidth <= 760 || reduceMotion || !radarInView);
   };
   document.addEventListener('visibilitychange', syncRadarVisibility);
   window.addEventListener('resize', syncRadarVisibility, { passive: true });
+  const radar = document.querySelector('.console-orbit');
+  if (radar && 'IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      radarInView = entries[0]?.isIntersecting ?? false;
+      syncRadarVisibility();
+    }, { threshold: 0.03 }).observe(radar);
+  }
   syncRadarVisibility();
 
   const toggle = document.getElementById('mobile-nav-toggle');

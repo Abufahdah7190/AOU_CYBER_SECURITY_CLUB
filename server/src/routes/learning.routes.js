@@ -42,7 +42,9 @@ router.get('/certificates/:certificateCode/image', [certificateCodeParam], handl
     if (!certificate) return res.status(404).send('Certificate not found');
     const svg = await renderCertificateSvg(certificate);
     res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    // A learner may reissue the same certificate code in a different language
+    // or theme. Do not let a browser keep the earlier SVG for an hour.
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
     return res.send(svg);
   } catch (error) { return next(error); }
 });

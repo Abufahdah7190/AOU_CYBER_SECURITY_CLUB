@@ -1459,6 +1459,28 @@ function initChallenges() {
 // Arabic before switching to English. A short fallback timer covers the
 // unlikely case that i18n.js fails to load.
 let appStarted = false;
+let gamesStarted = false;
+
+// The games used to start three animation/timer loops as soon as the page
+// loaded, even while the visitor was still on the sign-in screen.  Keep that
+// work dormant until the Games tab is actually opened.
+function startGames() {
+  if (gamesStarted) return;
+  gamesStarted = true;
+  initGhostGame();
+  initDefenseGame();
+  initBowGame();
+  initLinkGame();
+  initPacketGame();
+  initWhackGame();
+  initQuiz();
+  initSimulator();
+}
+
+document.addEventListener('tabchange', (event) => {
+  if (event.detail?.tab === 'games') startGames();
+});
+
 function startApp() {
   if (appStarted) return;
   appStarted = true;
@@ -1471,15 +1493,8 @@ function startApp() {
   initLinkChecker();
   initFileScanner();
   initPasswordChecker();
-  initGhostGame();
-  initDefenseGame();
-  initBowGame();
-  initLinkGame();
-  initPacketGame();
-  initWhackGame();
-  initQuiz();
-  initSimulator();
   initChallenges();
+  // Game engines are loaded on demand by startGames() above.
 }
 
 document.addEventListener('languagechange', startApp, { once: true });
