@@ -38,6 +38,23 @@ function normalizeLanguage(lang) {
   return lang === 'en' ? 'en' : 'ar';
 }
 
+// Certificates are public records. For known club paths the server owns the
+// bilingual title instead of trusting an old/browser-provided display name.
+const COURSE_TITLES = Object.freeze({
+  'cyber-basics': { ar: 'أساسيات الأمن السيبراني', en: 'Introduction to Cybersecurity' },
+  'digital-literacy': { ar: 'الوعي الرقمي الآمن', en: 'Digital Safety Awareness' },
+  'network-defense': { ar: 'شبكات وحماية البيانات', en: 'Network Security Fundamentals' },
+  'digital-forensics': { ar: 'التحقيق الجنائي الرقمي', en: 'Digital Forensics' },
+  'secure-coding': { ar: 'حماية تطبيقات الويب وOWASP Top 10', en: 'Web Application Security and OWASP Top 10' },
+  'ethical-hacking': { ar: 'الاختبار الاختراقي الأخلاقي', en: 'Ethical Hacking' },
+  'cloud-security': { ar: 'أمن الحوسبة السحابية', en: 'Cloud Security Essentials' },
+  'soc-analyst': { ar: 'تحليل التهديدات والاستخبارات الأمنية', en: 'Cyber Threat Intelligence and SOC Analysis' },
+});
+
+function courseTitleFor(courseSlug, language, fallback) {
+  return COURSE_TITLES[courseSlug]?.[normalizeLanguage(language)] || String(fallback || courseSlug);
+}
+
 function escapeXml(str) {
   if (!str) return '';
   return String(str)
@@ -111,8 +128,11 @@ function commonFields(certificate) {
 function buildLightSvg(certificate, qrDataUrl) {
   const f = commonFields(certificate);
   const isEn = f.isEn;
-  const bodyStack = isEn ? 'Georgia, "Times New Roman", serif' : '"Cairo", "Tahoma", sans-serif';
-  const sansStack = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';
+  // Web SVG viewers (especially mobile Safari) cannot rely on a locally
+  // installed Cairo font. Arial is present on iOS/Android and renders Arabic
+  // shaping consistently, while the direction attributes below preserve RTL.
+  const bodyStack = isEn ? 'Georgia, "Times New Roman", serif' : 'Arial, Tahoma, sans-serif';
+  const sansStack = isEn ? 'Arial, "Helvetica Neue", sans-serif' : 'Arial, Tahoma, sans-serif';
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img" dir="${f.documentDirection}" lang="${normalizeLanguage(certificate.language)}">
@@ -145,27 +165,27 @@ function buildLightSvg(certificate, qrDataUrl) {
   ${logoDataUrl() ? `<image x="740" y="45" width="120" height="120" href="${logoDataUrl()}" xlink:href="${logoDataUrl()}" preserveAspectRatio="xMidYMid meet"/>` : ''}
 
   <!-- اسم النادي / الجهة المصدرة -->
-  <text x="800" y="180" text-anchor="middle" fill="#475569" font-family='${sansStack}' font-size="15" font-weight="800" letter-spacing="2">${escapeXml(f.clubSub)}</text>
+  <text x="800" y="180" text-anchor="middle" fill="#475569" font-family='${sansStack}' font-size="15" font-weight="800" letter-spacing="${isEn ? '2' : '0'}" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.clubSub)}</text>
 
   <!-- عنوان الشهادة الرئيسي -->
-  <text x="800" y="235" text-anchor="middle" fill="url(#titleGrad)" font-family='${bodyStack}' font-size="40" font-weight="800" letter-spacing="1">${escapeXml(f.title)}</text>
-  <text x="800" y="275" text-anchor="middle" fill="#334155" font-family='${sansStack}' font-size="18" font-weight="600">${escapeXml(f.awardedTo)}</text>
+  <text x="800" y="235" text-anchor="middle" fill="url(#titleGrad)" font-family='${bodyStack}' font-size="40" font-weight="800" letter-spacing="${isEn ? '1' : '0'}" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.title)}</text>
+  <text x="800" y="275" text-anchor="middle" fill="#334155" font-family='${sansStack}' font-size="18" font-weight="600" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.awardedTo)}</text>
 
   <!-- اسم الطالب البارز -->
-  <text x="800" y="345" text-anchor="middle" fill="#0f172a" font-family='${sansStack}' font-size="46" font-weight="800">${escapeXml(certificate.studentName)}</text>
+  <text x="800" y="345" text-anchor="middle" fill="#0f172a" font-family='${sansStack}' font-size="46" font-weight="800" direction="auto" unicode-bidi="plaintext">${escapeXml(certificate.studentName)}</text>
   <line x1="400" y1="380" x2="1200" y2="380" stroke="url(#frameGrad)" stroke-width="2.5"/>
 
   <!-- السطر التعريفي الأول -->
-  <text x="800" y="430" text-anchor="middle" fill="#1e293b" font-family='${sansStack}' font-size="18" font-weight="600">${escapeXml(f.statementLine1)}</text>
+  <text x="800" y="430" text-anchor="middle" fill="#1e293b" font-family='${sansStack}' font-size="18" font-weight="600" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.statementLine1)}</text>
 
   <!-- اسم الدورة التدريبية -->
-  <text x="800" y="495" text-anchor="middle" fill="#1d4ed8" font-family='${sansStack}' font-size="30" font-weight="800">${escapeXml(certificate.courseName)}</text>
+  <text x="800" y="495" text-anchor="middle" fill="#1d4ed8" font-family='${sansStack}' font-size="30" font-weight="800" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(certificate.courseName)}</text>
 
   <!-- السطر التعريفي الثاني -->
-  <text x="800" y="555" text-anchor="middle" fill="#334155" font-family='${sansStack}' font-size="16" font-weight="600">${escapeXml(f.statementLine2)}</text>
+  <text x="800" y="555" text-anchor="middle" fill="#334155" font-family='${sansStack}' font-size="16" font-weight="600" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.statementLine2)}</text>
 
   <!-- تاريخ الإصدار الرسمي -->
-  <text x="800" y="615" text-anchor="middle" fill="#475569" font-family='${sansStack}' font-size="16" font-weight="700">${escapeXml(f.awardedDay)} ${escapeXml(f.issueDate)}</text>
+  <text x="800" y="615" text-anchor="middle" fill="#475569" font-family='${sansStack}' font-size="16" font-weight="700" direction="${f.documentDirection}" unicode-bidi="plaintext">${escapeXml(f.awardedDay)} ${escapeXml(f.issueDate)}</text>
 
   <!-- صندوق الـ QR Code ورمز التحقق في الزاوية السفلى -->
   <g transform="translate(1310, 680)">
@@ -344,6 +364,7 @@ function queueCertificateEmail({ certificate, recipientEmail }) {
 
 module.exports = {
   studentFullName,
+  courseTitleFor,
   issueCertificate,
   findByCode,
   renderCertificateSvg,

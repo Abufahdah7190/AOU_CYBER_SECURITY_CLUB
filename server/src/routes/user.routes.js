@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/profile', requireAuth, async (req, res, next) => {
   try {
     const [userResult, progressResult, certificateResult] = await Promise.all([
-      pool.query(`SELECT id, first_name AS "firstName", last_name AS "lastName", email, role, phone, major, gender, created_at AS "createdAt" FROM users WHERE id = $1`, [req.user.id]),
+      pool.query(`SELECT id, first_name AS "firstName", last_name AS "lastName", email, role, phone, major, gender, avatar_data AS "avatarData", created_at AS "createdAt" FROM users WHERE id = $1`, [req.user.id]),
       pool.query(`SELECT course_slug AS "courseSlug", percent, completed_at AS "completedAt", last_accessed_at AS "lastAccessedAt" FROM student_course_progress WHERE student_id = $1 ORDER BY last_accessed_at DESC`, [req.user.id]),
       pool.query(`SELECT course_slug AS "courseSlug", course_name AS "courseName", student_name AS "studentName", language, theme, certificate_code AS "certificateCode", issued_at AS "issuedAt" FROM student_course_certificates WHERE student_id = $1 ORDER BY issued_at DESC`, [req.user.id]),
     ]);

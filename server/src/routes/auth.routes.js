@@ -65,6 +65,9 @@ router.patch(
     body('phone').optional({ checkFalsy: true }).trim().isMobilePhone('any'),
     body('major').optional({ checkFalsy: true }).trim().isLength({ max: 150 }),
     body('gender').optional({ checkFalsy: true }).isIn(['male', 'female']),
+    body('avatarData').optional({ checkFalsy: true }).isString().isLength({ max: 350000 })
+      .matches(/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=\s]+$/)
+      .withMessage('صورة الملف الشخصي يجب أن تكون PNG أو JPEG أو WebP.'),
   ],
   handleValidation,
   ctrl.updateProfile

@@ -10,6 +10,7 @@ const {
   renderCertificateSvg,
   queueCertificateEmail,
   withQrDataUrl,
+  courseTitleFor,
 } = require('../services/certificate.service');
 
 const router = express.Router();
@@ -108,7 +109,7 @@ router.put('/progress/:courseSlug', [
       const issued = await issueCertificate({
         studentId: req.user.id,
         courseSlug,
-        courseName: String(req.body.courseName || courseSlug).trim(),
+        courseName: courseTitleFor(courseSlug, language, req.body.courseName),
         studentName: studentFullName(user),
         language,
         theme,
@@ -159,7 +160,7 @@ router.post('/certificates/:courseSlug', [
     const issued = await issueCertificate({
       studentId: req.user.id,
       courseSlug: req.params.courseSlug,
-      courseName: req.body.courseName,
+      courseName: courseTitleFor(req.params.courseSlug, req.body.language, req.body.courseName),
       studentName: studentFullName(user),
       language: req.body.language,
       theme: req.body.theme || 'light',

@@ -16,7 +16,8 @@
   function renderCertificate(c) {
     const imageUrl = `/api/learning/certificates/${encodeURIComponent(c.certificateCode)}/image`;
     result.className = 'verify-success';
-    result.innerHTML = `<strong>✓ ${copy('valid')}</strong><img class="verify-certificate-image" src="${imageUrl}" alt="${copy('valid')} ${escapeHtml(c.studentName)}"><dl><dt>${copy('student')}</dt><dd>${escapeHtml(c.studentName)}</dd><dt>${copy('course')}</dt><dd>${escapeHtml(c.courseName)}</dd><dt>${copy('serial')}</dt><dd>${escapeHtml(c.certificateCode)}</dd><dt>${copy('status')}</dt><dd>${c.status === 'valid' ? copy('validStatus') : copy('revoked')}</dd><dt>${copy('issued')}</dt><dd>${new Date(c.issuedAt).toLocaleDateString(english() ? 'en-GB' : 'ar-SA')}</dd></dl>`;
+    const displayLocale = english() ? 'en-GB' : 'ar-SA';
+    result.innerHTML = `<strong class="verify-verdict">✓ ${copy('valid')}</strong><img class="verify-certificate-image" src="${imageUrl}" alt="${copy('valid')} ${escapeHtml(c.studentName)}"><dl><dt>${copy('student')}</dt><dd dir="auto">${escapeHtml(c.studentName)}</dd><dt>${copy('course')}</dt><dd dir="auto">${escapeHtml(c.courseName)}</dd><dt>${copy('serial')}</dt><dd dir="ltr" class="verify-code">${escapeHtml(c.certificateCode)}</dd><dt>${copy('status')}</dt><dd>${c.status === 'valid' ? copy('validStatus') : copy('revoked')}</dd><dt>${copy('issued')}</dt><dd>${new Date(c.issuedAt).toLocaleDateString(displayLocale)}</dd></dl>`;
   }
   async function verify(code) {
     result.className = 'verify-loading'; result.textContent = copy('checking');

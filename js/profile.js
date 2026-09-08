@@ -13,7 +13,17 @@
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const request = async (url, options = {}) => { const response = await fetch(url, { ...options, credentials: 'include', cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || 'تعذر تنفيذ العملية.'); return data; };
   function setMessage(text, type = '') { const box = $('#profile-message'); if (!box) return; box.textContent = text || ''; box.className = `profile-message${type ? ` ${type}` : ''}`; }
-  function fillUser(user) { if (!user) return; const english = lang() === 'en'; $('#profile-first-name') && ($('#profile-first-name').value = user.firstName || ''); $('#profile-last-name') && ($('#profile-last-name').value = user.lastName || ''); $('#profile-email') && ($('#profile-email').value = user.email || ''); $('#profile-phone') && ($('#profile-phone').value = user.phone || ''); $('#profile-major') && ($('#profile-major').value = user.major || ''); $('#profile-gender') && ($('#profile-gender').value = user.gender || ''); const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || (english ? 'Student' : 'طالب'); if ($('#profile-full-name')) $('#profile-full-name').textContent = fullName; if ($('#profile-role')) $('#profile-role').textContent = user.role === 'admin' ? (english ? 'Administrator' : 'مسؤول') : (english ? 'Student' : 'طالب'); if ($('#profile-joined')) $('#profile-joined').textContent = `${english ? 'Joined:' : 'تاريخ الانضمام:'} ${user.createdAt ? new Date(user.createdAt).toLocaleDateString(english ? 'en-GB' : 'ar-SA') : '—'}`; if ($('#profile-avatar')) $('#profile-avatar').textContent = fullName.slice(0, 1); }
+  function renderAvatar(user, fullName) {
+    const avatar = $('#profile-avatar');
+    if (!avatar) return;
+    const source = String(user?.avatarData || '');
+    avatar.style.backgroundImage = source ? `url("${source.replace(/"/g, '%22')}")` : '';
+    avatar.textContent = source ? '' : fullName.slice(0, 1).toUpperCase();
+    avatar.setAttribute('aria-label', source
+      ? (lang() === 'en' ? `Profile photo for ${fullName}` : `الصورة الشخصية لـ ${fullName}`)
+      : (lang() === 'en' ? `Initials for ${fullName}` : `الحرف الأول من اسم ${fullName}`));
+  }
+  function fillUser(user) { if (!user) return; const english = lang() === 'en'; $('#profile-first-name') && ($('#profile-first-name').value = user.firstName || ''); $('#profile-last-name') && ($('#profile-last-name').value = user.lastName || ''); $('#profile-email') && ($('#profile-email').value = user.email || ''); $('#profile-phone') && ($('#profile-phone').value = user.phone || ''); $('#profile-major') && ($('#profile-major').value = user.major || ''); $('#profile-gender') && ($('#profile-gender').value = user.gender || ''); const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || (english ? 'Student' : 'طالب'); if ($('#profile-full-name')) $('#profile-full-name').textContent = fullName; if ($('#profile-role')) $('#profile-role').textContent = user.role === 'admin' ? (english ? 'Administrator' : 'مسؤول') : (english ? 'Student' : 'طالب'); if ($('#profile-joined')) $('#profile-joined').textContent = `${english ? 'Joined:' : 'تاريخ الانضمام:'} ${user.createdAt ? new Date(user.createdAt).toLocaleDateString(english ? 'en-GB' : 'ar-SA') : '—'}`; renderAvatar(user, fullName); }
   function renderStats(stats = {}) { if ($('#stat-enrolled')) $('#stat-enrolled').textContent = stats.enrolledCourses || 0; if ($('#stat-completed')) $('#stat-completed').textContent = stats.completedCourses || 0; if ($('#stat-certificates')) $('#stat-certificates').textContent = stats.certificatesEarned || 0; }
   function certificateImageUrl(certificate) {
     const apiBase = (window.CYBERCLUB_API_BASE || '').replace(/\/$/, '');
@@ -91,7 +101,9 @@
     }
   }
 
-  async function updateProfile(event) { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; try { const data = await request(`${AUTH_URL}/profile`, { method: 'PATCH', body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) }); profileState.user = data.user; fillUser(data.user); setMessage(messageFor('updated'), 'success'); } catch (error) { setMessage(messageFor('generic'), 'error'); } }
+  function profilePayload() { return { ...Object.fromEntries(new FormData($('#profile-form')).entries()), avatarData: profileState.user?.avatarData || undefined }; }
+  async function saveProfile(payload, successMessage = messageFor('updated')) { const data = await request(`${AUTH_URL}/profile`, { method: 'PATCH', body: JSON.stringify(payload) }); profileState.user = data.user; fillUser(data.user); setMessage(successMessage, 'success'); return data; }
+  async function updateProfile(event) { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; try { await saveProfile(profilePayload()); } catch (error) { setMessage(error.message || messageFor('generic'), 'error'); } }
   async function changePassword(event) { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; const button = form.querySelector('button[type="submit"]'); try { button.disabled = true; await request(`${AUTH_URL}/change-password`, { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) }); form.reset(); setMessage(messageFor('password'), 'success'); } catch (error) { setMessage(messageFor('generic'), 'error'); } finally { button.disabled = false; } }
   async function logout() { try { await request(`${AUTH_URL}/logout`, { method: 'POST' }); window.location.replace('/index.html'); } catch (error) { setMessage(error.message, 'error'); } }
   document.addEventListener('auth:ready', (event) => { fillUser(event.detail?.user); loadProfile(); });
@@ -102,9 +114,23 @@
     $('#profile-logout')?.addEventListener('click', logout);
     $('#profile-avatar-input')?.addEventListener('change', (event) => {
       const file = event.target.files?.[0];
-      if (!file || !file.type.startsWith('image/')) return;
+      const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+      const maxBytes = 250 * 1024;
+      if (!file) return;
+      if (!allowed.includes(file.type) || file.size > maxBytes) {
+        event.target.value = '';
+        setMessage(lang() === 'en' ? 'Choose a PNG, JPEG, or WebP image smaller than 250 KB.' : 'اختر صورة PNG أو JPEG أو WebP بحجم أقل من 250 كيلوبايت.', 'error');
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = () => { const avatar = $('#profile-avatar'); if (avatar) { avatar.textContent = ''; avatar.style.backgroundImage = `url(${reader.result})`; avatar.style.backgroundSize = 'cover'; avatar.style.backgroundPosition = 'center'; } };
+      reader.onload = async () => {
+        try {
+          if (!profileState.user) throw new Error('Profile is still loading.');
+          profileState.user.avatarData = String(reader.result);
+          renderAvatar(profileState.user, `${profileState.user.firstName || ''} ${profileState.user.lastName || ''}`.trim() || profileState.user.email);
+          await saveProfile(profilePayload(), lang() === 'en' ? 'Profile photo saved.' : 'تم حفظ الصورة الشخصية.');
+        } catch (error) { setMessage(error.message || messageFor('generic'), 'error'); }
+      };
       reader.readAsDataURL(file);
     });
     if (document.body.classList.contains('profile-page')) loadProfile();

@@ -54,6 +54,7 @@ function publicUser(user) {
     major: user.major,
     role: user.role,
     gender: user.gender,
+    avatarData: user.avatar_data || null,
     createdAt: user.created_at,
   };
 }
@@ -234,8 +235,13 @@ async function me(req, res, next) {
 // ---------------------------------------------------------------------
 async function updateProfile(req, res, next) {
   try {
-    const { firstName, lastName, phone, major, gender } = req.body;
-    const updated = await usersRepo.updateProfile(req.user.id, { firstName, lastName, phone, major, gender });
+    const { firstName, lastName, phone, major, gender, avatarData } = req.body;
+    // The route validator has already checked the shape. Keep an explicit
+    // byte ceiling here as defence in depth before persisting a data URI.
+    if (avatarData && Buffer.byteLength(avatarData, 'utf8') > 350000) {
+      return res.status(400).json({ error: 'صورة الملف الشخصي كبيرة جدًا.' });
+    }
+    const updated = await usersRepo.updateProfile(req.user.id, { firstName, lastName, phone, major, gender, avatarData });
     await recordAudit({ actorId: req.user.id, action: 'user.update_profile', entityType: 'user', entityId: req.user.id, req });
     return res.json({ user: publicUser(updated) });
   } catch (err) {

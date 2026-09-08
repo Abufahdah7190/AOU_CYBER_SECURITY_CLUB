@@ -35,6 +35,12 @@
     "activeMembers": "Active members: {count}",
     "issuedCertificates": "Certificates issued: {count}"
   },
+  "hero": {
+    "titlePrefix": "Building",
+    "titleAccent": "a safer",
+    "titleSuffix": "digital generation.",
+    "description": "The Cyber Security Club platform at Arab Open University — Riyadh. Learn, practise, and join a campus community leading digital awareness with confidence."
+  },
   "home": {
     "title": "Club Introduction and Goals",
     "about": "The Cybersecurity Club is one of the student clubs at the Arab Open University, aiming to raise awareness of the importance of cybersecurity and spread a culture of safe and responsible technology use among students. The club seeks to empower students to develop their information security skills through workshops, training courses, and technical projects that keep pace with the digital age. We aspire to build a pioneering technical community capable of innovation and collaboration, and to offer specialized events and competitions that enhance knowledge and practical application.",

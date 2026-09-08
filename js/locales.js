@@ -37,6 +37,12 @@ window.LOCALES = {
       "activeMembers": "أعضاء نشطون: {count}",
       "issuedCertificates": "شهادات صادرة: {count}"
     },
+    "hero": {
+      "titlePrefix": "نصنع جيلاً",
+      "titleAccent": "أكثر أمانًا",
+      "titleSuffix": "رقميًا.",
+      "description": "منصة نادي الأمن السيبراني في الجامعة العربية المفتوحة — الرياض. تعلّم، اختبر، وشارك في مجتمع جامعي يقود الوعي الرقمي بثقة."
+    },
     "home": {
       "title": "تعريف النادي وأهدافه",
       "about": "نادي الأمن السيبراني هو أحد الأندية الطلابية في الجامعة العربية المفتوحة، يهدف إلى تعزيز الوعي بأهمية الأمن السيبراني ونشر ثقافة الاستخدام الآمن والمسؤول للتقنية بين الطلبة. يسعى النادي إلى تمكين الطلاب من تطوير مهاراتهم في مجال أمن المعلومات عبر ورش عمل، ودورات تدريبية، ومشاريع تقنية تواكب تطورات العصر الرقمي. نطمح لبناء مجتمع تقني ريادي قادر على الابتكار والتعاون، وتقديم فعاليات ومسابقات متخصصة تعزز المعرفة والتطبيق العملي.",
@@ -603,6 +609,12 @@ window.LOCALES = {
     "status": {
       "activeMembers": "Active members: {count}",
       "issuedCertificates": "Certificates issued: {count}"
+    },
+    "hero": {
+      "titlePrefix": "Building",
+      "titleAccent": "a safer",
+      "titleSuffix": "digital generation.",
+      "description": "The Cyber Security Club platform at Arab Open University — Riyadh. Learn, practise, and join a campus community leading digital awareness with confidence."
     },
     "home": {
       "title": "Club Introduction and Goals",

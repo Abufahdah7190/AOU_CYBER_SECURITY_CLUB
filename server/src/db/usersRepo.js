@@ -8,11 +8,11 @@ const { pool } = require('./pool');
 // text, so user input is never interpreted as SQL syntax.
 
 const PUBLIC_COLUMNS = `id, first_name, last_name, email, phone, major, gender, role,
-  is_active, email_verified_at, created_at`;
+  avatar_data, avatar_updated_at, is_active, email_verified_at, created_at`;
 
 async function findByEmail(email) {
   const { rows } = await pool.query(
-    `SELECT id, first_name, last_name, email, phone, password_hash, major, gender, role,
+    `SELECT id, first_name, last_name, email, phone, password_hash, major, gender, role, avatar_data,
             is_active, failed_login_count, locked_until, created_at
      FROM users WHERE email = $1`,
     [email]
@@ -35,12 +35,14 @@ async function createUser({ firstName, lastName, email, phone, passwordHash, maj
   return rows[0];
 }
 
-async function updateProfile(id, { firstName, lastName, phone, major, gender }) {
+async function updateProfile(id, { firstName, lastName, phone, major, gender, avatarData }) {
   const { rows } = await pool.query(
-    `UPDATE users SET first_name = $2, last_name = $3, phone = $4, major = $5, gender = $6
+    `UPDATE users SET first_name = $2, last_name = $3, phone = $4, major = $5, gender = $6,
+       avatar_data = COALESCE($7, avatar_data),
+       avatar_updated_at = CASE WHEN $7 IS NULL THEN avatar_updated_at ELSE now() END
      WHERE id = $1
      RETURNING ${PUBLIC_COLUMNS}`,
-    [id, firstName, lastName, phone || null, major || null, gender || null]
+    [id, firstName, lastName, phone || null, major || null, gender || null, avatarData === undefined ? null : avatarData]
   );
   return rows[0] || null;
 }
