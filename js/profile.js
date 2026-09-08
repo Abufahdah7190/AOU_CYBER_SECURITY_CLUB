@@ -15,7 +15,20 @@
   function setMessage(text, type = '') { const box = $('#profile-message'); if (!box) return; box.textContent = text || ''; box.className = `profile-message${type ? ` ${type}` : ''}`; }
   function fillUser(user) { if (!user) return; const english = lang() === 'en'; $('#profile-first-name') && ($('#profile-first-name').value = user.firstName || ''); $('#profile-last-name') && ($('#profile-last-name').value = user.lastName || ''); $('#profile-email') && ($('#profile-email').value = user.email || ''); $('#profile-phone') && ($('#profile-phone').value = user.phone || ''); $('#profile-major') && ($('#profile-major').value = user.major || ''); $('#profile-gender') && ($('#profile-gender').value = user.gender || ''); const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || (english ? 'Student' : 'طالب'); if ($('#profile-full-name')) $('#profile-full-name').textContent = fullName; if ($('#profile-role')) $('#profile-role').textContent = user.role === 'admin' ? (english ? 'Administrator' : 'مسؤول') : (english ? 'Student' : 'طالب'); if ($('#profile-joined')) $('#profile-joined').textContent = `${english ? 'Joined:' : 'تاريخ الانضمام:'} ${user.createdAt ? new Date(user.createdAt).toLocaleDateString(english ? 'en-GB' : 'ar-SA') : '—'}`; if ($('#profile-avatar')) $('#profile-avatar').textContent = fullName.slice(0, 1); }
   function renderStats(stats = {}) { if ($('#stat-enrolled')) $('#stat-enrolled').textContent = stats.enrolledCourses || 0; if ($('#stat-completed')) $('#stat-completed').textContent = stats.completedCourses || 0; if ($('#stat-certificates')) $('#stat-certificates').textContent = stats.certificatesEarned || 0; }
-  function certificateImageUrl(certificate) { return certificate.imageUrl || `${(window.CYBERCLUB_API_BASE || '').replace(/\/$/, '')}/api/learning/certificates/${encodeURIComponent(certificate.certificateCode)}/image`; }
+  function certificateImageUrl(certificate) {
+    const apiBase = (window.CYBERCLUB_API_BASE || '').replace(/\/$/, '');
+    const fallback = `${apiBase}/api/learning/certificates/${encodeURIComponent(certificate.certificateCode)}/image`;
+    if (!certificate.imageUrl) return fallback;
+    try {
+      const supplied = new URL(certificate.imageUrl, window.location.origin);
+      const isLocalAddress = ['localhost', '127.0.0.1', '::1'].includes(supplied.hostname);
+      // Old certificates can contain the development URL that was configured
+      // when they were issued. A deployed visitor must never try to contact
+      // localhost on their own device; use the live site's API instead.
+      if (isLocalAddress && !['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)) return fallback;
+      return supplied.href;
+    } catch (_) { return fallback; }
+  }
   function certificatePreview(certificate) { const verifyUrl = certificate.verificationUrl || `${window.location.origin}/certificate-verify.html?code=${encodeURIComponent(certificate.certificateCode)}`; const imageUrl = certificateImageUrl(certificate); const modal = document.createElement('div'); modal.className = 'certificate-modal'; modal.innerHTML = `<div class="certificate-sheet certificate-sheet-image"><img class="certificate-render" src="${imageUrl}" alt="شهادة ${escapeHtml(certificate.courseName)}"><p class="certificate-disclaimer">يمكن التحقق من صحة الشهادة عبر مسح رمز QR الظاهر عليها أو <a href="${verifyUrl}" target="_blank" rel="noopener">فتح رابط التحقق</a>.</p><div class="certificate-actions-print"><a class="btn primary" href="${imageUrl}" download="${escapeHtml(certificate.certificateCode)}.svg">تحميل الشهادة (SVG)</a><button class="btn ghost print-certificate" type="button">طباعة / حفظ PDF</button><button class="btn ghost close-certificate" type="button">إغلاق</button></div></div>`; document.body.appendChild(modal); modal.querySelector('.print-certificate').onclick = () => window.print(); modal.querySelector('.close-certificate').onclick = () => modal.remove(); modal.addEventListener('click', (event) => { if (event.target === modal) modal.remove(); }); }
   function openCertificateOptions(certificate) {
     document.querySelector('.certificate-options-modal')?.remove();
