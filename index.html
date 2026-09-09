@@ -22,10 +22,10 @@
 <!-- deployed behind a web server, also send: -->
 <!-- Content-Security-Policy: frame-ancestors 'self'  (and/or X-Frame-Options: SAMEORIGIN) -->
 <meta content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: http://localhost:3000 http://127.0.0.1:3000; connect-src 'self' https://*.supabase.co https://*.supabase.in; object-src 'none'; base-uri 'self'; form-action 'self';" http-equiv="Content-Security-Policy"/>
-<link href="css/style.css" rel="stylesheet"/>
+<link href="css/style.css" rel="stylesheet"/><link href="css/club-forms.css" rel="stylesheet"/>
 </head>
 <body class="auth-locked">
-<script>document.body.classList.add('booting');</script>
+
 <div class="secure-boot-screen" aria-live="polite" aria-label="Initializing secure environment"><div class="boot-mark"><span></span><span></span><span></span></div><p>CYBERCLUB / INITIALIZING</p><small>SECURE ENVIRONMENT · AOU RIYADH</small></div>
 <div class="topbar" data-gateway-masthead>
 <div class="topbar-inner">
@@ -98,7 +98,7 @@
 <div class="panel-wrap">
 <section class="panel auth-panel" id="tab-auth" style="display:block">
   <div class="auth-shell">
-    <div class="auth-heading"><span class="auth-kicker" data-i18n="auth.kicker">CYBERCLUB / SECURE ACCESS</span><h2 data-i18n="auth.title">بوابة نادي الأمن السيبراني</h2><p data-i18n="auth.subtitle">سجّل الدخول إلى مسارك التعليمي، أو أنشئ حسابك الجامعي للانضمام إلى المنصة.</p></div>
+    <div class="auth-heading"><span class="auth-kicker" data-i18n="auth.kicker">CYBERCLUB / SECURE ACCESS</span><h2 data-i18n="auth.title">بوابة نادي الأمن السيبراني</h2><p data-i18n="auth.subtitle">سجّل الدخول إلى مسارك التعليمي، أو أنشئ حسابك الجامعي للانضمام إلى المنصة.</p></div><div class="club-actions"><a class="club-action" href="suggestions.html"><span class="action-icon" aria-hidden="true">↗</span><span>اقتراحات واستفسارات<small>فكرتك تصنع الفرق</small></span></a><a class="club-action join-action" href="join.html"><span class="action-icon" aria-hidden="true">+</span><span>انضم إلينا<small>كن جزءًا من مجتمعنا</small></span></a></div>
     <div class="auth-card" data-auth-card>
       <aside class="auth-welcome" aria-live="polite">
         <span class="auth-welcome-mark" aria-hidden="true">◈</span>
@@ -973,25 +973,7 @@
 <section class="panel" id="tab-contact" style="display:none">
 <div class="feedback-container">
 <h2 data-i18n="contact.title" style="color: var(--accent2); margin-bottom: 12px;">تواصل معنا</h2>
-<form class="feedback-form" id="suggestion-form">
-<div class="form-group">
-<label data-i18n="contact.nameLabel" for="suggestion-name">الاسم</label>
-<input id="suggestion-name" name="name" required="" type="text" autocomplete="name"/>
-</div>
-<div class="form-group">
-<label data-i18n="contact.emailLabel" for="suggestion-email">البريد الإلكتروني</label>
-<input id="suggestion-email" name="email" required="" type="email" autocomplete="email"/>
-</div>
-<div class="form-group">
-<label data-i18n="contact.messageLabel" for="suggestion-message">الرسالة</label>
-<textarea id="suggestion-message" name="message" required="" rows="4"></textarea>
-</div>
-<div class="form-actions">
-<button class="btn primary" id="suggestion-submit" data-i18n="contact.submitBtn" type="submit">إرسال</button>
-<button class="btn ghost" data-i18n="contact.resetBtn" type="reset">مسح</button>
-</div>
-<p id="suggestion-status" aria-live="polite" style="margin:10px 0 0;font-weight:700;"></p>
-</form>
+<p>شاركنا فكرتك أو استفسارك، ويسعدنا التواصل معك.</p><div class="club-actions"><a class="club-action" href="suggestions.html"><span class="action-icon" aria-hidden="true">↗</span><span>اقتراحات واستفسارات<small>فكرتك تصنع الفرق</small></span></a><a class="club-action join-action" href="join.html"><span class="action-icon" aria-hidden="true">+</span><span>انضم إلينا<small>كن جزءًا من مجتمعنا</small></span></a></div>
 </div>
 </section>
 <!-- معلومات الأمان -->
@@ -1096,28 +1078,9 @@
 </div>
 </section>
 </div>
-<section class="panel" id="join-form-section" hidden style="margin-top:14px;">
-<div class="feedback-container">
-<h2 data-i18n="footer.joinUs" style="color:var(--accent2);margin-bottom:12px;">انضم إلينا</h2>
-<form class="feedback-form" id="join-form">
-<div class="form-group"><label for="join-name">الاسم الكامل</label><input id="join-name" name="name" required type="text" autocomplete="name"/></div>
-<div class="form-group"><label for="join-email">البريد الإلكتروني</label><input id="join-email" name="email" required type="email" autocomplete="email"/></div>
-<div class="form-group"><label for="join-phone">رقم الجوال</label><input id="join-phone" name="phone" type="tel" autocomplete="tel"/></div>
-<div class="form-group"><label for="join-major">التخصص</label><input id="join-major" name="major" required type="text"/></div>
-<div class="form-group"><label for="join-message">لماذا ترغب في الانضمام للنادي؟</label><textarea id="join-message" name="message" rows="4"></textarea></div>
-<div class="form-actions">
-<button class="btn primary" id="join-submit" type="submit">إرسال طلب الانضمام</button>
-<button class="btn ghost" id="close-join-form" type="button">إلغاء</button>
-</div>
-<p id="join-status" aria-live="polite" style="margin:10px 0 0;font-weight:700;"></p>
-</form>
-</div>
-</section>
+
 <footer style="margin-top:14px;text-align:center;color:var(--muted);font-size:12px;">
-<div class="footer-actions" style="margin-bottom:6px;">
-<button class="footer-btn" data-i18n="footer.suggestions" id="open-suggestion-form" type="button">اقتراحات واستفسارات</button>
-<button class="footer-btn" data-i18n="footer.joinUs" id="open-join-form" type="button">انضم إلينا</button>
-</div>
+<div class="club-actions"><a class="club-action" href="suggestions.html"><span class="action-icon" aria-hidden="true">↗</span><span>اقتراحات واستفسارات<small>فكرتك تصنع الفرق</small></span></a><a class="club-action join-action" href="join.html"><span class="action-icon" aria-hidden="true">+</span><span>انضم إلينا<small>كن جزءًا من مجتمعنا</small></span></a></div>
 <div data-i18n="footer.followUs" style="margin-bottom:6px;color:var(--muted2);">تابعنا</div>
 <div class="socials" style="justify-content:center; margin-bottom:8px;">
 <a aria-label="Twitter" href="https://x.com/aou_csclub?s=21" rel="noopener" target="_blank" title="X / Twitter"><svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2H21l-6.52 7.46L22 22h-6.656l-5.21-6.36L3.8 22H1l6.98-7.98L2 2h6.742l4.73 5.78L18.244 2Zm-2.328 18h1.808L8.18 4H6.258l9.658 16Z"></path></svg></a>
@@ -1127,21 +1090,19 @@
     </footer>
 </div>
 <!-- Three.js and Globe.gl -->
-<script src="js/locales.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/i18n.js"></script>
-<script src="js/dynamic-i18n.js"></script>
-<script src="js/password-analysis.js"></script>
-<script src="js/link-analysis.js"></script>
-<script src="js/file-analysis.js"></script>
-<script src="js/script.js"></script>
-<script src="js/email-domain-suggest.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/learning.js"></script>
-<script src="js/course-catalog-i18n.js"></script>
-<script src="js/profile.js"></script>
-<script src="js/attack-map.js"></script>
-<script src="js/ui-shell.js"></script>
+<script defer src="js/locales.js"></script>
+<script defer src="js/i18n.js"></script>
+<script defer src="js/dynamic-i18n.js"></script>
+<script defer src="js/password-analysis.js"></script>
+<script defer src="js/link-analysis.js"></script>
+<script defer src="js/file-analysis.js"></script>
+<script defer src="js/script.js"></script>
+<script defer src="js/email-domain-suggest.js"></script>
+<script defer src="js/auth.js"></script>
+<script defer src="js/learning.js"></script>
+<script defer src="js/course-catalog-i18n.js"></script>
+<script defer src="js/profile.js"></script>
+<script defer src="js/attack-map.js"></script>
+<script defer src="js/ui-shell.js"></script>
 </body>
 </html>

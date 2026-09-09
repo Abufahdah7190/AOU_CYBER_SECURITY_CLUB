@@ -1,21 +1,32 @@
-# Supabase forms integration
+# تفعيل رسائل النادي في Supabase
 
-The Google Forms links have been removed from both the root site and the Render-served `server/public` copy.
+النسخة المعدلة تحتوي صفحتين مستقلتين: suggestions.html للاقتراحات والاستفسارات، وjoin.html لطلبات الانضمام. جميع الحقول المطلوبة موجودة، ومنها رقم الجوال وسبب الانضمام.
 
-## One required step
-Open `js/supabase-client.js` and replace:
-- `YOUR-PROJECT-REF` with your Supabase project URL
-- `YOUR_SUPABASE_ANON_PUBLIC_KEY` with the Supabase **anon/public** key
+## تفعيل الحفظ
 
-Do the same in `server/public/js/supabase-client.js`.
+1. افتح مشروعك في https://supabase.com/dashboard وتأكد أنه نفس المشروع المحدد في js/supabase-config.js.
+2. من SQL Editor افتح استعلامًا جديدًا، وانسخ ملف supabase/forms-setup.sql كاملًا ثم شغّله.
+3. ارفع ملفات الموقع المعدلة إلى استضافتك الحالية. تم تحديث نسخة server/public أيضًا.
+4. افتح الموقع المنشور وأرسل طلبًا تجريبيًا، ثم تأكد من ظهوره في Table Editor.
 
-Do NOT use the `service_role` key in browser code.
+الملف ينشئ الجداول الناقصة، ويضيف الأعمدة الناقصة بدون حذف الرسائل القديمة. إذا كان سبب الانضمام محفوظًا سابقًا باسم message، ينسخه إلى reason_to_join ويحافظ على العمود القديم. يستبدل سياسات الوصول لهذين الجدولين فقط بصلاحية الإرسال للزوار، ويمنع القراءة والتعديل والحذف من واجهة الموقع. راجع أي تكامل إداري قديم يعتمد على الوصول المباشر لهذين الجدولين قبل تطبيقه. الجداول التي لها أعمدة مخصصة إلزامية إضافية قد تحتاج مواءمة مخططها.
 
-## Expected columns
-`suggestions`: `name`, `email`, `message`
+## أين أشوف الرسائل؟
 
-`join_applications`: `name`, `email`, `phone`, `major`, `message`
+من Supabase → Table Editor:
 
-If your existing columns have different names, change the payload keys in `js/script.js` and `server/public/js/script.js` to match them.
+- suggestions: الاسم name، البريد email، الجوال phone، الرسالة message، وقت الإرسال created_at.
+- join_applications: الاسم name، البريد email، الجوال phone، التخصص major، سبب الانضمام reason_to_join، وقت الإرسال created_at.
 
-RLS must allow INSERT for `anon` on both tables.
+رتّب created_at تنازليًا لعرض الأحدث أولًا. الرسائل تُحفظ في لوحة Supabase، ولا تُرسل تلقائيًا إلى بريدك الإلكتروني.
+
+## إعداد الاتصال
+
+عنوان المشروع والمفتاح العام الموجودان أصلًا في الملف المرفق محفوظان في js/supabase-config.js، مع نسخة مطابقة في server/public/js/supabase-config.js. إذا غيرت مشروع Supabase، حدّث النسختين. لا تضع مفتاح service_role أو أي مفتاح سري في ملفات المتصفح.
+
+لم يتم تنفيذ SQL داخل حسابك أو تأكيد وصول رسالة فعلية إلى مشروعك من هذه الجلسة؛ لا تتوفر صلاحية إدارة مشروع Supabase هنا. نجاح اختبارات الواجهة المحلية لا يغني عن خطوة التفعيل والاختبار أعلاه.
+
+النماذج العامة تسمح بالإرسال فقط، مع تحقق من طول وصيغة البيانات على مستوى الصلاحيات. هذا ليس نظام مكافحة رسائل مزعجة كاملًا؛ عند الحاجة يمكن إضافة تحقق بشري وحد إرسال عبر وظيفة خلفية.
+
+مرجع الصلاحيات الرسمي: https://supabase.com/docs/guides/database/postgres/row-level-security
+

@@ -5,7 +5,7 @@
     body.classList.remove('booting');
     body.classList.add('boot-complete');
   };
-  window.setTimeout(finishBoot, reduceMotion ? 0 : 620);
+  finishBoot();
 
   // The radar is a visual affordance, not live security telemetry. CSS owns its
   // motion; this tiny visibility hook avoids animating while the tab is hidden.
