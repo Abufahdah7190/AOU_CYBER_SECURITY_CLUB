@@ -25,8 +25,14 @@
   }
 
   async function loadState() {
-    try { state = await request('/progress'); render(); }
-    catch (error) { console.warn('Learning state unavailable:', error.message); render(); }
+    try { 
+      state = await request('/progress'); 
+      render(); 
+    }
+    catch (error) { 
+      console.warn('Learning state unavailable:', error.message); 
+      render(); 
+    }
   }
 
   function render() {
@@ -65,8 +71,6 @@
       card.setAttribute('role', 'link');
       card.setAttribute('tabindex', '0');
       card.addEventListener('click', (event) => {
-        // Buttons remain available for their own actions; clicking anywhere
-        // else on the course card opens the dedicated learning page.
         if (event.target.closest('button, a, input, select, textarea')) return;
         openCourse(card);
       });
@@ -78,8 +82,6 @@
       });
     });
     document.querySelectorAll('.course-action').forEach((action) => {
-      // Course actions are real anchors with target="_blank". Do not call
-      // preventDefault here, otherwise the browser cannot open the new tab.
       if (action.tagName === 'A') return;
       action.addEventListener('click', (event) => {
         event.preventDefault();
@@ -105,13 +107,12 @@
       const saved = getSaved(slug);
       const quizScores = { ...(saved.quizScores || {}), [index]: true };
       const percent = Math.round((Object.values(quizScores).filter(Boolean).length / getCourse(slug).sections.length) * 100);
-     try {
+      try {
         const data = await request(`/progress/${slug}`, { method: 'PUT', body: JSON.stringify({ percent, lastSection: index + 1, quizScores, language: saved.language || 'ar' }) });
         state.progress = [...state.progress.filter((item) => item.courseSlug !== slug), data.progress];
         render(); openCourse(document.querySelector(`[data-course-id="${slug}"]`));
       } catch (error) { 
         console.warn('Network save failed, saving locally:', error);
-        // حفظ احتياطي محلياً كي لا تضيع إجابات وتقدم المستخدم
         localStorage.setItem(`offline_progress_${slug}`, JSON.stringify({ percent, lastSection: index + 1, quizScores }));
         result.textContent = 'تم الحفظ محلياً (سيتم المزامنة لاحقاً)'; 
       }
@@ -139,11 +140,17 @@
     const modal = document.createElement('div'); modal.className = 'certificate-modal'; modal.innerHTML = `<div class="certificate-sheet" dir="${arabic ? 'rtl' : 'ltr'}"><div class="certificate-logos"><img src="assets/branding/aou-logo.png" alt="AOU"><img src="assets/branding/cyberclub-logo.png" alt="Cyber Security Club"></div><h2>${title}</h2><p>${body}</p><h3>${certificate.studentName || ''}</h3><p>${courseLine}</p><h3>${certificate.courseName}</h3><p class="certificate-score">${arabic ? 'نسبة الاجتياز:' : 'Completion score:'} <strong>${certificate.completionPercent || 80}%</strong></p><p class="certificate-code">${arabic ? 'رمز التحقق الرقمي:' : 'Verification code:'} <strong>${certificate.certificateCode}</strong></p><div class="certificate-bottom"><img src="${certificate.qrDataUrl}" alt="QR Code للتحقق"><small>${disclaimer}</small></div><p class="${emailClass}" role="status">${emailText}</p><div class="certificate-actions-print"><button class="btn primary print-certificate">طباعة / حفظ PDF</button><button class="btn ghost close-certificate">إغلاق</button></div></div>`; document.body.appendChild(modal); modal.querySelector('.print-certificate').onclick = () => window.print(); modal.querySelector('.close-certificate').onclick = () => modal.remove();
   }
   function shareCertificate(slug) { const certificate = state.certificates.find((item) => item.courseSlug === slug); const text = certificate ? `I completed ${certificate.courseName} at AOU Cyber Security Club. Certificate: ${certificate.certificateCode}` : 'I completed a course at AOU Cyber Security Club.'; window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin + '/?certificate=' + encodeURIComponent(slug))}&summary=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer'); }
+  
   function init() {
     bindCourseNavigation();
+    // إزالة الاستدعاء المباشر لـ loadState لمنع إرسال الطلب قبل جاهزية المصادقة
     document.addEventListener('auth:ready', loadState);
-    loadState();
+    
+    // اختيارياً: إذا كنت ترغب في المحاولة فقط عندما تكون متأكداً من وجود جلسة أو ترك الحدث auth:ready يتولى الأمر
+    // يمكن الاعتماد بالكامل على حدث auth:ready أو إبقاء محاولة أخيرة هنا:
+    // loadState(); 
   }
+  
   document.addEventListener('languagechange', render);
   document.addEventListener('DOMContentLoaded', init);
 })();
