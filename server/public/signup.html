@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>إنشاء حساب جامعي</title>
+  <link rel="stylesheet" href="css/club-forms.css">
+</head>
+<body class="form-page">
+  <main class="form-layout">
+    <section class="form-card" aria-labelledby="signup-title">
+      <div class="form-card-heading"><div><h1 id="signup-title">إنشاء حساب جامعي</h1><p>استخدم بريدك الرسمي في الجامعة العربية المفتوحة.</p></div></div>
+      <form id="signup-form" novalidate>
+        <div class="field"><label for="signup-email">البريد الجامعي</label><input id="signup-email" name="email" type="email" required autocomplete="email" placeholder="student@aou.edu.sa" pattern="[^\s@]+@aou\.edu\.sa" dir="ltr"></div>
+        <div class="field"><label for="signup-password">كلمة المرور</label><input id="signup-password" name="password" type="password" required minlength="10" autocomplete="new-password"></div>
+        <button class="form-submit" type="submit">إنشاء الحساب وإرسال رابط التحقق</button>
+        <p id="signup-status" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>

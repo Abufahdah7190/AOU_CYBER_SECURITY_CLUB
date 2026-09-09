@@ -79,9 +79,9 @@ function escapeXml(str) {
 }
 
 function studentFullName(user) {
-  const first = user.first_name || user.firstName || '';
-  const last = user.last_name || user.lastName || '';
-  return `${first} ${last}`.trim() || user.email || 'الطالب';
+  const first = String(user.first_name || user.firstName || '').trim();
+  const last = String(user.last_name || user.lastName || '').trim();
+  return `${first} ${last}`.replace(/\s+/g, ' ').trim() || user.email || 'الطالب';
 }
 
 function verificationUrlFor(certificateCode) {

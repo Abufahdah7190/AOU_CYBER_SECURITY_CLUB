@@ -74,7 +74,7 @@ module.exports = {
   // without a code change. Comma-separated; defaults to both AOU domain
   // variants. Format confirmed by the club: student ID + "ksa"
   // @aou.edu.sa, e.g. 01345678ksa@aou.edu.sa
-  ALLOWED_EMAIL_DOMAINS: (process.env.ALLOWED_EMAIL_DOMAINS || process.env.ALLOWED_EMAIL_DOMAIN || 'aou.edu.sa,aou.edu')
+  ALLOWED_EMAIL_DOMAINS: (process.env.ALLOWED_EMAIL_DOMAINS || process.env.ALLOWED_EMAIL_DOMAIN || 'aou.edu.sa')
     .toLowerCase()
     .split(',')
     .map((domain) => domain.trim())

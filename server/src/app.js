@@ -82,8 +82,8 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: '256kb' }));
+app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 
 const maintenancePage = path.join(FRONTEND_ROOT, 'maintenance.html');
 app.locals.maintenancePage = maintenancePage;
@@ -123,7 +123,12 @@ app.use(express.static(FRONTEND_ROOT, {
   index: 'index.html',
   fallthrough: true,
   etag: true,
-  maxAge: env.isProd ? '1h' : 0,
+  maxAge: env.isProd ? '1d' : 0,
+  setHeaders: (res, filePath) => {
+    if (/\.(?:css|js|svg|png|jpe?g|webp|woff2?)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    }
+  },
 }));
 
 // Explicitly serve .html documents from the resolved frontend directory.

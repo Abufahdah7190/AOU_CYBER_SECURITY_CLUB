@@ -8,7 +8,7 @@
   const API_BASE = (window.CYBERCLUB_API_BASE || '').replace(/\/$/, '');
   const AUTH_URL = `${API_BASE}/api/auth`;
   const $ = (selector) => document.querySelector(selector);
-  const UNIVERSITY_EMAIL_PATTERN = /^[^\s@]+@(aou\.edu\.sa|aou\.edu)$/i;
+  const UNIVERSITY_EMAIL_PATTERN = /^[^\s@]+@aou\.edu\.sa$/i;
   const tr = (key, fallback) => window.i18n?.t(key, fallback) || fallback;
   const universityEmailMessage = () => tr('auth.universityEmailTitle', 'الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي');
 
