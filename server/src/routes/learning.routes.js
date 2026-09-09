@@ -53,6 +53,11 @@ router.use(requireAuth);
 
 router.get('/progress', async (req, res, next) => {
   try {
+    // التحقق المباشر من وجود المستخدم لتجنب أخطاء غير متوقعة
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'يجب تسجيل الدخول للمتابعة' });
+    }
+
     const { rows } = await pool.query(
       `SELECT course_slug AS "courseSlug", percent, last_section AS "lastSection",
               last_accessed_at AS "lastAccessedAt", quiz_scores AS "quizScores",
@@ -80,6 +85,10 @@ router.put('/progress/:courseSlug', [
   body('courseName').optional().trim().isLength({ min: 2, max: 200 }),
 ], handleValidation, async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'يجب تسجيل الدخول للمتابعة' });
+    }
+
     const { courseSlug } = req.params;
     const percent = Number(req.body.percent);
     const lastSection = Number(req.body.lastSection || 0);
@@ -118,8 +127,6 @@ router.put('/progress/:courseSlug', [
       });
       certificate = issued.certificate;
 
-      // Mail rendering and delivery run after the response has been scheduled;
-      // the learner never waits for SMTP/API availability or attachment creation.
       if (issued.created) {
         queueCertificateEmail({ certificate, recipientEmail: user.email });
       }
@@ -140,6 +147,10 @@ router.post('/certificates/:courseSlug', [
   body('theme').optional().isIn(['light']),
 ], handleValidation, async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'يجب تسجيل الدخول للمتابعة' });
+    }
+
     const progressResult = await pool.query(
       'SELECT percent FROM student_course_progress WHERE student_id=$1 AND course_slug=$2',
       [req.user.id, req.params.courseSlug]
@@ -156,9 +167,6 @@ router.post('/certificates/:courseSlug', [
     const user = userResult.rows[0];
     if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
-    // This endpoint is used from the profile page to (re)issue a certificate
-    // with a different language and/or theme. It reuses the single
-    // certificate code and only emails again when the certificate is new.
     const issued = await issueCertificate({
       studentId: req.user.id,
       courseSlug: req.params.courseSlug,
