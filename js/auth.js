@@ -2,8 +2,14 @@
 (function () {
   'use strict';
 
-  // التأكد من توفر عميل Supabase
-  const supabase = window.supabaseClient;
+  // البحث الآمن عن عميل Supabase بجميع الاحتمالات الممكنة لمنع خطأ undefined
+  const getSupabase = () => {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (window.supabase && typeof window.supabase.auth === 'object') return window.supabase;
+    // إذا تم إنشاؤه عبر createClient مباشرة
+    if (window._supabase) return window._supabase;
+    return null;
+  };
 
   const $ = (selector) => document.querySelector(selector);
   const UNIVERSITY_EMAIL_PATTERN = /^[^\s@]+@(aou\.edu\.sa|aou\.edu)$/i;
@@ -145,11 +151,16 @@
     setMessage('');
   }
 
-  // معالجة تسجيل الدخول / التسجيل عبر إرسال رابط مباشر (Magic Link / OTP) للإيميل
   async function handleAuthEmailSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
     if (!validateUniversityEmailForm(form) || !form.reportValidity()) return;
+
+    const sb = getSupabase();
+    if (!sb) {
+      setMessage('خطأ في إعدادات الاتصال بقاعدة البيانات (Supabase غير متوفر).', 'error');
+      return;
+    }
 
     const formDataObj = Object.fromEntries(new FormData(form).entries());
     const email = formDataObj.email;
@@ -158,8 +169,7 @@
     setMessage('');
 
     try {
-      // إرسال رابط الدخول/التسجيل (Magic Link) إلى الإيميل عبر Supabase
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await sb.auth.signInWithOtp({
         email: email,
         options: {
           emailRedirectTo: window.location.origin + window.location.pathname
@@ -178,10 +188,10 @@
   }
 
   async function loadCurrentUser() {
-    if (!supabase) return;
+    const sb = getSupabase();
+    if (!sb) return;
     
-    // التحقق مما إذا كان المستخدم قد ضغط على رابط التحقق وعاد بالجلسة
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
       showUser(session.user);
@@ -189,8 +199,7 @@
       showForms();
     }
 
-    // الاستماع لأي تغيرات في حالة تسجيل الدخول
-    supabase.auth.onAuthStateChange((event, currentSession) => {
+    sb.auth.onAuthStateChange((event, currentSession) => {
       if (currentSession && currentSession.user) {
         showUser(currentSession.user);
       } else {
@@ -199,16 +208,12 @@
     });
   }
 
-  function openPlatform() {
-    document.querySelector('[data-tab="home"]')?.click();
-    window.location.hash = 'tab-home';
-  }
-
   async function handleLogout() {
+    const sb = getSupabase();
     const button = $('#logout-button');
     if (button) button.disabled = true;
     try {
-      await supabase.auth.signOut();
+      if (sb) await sb.auth.signOut();
       showForms();
       setMessage(tr('auth.logoutSuccess', 'تم تسجيل الخروج بنجاح.'), 'success');
     } catch (error) {
@@ -223,15 +228,9 @@
     const register = $('#register-form');
     const forgot = $('#forgot-form');
 
-    if (login) {
-      login.addEventListener('submit', handleAuthEmailSubmit);
-    }
-    if (register) {
-      register.addEventListener('submit', handleAuthEmailSubmit);
-    }
-    if (forgot) {
-      forgot.addEventListener('submit', handleAuthEmailSubmit);
-    }
+    if (login) login.addEventListener('submit', handleAuthEmailSubmit);
+    if (register) register.addEventListener('submit', handleAuthEmailSubmit);
+    if (forgot) forgot.addEventListener('submit', handleAuthEmailSubmit);
 
     $('#logout-button')?.addEventListener('click', handleLogout);
     $('#header-logout-button')?.addEventListener('click', handleLogout);
