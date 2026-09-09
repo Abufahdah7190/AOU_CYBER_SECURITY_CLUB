@@ -4,12 +4,19 @@
  */
 window.supabaseClient = null;
 
-if (window.supabase &&
-    SUPABASE_URL.startsWith('https://') &&
-    !SUPABASE_URL.includes('YOUR-PROJECT-REF') &&
-    SUPABASE_ANON_KEY &&
-    !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_PUBLIC_KEY')) {
-  window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-  console.error('Supabase client not initialized: check SUPABASE_URL / SUPABASE_ANON_KEY in js/supabase-config.js');
+try {
+  const url = typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : window.SUPABASE_URL;
+  const anonKey = typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : window.SUPABASE_ANON_KEY;
+
+  if (
+    window.supabase &&
+    url && typeof url === 'string' && url.startsWith('https://') && !url.includes('YOUR-PROJECT-REF') &&
+    anonKey && typeof anonKey === 'string' && !anonKey.includes('YOUR_SUPABASE_ANON_PUBLIC_KEY')
+  ) {
+    window.supabaseClient = window.supabase.createClient(url, anonKey);
+  } else {
+    console.error('Supabase client not initialized: check SUPABASE_URL / SUPABASE_ANON_KEY in js/supabase-config.js');
+  }
+} catch (e) {
+  console.error('Error initializing Supabase client:', e);
 }
