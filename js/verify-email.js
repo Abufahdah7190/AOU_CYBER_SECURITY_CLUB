@@ -7,6 +7,17 @@
   try { email = sessionStorage.getItem('cyberclub.pendingEmail') || ''; } catch (_) {}
   document.getElementById('pending-email').textContent = email;
   resend.hidden = !email;
+  const tokenHash = new URLSearchParams(window.location.hash.slice(1)).get('token_hash');
+  const confirmButton = document.getElementById('confirm-login');
+  if (tokenHash) {
+    // Remove the one-time credential from browser history; keep it in memory only.
+    history.replaceState(null, '', window.location.pathname);
+    confirmButton.hidden = false;
+    resend.hidden = true;
+    document.querySelector('h1').textContent = 'تأكيد الدخول إلى النادي';
+    document.getElementById('verify-intro').textContent = 'اضغط تأكيد الدخول لإكمال التحقق من بريدك والانتقال إلى النادي.';
+    status.textContent = 'الرابط جاهز للتحقق. لن يُستخدم حتى تضغط الزر.';
+  }
   let redirecting = false;
   let cooldownUntil = 0;
   function accept(session) {
@@ -25,6 +36,7 @@
   if (!sb) {
     status.textContent = 'تعذر تحميل خدمة التحقق. تحقق من اتصالك وإعدادات Supabase ثم أعد تحميل الصفحة.';
     resend.disabled = true;
+    confirmButton.disabled = true;
     return;
   }
   resend.addEventListener('click', async () => {
@@ -43,9 +55,28 @@
       if (error.status === 429) cooldownUntil = Date.now() + 60000;
     } finally { cooldown(); }
   });
+  let confirming = false;
+  confirmButton.addEventListener('click', async () => {
+    if (!tokenHash || confirming) return;
+    confirming = true;
+    confirmButton.disabled = true;
+    status.textContent = 'جارٍ التحقق من الرابط…';
+    try {
+      const { data, error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: 'email' });
+      if (error) throw error;
+      if (!accept(data.session) && !redirecting) throw new Error('لم تُنشأ جلسة دخول. اطلب رابطًا جديدًا.');
+    } catch (error) {
+      status.textContent = error.code === 'otp_expired'
+        ? 'انتهت صلاحية الرابط أو استُخدم سابقًا. ارجع إلى تسجيل الدخول لطلب رابط جديد.'
+        : 'تعذر التحقق: ' + (error.message || 'تحقق من الاتصال وحاول مجددًا.');
+      confirmButton.disabled = false;
+      confirming = false;
+    }
+  });
   // The SDK consumes the callback tokens and synchronizes sessions across tabs.
-  sb.auth.onAuthStateChange((_event, session) => accept(session));
+  sb.auth.onAuthStateChange((_event, session) => { if (!tokenHash || confirming) accept(session); });
   async function init() {
+    if (tokenHash) return;
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const query = new URLSearchParams(window.location.search);
     const callbackError = hash.get('error_description') || query.get('error_description') || hash.get('error') || query.get('error');
