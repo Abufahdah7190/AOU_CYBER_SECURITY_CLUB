@@ -101,7 +101,6 @@
     <div class="auth-heading"><span class="auth-kicker" data-i18n="auth.kicker">CYBERCLUB / SECURE ACCESS</span><h2 data-i18n="auth.title">بوابة نادي الأمن السيبراني</h2><p data-i18n="auth.subtitle">سجّل الدخول إلى مسارك التعليمي، أو أنشئ حسابك الجامعي للانضمام إلى المنصة.</p></div><div class="club-actions"><a class="club-action" href="suggestions.html"><span class="action-icon" aria-hidden="true">↗</span><span>اقتراحات واستفسارات<small>فكرتك تصنع الفرق</small></span></a><a class="club-action join-action" href="join.html"><span class="action-icon" aria-hidden="true">+</span><span>انضم إلينا<small>كن جزءًا من مجتمعنا</small></span></a></div>
     <div class="auth-card" data-auth-card>
       <aside class="auth-welcome" aria-live="polite">
-        <span class="auth-welcome-mark" aria-hidden="true">◈</span>
         <p class="auth-welcome-eyebrow">CYBERCLUB / AOU</p>
         <h3 data-auth-welcome-title data-i18n="auth.welcomeBack">مرحبًا بعودتك</h3>
         <p data-auth-welcome-copy data-i18n="auth.welcomeBackCopy">سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.</p>
@@ -115,9 +114,7 @@
     <div class="auth-message" id="auth-message" role="status" aria-live="polite"></div>
     <form class="auth-form" id="login-form" role="tabpanel" aria-labelledby="auth-login-tab" novalidate>
       <div class="auth-field"><label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="login-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa"></div>
-      <div class="auth-field"><label for="login-password" data-i18n="auth.password">كلمة المرور</label><input id="login-password" name="password" type="password" autocomplete="current-password" required></div>
       <button class="btn primary auth-submit" type="submit" data-i18n="auth.secureLogin">دخول آمن</button>
-      <button class="auth-link" type="button" data-auth-forgot-open data-i18n="auth.forgot">نسيت كلمة المرور؟</button>
     </form>
     <form class="auth-form" id="forgot-form" hidden novalidate>
       <div class="auth-form-intro"><h3 data-i18n="auth.recoveryFormTitle">استعادة كلمة المرور</h3><p data-i18n="auth.recoveryFormCopy">أدخل بريدك الإلكتروني الجامعي وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p></div>
@@ -136,8 +133,6 @@
         <div class="auth-field auth-choice-field"><label for="register-major" data-i18n="auth.major">التخصص</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">⌘</span><select id="register-major" name="major" required><option value="" data-i18n="auth.chooseMajor">اختر تخصصك الأكاديمي</option><option data-i18n="auth.majorCs">علوم الحاسب</option><option data-i18n="auth.majorNetwork">أمن الشبكات</option><option data-i18n="auth.majorIt">تقنية المعلومات والحوسبة</option><option data-i18n="auth.majorBusiness">الحوسبة والأعمال</option><option data-i18n="auth.majorWeb">تطوير الويب</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help" data-i18n="auth.majorHelp">يساعدنا ذلك على تخصيص مسارك التعليمي.</small></div>
       </div>
       <div class="auth-field auth-choice-field"><label for="register-gender" data-i18n="auth.gender">الجنس</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">◉</span><select id="register-gender" name="gender" required><option value="" data-i18n="auth.chooseGender">اختر الجنس</option><option value="male" data-i18n="auth.male">ذكر</option><option value="female" data-i18n="auth.female">أنثى</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help" data-i18n="auth.genderHelp">تُستخدم هذه المعلومة لملفك الشخصي فقط.</small></div>
-      <div class="auth-field"><label for="register-password" data-i18n="auth.password">كلمة المرور</label><input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="10"><small data-i18n="auth.passwordHelp">10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.</small></div>
-      <div class="auth-field"><label for="register-password-confirm" data-i18n="auth.confirmPassword">تأكيد كلمة المرور</label><input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" required minlength="10"></div>
       <button class="btn primary auth-submit" type="submit" data-i18n="auth.createAccount">إنشاء الحساب</button>
     </form>
     <div class="auth-user" id="auth-user" hidden><p>تم تسجيل الدخول باسم <strong id="auth-user-name"></strong>.</p><button class="btn ghost" id="logout-button" type="button">تسجيل الخروج</button></div>
@@ -1098,6 +1093,9 @@
 <script defer src="js/file-analysis.js"></script>
 <script defer src="js/script.js"></script>
 <script defer src="js/email-domain-suggest.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/supabase-config.js"></script>
+<script defer src="js/supabase-client.js"></script>
 <script defer src="js/auth.js"></script>
 <script defer src="js/learning.js"></script>
 <script defer src="js/course-catalog-i18n.js"></script>

@@ -163,7 +163,7 @@
     }
 
     const formDataObj = Object.fromEntries(new FormData(form).entries());
-    const email = formDataObj.email;
+    const email = formDataObj.email.trim().toLowerCase();
 
     setBusy(form, true);
     setMessage('');
@@ -172,14 +172,16 @@
       const { error } = await sb.auth.signInWithOtp({
         email: email,
         options: {
-          emailRedirectTo: window.location.origin + window.location.pathname
+          shouldCreateUser: form.id === 'register-form',
+          ...(form.id === 'register-form' ? { data: { firstName: formDataObj.firstName, lastName: formDataObj.lastName, phone: formDataObj.phone, major: formDataObj.major, gender: formDataObj.gender } } : {}),
+          emailRedirectTo: new URL('verify-email.html', window.location.href).href
         }
       });
 
       if (error) throw error;
 
-      setMessage('تم إرسال رابط التحقق إلى بريدك الجامعي. يرجى فتح البريد والضغط على الرابط لفتح الموقع.', 'success');
-      form.reset();
+      try { sessionStorage.setItem('cyberclub.pendingEmail', email); } catch (_) {}
+      window.location.assign(new URL('verify-email.html', window.location.href).href);
     } catch (error) {
       setMessage(error.message || 'حدث خطأ أثناء إرسال رابط التحقق.', 'error');
     } finally {
@@ -189,9 +191,10 @@
 
   async function loadCurrentUser() {
     const sb = getSupabase();
-    if (!sb) return;
+    if (!sb) { showForms(); setMessage('تعذر تحميل خدمة التحقق. تحقق من الاتصال وإعدادات Supabase ثم أعد تحميل الصفحة.', 'error'); return; }
     
-    const { data: { session } } = await sb.auth.getSession();
+    const { data: { session }, error } = await sb.auth.getSession();
+    if (error) { showForms(); setMessage(error.message, 'error'); return; }
     
     if (session && session.user) {
       showUser(session.user);
@@ -240,7 +243,7 @@
       button.addEventListener('click', () => switchView(button.dataset.authView));
     });
 
-    loadCurrentUser();
+    loadCurrentUser().catch(() => { showForms(); setMessage('تعذر الاتصال بخدمة التحقق. أعد المحاولة.', 'error'); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAuth);
