@@ -114,7 +114,9 @@
     <div class="auth-message" id="auth-message" role="status" aria-live="polite"></div>
     <form class="auth-form" id="login-form" role="tabpanel" aria-labelledby="auth-login-tab" novalidate>
       <div class="auth-field"><label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="login-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa"></div>
+      <div class="auth-field"><label for="login-password" data-i18n="auth.password">كلمة المرور</label><input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="10"></div>
       <button class="btn primary auth-submit" type="submit" data-i18n="auth.secureLogin">دخول آمن</button>
+      <button class="auth-link" type="button" data-auth-forgot data-i18n="auth.forgot">نسيت كلمة المرور؟</button>
     </form>
     <form class="auth-form" id="forgot-form" hidden novalidate>
       <div class="auth-form-intro"><h3 data-i18n="auth.recoveryFormTitle">استعادة كلمة المرور</h3><p data-i18n="auth.recoveryFormCopy">أدخل بريدك الإلكتروني الجامعي وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p></div>
@@ -128,6 +130,10 @@
         <div class="auth-field"><label for="register-last-name" data-i18n="auth.lastName">اسم العائلة</label><input id="register-last-name" name="lastName" type="text" autocomplete="family-name" required minlength="2"></div>
       </div>
       <div class="auth-field"><label for="register-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="register-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" data-i18n-title="auth.universityEmailTitle" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
+      <div class="auth-grid">
+        <div class="auth-field"><label for="register-password" data-i18n="auth.password">كلمة المرور</label><input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="10"><small data-i18n="auth.passwordHelp">10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.</small></div>
+        <div class="auth-field"><label for="register-confirm-password" data-i18n="auth.confirmPassword">تأكيد كلمة المرور</label><input id="register-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required minlength="10"></div>
+      </div>
       <div class="auth-grid">
         <div class="auth-field"><label for="register-phone" data-i18n="auth.phone">رقم الهاتف</label><input id="register-phone" name="phone" type="tel" autocomplete="tel" required placeholder="05xxxxxxxx"></div>
         <div class="auth-field auth-choice-field"><label for="register-major" data-i18n="auth.major">التخصص</label><div class="auth-select-shell"><span class="auth-choice-icon" aria-hidden="true">⌘</span><select id="register-major" name="major" required><option value="" data-i18n="auth.chooseMajor">اختر تخصصك الأكاديمي</option><option data-i18n="auth.majorCs">علوم الحاسب</option><option data-i18n="auth.majorNetwork">أمن الشبكات</option><option data-i18n="auth.majorIt">تقنية المعلومات والحوسبة</option><option data-i18n="auth.majorBusiness">الحوسبة والأعمال</option><option data-i18n="auth.majorWeb">تطوير الويب</option></select><span class="auth-select-chevron" aria-hidden="true">⌄</span></div><small class="auth-choice-help" data-i18n="auth.majorHelp">يساعدنا ذلك على تخصيص مسارك التعليمي.</small></div>

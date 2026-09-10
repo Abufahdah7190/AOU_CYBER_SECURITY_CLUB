@@ -1,26 +1,25 @@
-/* CyberClub authentication client - Supabase Edition */
+/* AOU Cyber Club authentication client - Supabase Email & Password */
 (function () {
   'use strict';
 
-  // البحث الآمن عن عميل Supabase بجميع الاحتمالات الممكنة لمنع خطأ undefined
-  const getSupabase = () => {
-    if (window.supabaseClient) return window.supabaseClient;
-    if (window.supabase && typeof window.supabase.auth === 'object') return window.supabase;
-    // إذا تم إنشاؤه عبر createClient مباشرة
-    if (window._supabase) return window._supabase;
-    return null;
-  };
-
+  const getSupabase = () => window.supabaseClient || (window.supabase && typeof window.supabase.auth === 'object' ? window.supabase : null) || window._supabase || null;
   const $ = (selector) => document.querySelector(selector);
   const UNIVERSITY_EMAIL_PATTERN = /^[^\s@]+@(aou\.edu\.sa|aou\.edu)$/i;
   const tr = (key, fallback) => window.i18n?.t(key, fallback) || fallback;
   const universityEmailMessage = () => tr('auth.universityEmailTitle', 'الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي');
 
+  function setMessage(text, type) {
+    const box = $('#auth-message');
+    if (!box) return;
+    box.textContent = text || '';
+    box.className = `auth-message${type ? ` ${type}` : ''}`;
+  }
+
   function validateUniversityEmailField(input) {
     const value = String(input?.value || '').trim();
-    const isValid = !value || UNIVERSITY_EMAIL_PATTERN.test(value);
-    input?.setCustomValidity(isValid ? '' : universityEmailMessage());
-    return isValid;
+    const valid = !value || UNIVERSITY_EMAIL_PATTERN.test(value);
+    input?.setCustomValidity(valid ? '' : universityEmailMessage());
+    return valid;
   }
 
   function validateUniversityEmailForm(form) {
@@ -32,97 +31,66 @@
     return false;
   }
 
-  function setMessage(text, type) {
-    const box = $('#auth-message');
-    if (!box) return;
-    box.textContent = text || '';
-    box.className = `auth-message${type ? ` ${type}` : ''}`;
+  function validatePasswordPolicy(form) {
+    if (form?.id !== 'register-form') return true;
+    const input = form.querySelector('input[name="password"]');
+    if (!input) return true;
+    const valid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,}$/.test(input.value);
+    input.setCustomValidity(valid ? '' : tr('auth.passwordHelp', 'يجب أن تتكون كلمة المرور من 10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.'));
+    return valid;
   }
 
   function setBusy(form, busy) {
-    const button = form && form.querySelector('button[type="submit"]');
+    const button = form?.querySelector('button[type="submit"]');
     if (!button) return;
     button.disabled = busy;
     button.dataset.originalText ||= button.textContent;
     button.textContent = busy ? tr('auth.working', 'جارٍ التنفيذ...') : button.dataset.originalText;
   }
 
-  const PUBLIC_PANEL_IDS = [];
-
   function unlockSite() {
     document.body.classList.remove('auth-locked');
-    document.querySelectorAll('.panel').forEach((panel) => {
-      if (PUBLIC_PANEL_IDS.includes(panel.id)) return;
-      panel.style.display = panel.id === 'tab-home' ? 'block' : 'none';
-    });
+    document.querySelectorAll('.panel').forEach((panel) => { panel.style.display = panel.id === 'tab-home' ? 'block' : 'none'; });
     document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.tab === 'home'));
-    const authPanel = $('#tab-auth');
-    if (authPanel) authPanel.style.display = 'none';
-    const authTab = document.querySelector('[data-tab="auth"]');
-    if (authTab) authTab.hidden = true;
-    const profileTab = document.querySelector('[data-tab="profile"]');
-    if (profileTab) profileTab.hidden = false;
-    const profileLink = document.querySelector('[data-profile-link]');
-    if (profileLink) profileLink.hidden = false;
-    const accountMenu = document.querySelector('[data-account-menu]');
-    if (accountMenu) accountMenu.hidden = false;
+    const authPanel = $('#tab-auth'); if (authPanel) authPanel.style.display = 'none';
+    const authTab = document.querySelector('[data-tab="auth"]'); if (authTab) authTab.hidden = true;
+    const profileTab = document.querySelector('[data-tab="profile"]'); if (profileTab) profileTab.hidden = false;
+    const profileLink = document.querySelector('[data-profile-link]'); if (profileLink) profileLink.hidden = false;
+    const accountMenu = document.querySelector('[data-account-menu]'); if (accountMenu) accountMenu.hidden = false;
   }
 
   function lockSite() {
     document.body.classList.add('auth-locked');
-    document.querySelectorAll('.panel').forEach((panel) => {
-      if (PUBLIC_PANEL_IDS.includes(panel.id)) return;
-      panel.style.display = panel.id === 'tab-auth' ? 'block' : 'none';
-    });
+    document.querySelectorAll('.panel').forEach((panel) => { panel.style.display = panel.id === 'tab-auth' ? 'block' : 'none'; });
     document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.tab === 'auth'));
-    const authTab = document.querySelector('[data-tab="auth"]');
-    if (authTab) authTab.hidden = false;
+    const authTab = document.querySelector('[data-tab="auth"]'); if (authTab) authTab.hidden = false;
   }
 
   function showUser(user) {
     unlockSite();
-    const authPanel = $('#tab-auth');
-    const authTab = document.querySelector('[data-tab="auth"]');
-    const profileTab = document.querySelector('[data-tab="profile"]');
-    if (authPanel) { authPanel.style.display = 'none'; authPanel.hidden = true; authPanel.setAttribute('aria-hidden', 'true'); }
-    if (authTab) { authTab.hidden = true; authTab.setAttribute('aria-hidden', 'true'); }
-    if (profileTab) { profileTab.hidden = false; profileTab.removeAttribute('aria-hidden'); }
-    const profileLink = document.querySelector('[data-profile-link]');
-    if (profileLink) { profileLink.hidden = false; profileLink.removeAttribute('aria-hidden'); }
-    const accountMenu = document.querySelector('[data-account-menu]');
-    if (accountMenu) { accountMenu.hidden = false; accountMenu.removeAttribute('aria-hidden'); }
-    
-    const email = user.email || '';
-    const headerName = $('#header-profile-name');
-    const headerAvatar = $('#header-profile-avatar');
-    if (headerName) headerName.textContent = email;
-    if (headerAvatar) headerAvatar.textContent = email.trim().charAt(0).toUpperCase();
-    
+    const authPanel = $('#tab-auth'); if (authPanel) { authPanel.style.display = 'none'; authPanel.hidden = true; }
+    const authTab = document.querySelector('[data-tab="auth"]'); if (authTab) authTab.hidden = true;
+    const email = user?.email || '';
+    const headerName = $('#header-profile-name'); if (headerName) headerName.textContent = email;
+    const headerAvatar = $('#header-profile-avatar'); if (headerAvatar) headerAvatar.textContent = email.trim().charAt(0).toUpperCase();
     if ($('#auth-user-name')) $('#auth-user-name').textContent = email;
     if ($('#auth-user')) $('#auth-user').hidden = false;
     if ($('#login-form')) $('#login-form').hidden = true;
     if ($('#register-form')) $('#register-form').hidden = true;
-    const switcher = document.querySelector('.auth-switcher');
-    if (switcher) switcher.hidden = true;
+    if ($('#forgot-form')) $('#forgot-form').hidden = true;
+    const switcher = document.querySelector('.auth-switcher'); if (switcher) switcher.hidden = true;
     document.dispatchEvent(new CustomEvent('auth:ready', { detail: { user } }));
   }
 
   function showForms() {
     lockSite();
-    const authPanel = $('#tab-auth');
-    const authTab = document.querySelector('[data-tab="auth"]');
-    const profileTab = document.querySelector('[data-tab="profile"]');
-    if (authPanel) { authPanel.hidden = false; authPanel.removeAttribute('aria-hidden'); }
-    if (authTab) { authTab.hidden = false; authTab.removeAttribute('aria-hidden'); }
-    if (profileTab) { profileTab.hidden = true; profileTab.setAttribute('aria-hidden', 'true'); }
-    const profileLink = document.querySelector('[data-profile-link]');
-    if (profileLink) { profileLink.hidden = true; profileLink.setAttribute('aria-hidden', 'true'); }
-    const accountMenu = document.querySelector('[data-account-menu]');
-    if (accountMenu) { accountMenu.hidden = true; accountMenu.setAttribute('aria-hidden', 'true'); }
-    
+    const authPanel = $('#tab-auth'); if (authPanel) { authPanel.hidden = false; authPanel.removeAttribute('aria-hidden'); }
+    const authTab = document.querySelector('[data-tab="auth"]'); if (authTab) authTab.hidden = false;
+    const profileTab = document.querySelector('[data-tab="profile"]'); if (profileTab) profileTab.hidden = true;
+    const profileLink = document.querySelector('[data-profile-link]'); if (profileLink) profileLink.hidden = true;
+    const accountMenu = document.querySelector('[data-account-menu]'); if (accountMenu) accountMenu.hidden = true;
     if ($('#auth-user')) $('#auth-user').hidden = true;
-    const switcher = document.querySelector('.auth-switcher');
-    if (switcher) switcher.hidden = false;
+    const switcher = document.querySelector('.auth-switcher'); if (switcher) switcher.hidden = false;
     switchView('login');
   }
 
@@ -134,118 +102,89 @@
     if ($('#login-form')) $('#login-form').hidden = !login;
     if ($('#register-form')) $('#register-form').hidden = login;
     if ($('#forgot-form')) $('#forgot-form').hidden = true;
-    
     document.querySelectorAll('[data-auth-view]').forEach((button) => {
-      const isActive = button.dataset.authView === view;
-      button.classList.toggle('active', isActive);
-      button.setAttribute('aria-selected', String(isActive));
-      button.tabIndex = isActive ? 0 : -1;
+      const active = button.dataset.authView === view;
+      button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
     });
-    
-    const welcomeTitle = document.querySelector('[data-auth-welcome-title]');
-    const welcomeCopy = document.querySelector('[data-auth-welcome-copy]');
-    if (welcomeTitle) welcomeTitle.textContent = login ? tr('auth.welcomeBack', 'مرحبًا بعودتك') : tr('auth.welcomeNew', 'ابدأ رحلتك معنا');
-    if (welcomeCopy) welcomeCopy.textContent = login
-      ? tr('auth.welcomeBackCopy', 'سجّل دخولك برابط سحري يُرسل إلى بريدك الجامعي.')
-      : tr('auth.welcomeNewCopy', 'أنشئ حسابك الجامعي وانضم إلى مجتمع النادي السيبراني.');
+    const title = $('[data-auth-welcome-title]'); if (title) title.textContent = login ? tr('auth.welcomeBack', 'مرحبًا بعودتك') : tr('auth.welcomeNew', 'ابدأ رحلتك معنا');
+    const copy = $('[data-auth-welcome-copy]'); if (copy) copy.textContent = login ? tr('auth.welcomeBackCopy', 'سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.') : tr('auth.welcomeNewCopy', 'أنشئ حسابك الجامعي وانضم إلى مجتمع النادي السيبراني.');
     setMessage('');
   }
 
-  async function handleAuthEmailSubmit(event) {
+  function showForgotForm() {
+    const card = document.querySelector('[data-auth-card]');
+    card?.classList.add('forgot-mode');
+    if ($('#login-form')) $('#login-form').hidden = true;
+    if ($('#register-form')) $('#register-form').hidden = true;
+    if ($('#forgot-form')) $('#forgot-form').hidden = false;
+    document.querySelectorAll('[data-auth-view]').forEach((button) => { button.classList.remove('active'); button.setAttribute('aria-selected', 'false'); });
+    const email = $('#login-email')?.value;
+    if (email && $('#forgot-email')) $('#forgot-email').value = email;
+    setMessage('');
+  }
+
+  async function handleAuthSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
+    validatePasswordPolicy(form);
     if (!validateUniversityEmailForm(form) || !form.reportValidity()) return;
-
     const sb = getSupabase();
-    if (!sb) {
-      setMessage('خطأ في إعدادات الاتصال بقاعدة البيانات (Supabase غير متوفر).', 'error');
+    if (!sb) return setMessage('خطأ في إعدادات الاتصال بقاعدة البيانات (Supabase غير متوفر).', 'error');
+    const values = Object.fromEntries(new FormData(form).entries());
+    const email = String(values.email || '').trim().toLowerCase();
+    if (form.id === 'register-form' && values.password !== values.confirmPassword) {
+      setMessage(tr('auth.passwordMismatch', 'تأكيد كلمة المرور غير مطابق.'), 'error');
       return;
     }
-
-    const formDataObj = Object.fromEntries(new FormData(form).entries());
-    const email = formDataObj.email.trim().toLowerCase();
-
-    setBusy(form, true);
-    setMessage('');
-
+    setBusy(form, true); setMessage('');
     try {
-      const { error } = await sb.auth.signInWithOtp({
-        email: email,
-        options: {
-          shouldCreateUser: form.id === 'register-form',
-          ...(form.id === 'register-form' ? { data: { firstName: formDataObj.firstName, lastName: formDataObj.lastName, phone: formDataObj.phone, major: formDataObj.major, gender: formDataObj.gender } } : {}),
-          emailRedirectTo: new URL('verify-email.html', window.location.href).href
-        }
-      });
-
-      if (error) throw error;
-
-      try { sessionStorage.setItem('cyberclub.pendingEmail', email); } catch (_) {}
-      window.location.assign(new URL('verify-email.html', window.location.href).href);
+      let result;
+      if (form.id === 'login-form') {
+        result = await sb.auth.signInWithPassword({ email, password: values.password });
+      } else if (form.id === 'register-form') {
+        result = await sb.auth.signUp({
+          email,
+          password: values.password,
+          options: { data: { firstName: values.firstName, lastName: values.lastName, phone: values.phone, major: values.major, gender: values.gender } }
+        });
+      } else {
+        result = await sb.auth.resetPasswordForEmail(email, { redirectTo: new URL('reset-password.html', window.location.href).href });
+        if (!result.error) { setMessage(tr('auth.recoverySent', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.'), 'success'); form.reset(); }
+        return;
+      }
+      if (result.error) throw result.error;
+      window.location.replace(new URL('index.html', window.location.href).href);
     } catch (error) {
-      setMessage(error.message || 'حدث خطأ أثناء إرسال رابط التحقق.', 'error');
-    } finally {
-      setBusy(form, false);
-    }
+      setMessage(error.message || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'), 'error');
+    } finally { setBusy(form, false); }
   }
 
   async function loadCurrentUser() {
     const sb = getSupabase();
-    if (!sb) { showForms(); setMessage('تعذر تحميل خدمة التحقق. تحقق من الاتصال وإعدادات Supabase ثم أعد تحميل الصفحة.', 'error'); return; }
-    
+    if (!sb) { showForms(); setMessage('تعذر تحميل خدمة المصادقة. تحقق من الاتصال وإعدادات Supabase ثم أعد تحميل الصفحة.', 'error'); return; }
     const { data: { session }, error } = await sb.auth.getSession();
     if (error) { showForms(); setMessage(error.message, 'error'); return; }
-    
-    if (session && session.user) {
-      showUser(session.user);
-    } else {
-      showForms();
-    }
-
-    sb.auth.onAuthStateChange((event, currentSession) => {
-      if (currentSession && currentSession.user) {
-        showUser(currentSession.user);
-      } else {
-        showForms();
-      }
-    });
+    if (session?.user) showUser(session.user); else showForms();
+    sb.auth.onAuthStateChange((_event, currentSession) => currentSession?.user ? showUser(currentSession.user) : showForms());
   }
 
   async function handleLogout() {
-    const sb = getSupabase();
-    const button = $('#logout-button');
-    if (button) button.disabled = true;
-    try {
-      if (sb) await sb.auth.signOut();
-      showForms();
-      setMessage(tr('auth.logoutSuccess', 'تم تسجيل الخروج بنجاح.'), 'success');
-    } catch (error) {
-      setMessage(error.message, 'error');
-    } finally {
-      if (button) button.disabled = false;
-    }
+    const sb = getSupabase(); const button = $('#logout-button'); if (button) button.disabled = true;
+    try { if (sb) await sb.auth.signOut(); showForms(); setMessage(tr('auth.logoutSuccess', 'تم تسجيل الخروج بنجاح.'), 'success'); }
+    catch (error) { setMessage(error.message, 'error'); }
+    finally { if (button) button.disabled = false; }
   }
 
   function initAuth() {
-    const login = $('#login-form');
-    const register = $('#register-form');
-    const forgot = $('#forgot-form');
-
-    if (login) login.addEventListener('submit', handleAuthEmailSubmit);
-    if (register) register.addEventListener('submit', handleAuthEmailSubmit);
-    if (forgot) forgot.addEventListener('submit', handleAuthEmailSubmit);
-
+    ['login-form', 'register-form', 'forgot-form'].forEach((id) => document.getElementById(id)?.addEventListener('submit', handleAuthSubmit));
     $('#logout-button')?.addEventListener('click', handleLogout);
     $('#header-logout-button')?.addEventListener('click', handleLogout);
-
+    document.querySelectorAll('[data-auth-view]').forEach((button) => button.addEventListener('click', () => switchView(button.dataset.authView)));
+    $('[data-auth-forgot]')?.addEventListener('click', showForgotForm);
+    $('[data-auth-forgot-back]')?.addEventListener('click', () => switchView('login'));
+    document.querySelectorAll('input[name="email"]').forEach((input) => input.addEventListener('input', () => validateUniversityEmailField(input)));
     lockSite();
-    document.querySelectorAll('[data-auth-view]').forEach((button) => {
-      button.addEventListener('click', () => switchView(button.dataset.authView));
-    });
-
-    loadCurrentUser().catch(() => { showForms(); setMessage('تعذر الاتصال بخدمة التحقق. أعد المحاولة.', 'error'); });
+    loadCurrentUser().catch(() => { showForms(); setMessage('تعذر الاتصال بخدمة المصادقة. أعد المحاولة.', 'error'); });
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAuth);
-  else initAuth();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAuth); else initAuth();
 })();
