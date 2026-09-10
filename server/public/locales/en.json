@@ -35,6 +35,12 @@
     "activeMembers": "Active members: {count}",
     "issuedCertificates": "Certificates issued: {count}"
   },
+  "hero": {
+    "titlePrefix": "Building",
+    "titleAccent": "a safer",
+    "titleSuffix": "digital generation.",
+    "description": "The Cyber Security Club platform at Arab Open University — Riyadh. Learn, practise, and join a campus community leading digital awareness with confidence."
+  },
   "home": {
     "title": "Club Introduction and Goals",
     "about": "The Cybersecurity Club is one of the student clubs at the Arab Open University, aiming to raise awareness of the importance of cybersecurity and spread a culture of safe and responsible technology use among students. The club seeks to empower students to develop their information security skills through workshops, training courses, and technical projects that keep pace with the digital age. We aspire to build a pioneering technical community capable of innovation and collaboration, and to offer specialized events and competitions that enhance knowledge and practical application.",
@@ -434,31 +440,7 @@
     "emailLabel": "Email",
     "messageLabel": "Message",
     "submitBtn": "Send",
-    "resetBtn": "Clear",
-    "intro": "Share your idea or question. We would be happy to hear from you.",
-    "suggestionsCard": "Suggestions & Inquiries",
-    "suggestionsCardCopy": "Your idea makes a difference",
-    "joinCard": "Join Us",
-    "joinCardCopy": "Be part of our community",
-    "suggestionsPageTitle": "Suggestions & Inquiries | Cybersecurity Club",
-    "joinPageTitle": "Join Us | Cybersecurity Club",
-    "allFieldsRequired": "All fields are required",
-    "fullName": "Full name",
-    "phone": "Phone number",
-    "message": "Your message or suggestion",
-    "reason": "Why do you want to join the club?",
-    "messagePlaceholder": "Tell us the details of your idea or question…",
-    "reasonPlaceholder": "Tell us about your interests and what you hope to learn or contribute…",
-    "privacy": "We use your contact details to reply. Do not enter passwords or sensitive information.",
-    "sendMessage": "Send message",
-    "sendApplication": "Send application",
-    "backHome": "Back to home",
-    "suggestionsHeading": "Every idea starts <br><em>with a conversation.</em>",
-    "suggestionsIntro": "Have an idea to improve the club, or a question you want answered? We are listening.",
-    "suggestionsAlternate": "Interested in joining the club? Join us ←",
-    "joinHeading": "There is a place for you. <br><em>Start your journey.</em>",
-    "joinIntro": "Your passion for cybersecurity is the beginning. Share your interests, learn, and make an impact with our community.",
-    "joinAlternate": "Have a question before joining? Contact us ←"
+    "resetBtn": "Clear"
   },
   "securityInfo": {
     "t1": "Complete Security Guide",
@@ -580,12 +562,13 @@
     "createAccount": "Create account",
     "requiredFields": "Please complete every required field before creating your account.",
     "passwordMismatch": "Password confirmation does not match.",
-    "logoutSuccess": "You have been signed out."
+    "logoutSuccess": "You have been signed out.",
+    "recoverySent": "A password reset link has been sent to your email."
   },
   "footer": {
     "suggestions": "Suggestions & Inquiries",
     "joinUs": "Join Us",
     "followUs": "Follow Us",
-    "copyright": "© Cybersecurity Club — Arab Open University"
+    "copyright": "© Cyber Security Club — Arab Open University"
   }
 }
