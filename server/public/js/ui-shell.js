@@ -31,6 +31,9 @@
   const securityLabTrigger = document.getElementById('security-lab-trigger');
   const morePanel = document.getElementById('more-menu-panel');
   const statusStrip = document.getElementById('platform-status');
+  const accountMenu = document.querySelector('[data-account-menu]');
+  const accountTrigger = document.getElementById('account-menu-trigger');
+  const accountPanel = document.getElementById('account-menu-panel');
   let publicStatus = null;
 
   const interpolate = (key, count) => {
@@ -127,6 +130,25 @@
     }
   };
   installVisualEnhancements();
+  const setAccountMenu = (open) => {
+    if (!accountMenu || !accountTrigger || !accountPanel) return;
+    accountMenu.classList.toggle('is-open', open);
+    accountTrigger.setAttribute('aria-expanded', String(open));
+    accountPanel.hidden = !open;
+  };
+  accountTrigger?.addEventListener('click', () => {
+    setAccountMenu(accountPanel.hidden);
+  });
+  accountPanel?.querySelector('a[href]')?.addEventListener('click', () => setAccountMenu(false));
+  document.addEventListener('pointerdown', (event) => {
+    if (accountMenu && !accountMenu.contains(event.target)) setAccountMenu(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && accountPanel && !accountPanel.hidden) {
+      setAccountMenu(false);
+      accountTrigger?.focus();
+    }
+  });
   if (!nav) return;
   const setMenu = (open) => {
     body.classList.toggle('nav-open', open);
