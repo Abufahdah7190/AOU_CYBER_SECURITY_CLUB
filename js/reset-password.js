@@ -19,7 +19,7 @@
     mismatch: en() ? 'Password confirmation does not match.' : 'تأكيد كلمة المرور غير مطابق.',
     unavailable: en() ? 'Supabase authentication is unavailable.' : 'خدمة المصادقة غير متاحة حاليًا.',
     failed: en() ? 'Password reset could not be completed.' : 'تعذر إعادة تعيين كلمة المرور.',
-    success: en() ? 'Your password was changed. You can now sign in.' : 'تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.',
+    success: en() ? 'Password changed. Opening your profile…' : 'تم تغيير كلمة المرور. جارٍ فتح ملفك الشخصي…',
     hint: en() ? 'At least 10 characters, including an uppercase letter, a lowercase letter and a digit.' : '10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.',
     checkLength: en() ? '10+ characters' : '10 أحرف فأكثر',
     checkCase: en() ? 'Upper & lower case' : 'حرف كبير وصغير',
@@ -73,6 +73,7 @@
     submitBtn.disabled = isBusy || !isPasswordAcceptable();
   }
 
+  document.addEventListener('languagechange', updateStrengthUI);
   pwInput.addEventListener('input', updateStrengthUI);
   confirmInput.addEventListener('input', updateStrengthUI);
   updateStrengthUI();
@@ -90,7 +91,8 @@
     showMessage(text('unavailable'), 'error');
   } else {
     sb.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || session) markSessionReady(session);
+      if (event === 'SIGNED_OUT') { recoverySessionReady = false; form.hidden = true; showMessage(text('invalid'), 'error'); }
+      else if (session) markSessionReady(session);
     });
     sb.auth.getSession().then(({ data, error }) => {
       if (error) throw error;
@@ -102,7 +104,7 @@
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!form.reportValidity()) return;
+    if (isBusy || !form.reportValidity()) return;
     const newPassword = pwInput.value;
     const confirmation = confirmInput.value;
     if (!POLICY.test(newPassword)) return showMessage(text('hint'), 'error');
@@ -113,7 +115,7 @@
       const { error } = await sb.auth.updateUser({ password: newPassword });
       if (error) throw error;
       form.reset(); showMessage(text('success'), 'success');
-      setTimeout(() => window.location.replace(new URL('index.html', window.location.href).href), 1200);
+      setTimeout(() => window.location.replace(new URL('/profile.html', window.location.href).href), 1200);
     } catch (error) { showMessage(error.message || text('failed'), 'error'); }
     finally { setBusy(false); }
   });

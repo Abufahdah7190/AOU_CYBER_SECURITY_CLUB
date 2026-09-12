@@ -3,7 +3,7 @@ services:
     name: aou-cyberclub
     runtime: node
     plan: free
-    buildCommand: npm install --prefix server --no-audit --no-fund
+    buildCommand: npm ci --prefix server --no-audit --no-fund
     startCommand: node server/src/server.js
     healthCheckPath: /api/health
     envVars:
@@ -11,6 +11,10 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
       - key: DATABASE_URL
         sync: false
       - key: JWT_ACCESS_SECRET

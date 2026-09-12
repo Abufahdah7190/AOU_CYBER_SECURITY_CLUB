@@ -6,7 +6,7 @@
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   const slug = params.get('course') || (pathParts[0] === 'learn' ? pathParts[1] : '') || 'cyber-basics';
   const $ = (id) => document.getElementById(id);
-  const safeLang = () => (localStorage.getItem('club-lang') === 'en' ? 'en' : 'ar');
+  const safeLang = () => { try { return localStorage.getItem('club-lang') || (navigator.language.startsWith('en') ? 'en' : 'ar'); } catch (_) { return navigator.language.startsWith('en') ? 'en' : 'ar'; } };
   let lang = safeLang();
   let current = 0;
   let saved = { percent: 0, lastSection: 0, quizScores: {} };
@@ -71,7 +71,8 @@
   }
 
   const fallback = fallbackCourse(slug);
-  const rawCourse = window.CYBERCLUB_LMS_BY_SLUG?.[slug] || fallback;
+  const rawCourse = window.CYBERCLUB_LMS_BY_SLUG?.[slug];
+  if (!rawCourse) { document.getElementById('course-title').textContent = 'Course not found / الدورة غير موجودة'; document.getElementById('course-loading').hidden=true; document.getElementById('complete-lesson').disabled=true; return; }
   const containsArabic = (value) => typeof value === 'string' && /[\u0600-\u06FF]/.test(value);
   const mergeEnglish = (source, backup) => {
     if (Array.isArray(source)) return source.map((item, index) => mergeEnglish(item, backup?.[index]));
@@ -87,11 +88,12 @@
     return source;
   };
   const course = mergeEnglish(rawCourse, fallback);
+  const escapeHtml = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   const text = (value) => (value && typeof value === 'object' ? (value[lang] || value.ar || value.en || '') : (value || ''));
   const allLessons = () => (course.modules || []).flatMap((module, moduleIndex) => (module.lessons || []).map((lesson, lessonIndex) => ({ lesson, module, moduleIndex, lessonIndex })));
   const flat = () => allLessons();
   const request = async (path, options = {}) => {
-    const response = await fetch(`${API}${path}`, { credentials: 'include', cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
+    const response = await window.clubFetch(`${API}${path}`, { credentials: 'include', cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
     return result;
@@ -143,7 +145,7 @@
   function answerIsCorrect(question, questionIndex) {
     const type = question.type || 'mcq';
     if (type === 'matching') {
-      const answers = [...document.querySelectorAll(`[data-match-index="${questionIndex}"]`)].map((select) => Number(select.value));
+      const answers = [...document.querySelectorAll(`[data-match-index="${questionIndex}"]`)].map((select) => select.value === '' ? -1 : Number(select.value));
       return answers.length === (question.correct || []).length && answers.every((value, index) => value === question.correct[index]);
     }
     if (type === 'ordering') {
@@ -169,7 +171,7 @@
     const media = `<div class="lms-article-placeholder"><strong>${lang === 'ar' ? 'درس مقالي' : 'Article lesson'}</strong><small>${lang === 'ar' ? 'اقرأ المحتوى التالي ثم أجب عن أسئلة الاختبار.' : 'Read the lesson content below, then answer the five-question quiz.'}</small></div>`;
     $('lesson-breadcrumb').textContent = `${text(item.module.title)} / ${text(lesson.title)}`;
     const quizHtml = questions.length ? questions.map((question, questionIndex) => renderQuestion(question, questionIndex, done)).join('') : `<p>${lang === 'ar' ? 'لا توجد أسئلة لهذا الدرس حاليًا.' : 'No questions are currently available for this lesson.'}</p>`;
-    content.innerHTML = `<div class="lms-lesson-kicker">${text(lesson.typeLabel)} · ${lang === 'ar' ? `الدرس ${current + 1} من ${flat().length}` : `Lesson ${current + 1} of ${flat().length}`}</div><h2>${text(lesson.title)}</h2>${media}<p class="lms-lesson-body">${text(lesson.body)}</p><div class="lms-lesson-steps"><h3>${lang === 'ar' ? 'ماذا ستطبق؟' : 'What you will practice'}</h3><ol>${steps.map((step) => `<li>${step}</li>`).join('')}</ol></div><div class="lms-quiz"><h3>${lang === 'ar' ? 'اختبار قصير' : 'Quick quiz'}</h3>${quizHtml}<span id="quiz-result">${done ? (lang === 'ar' ? 'تم اجتياز هذا الدرس.' : 'Lesson completed.') : ''}</span></div>`;
+    content.innerHTML = `<div class="lms-lesson-kicker">${text(lesson.typeLabel)} · ${lang === 'ar' ? `الدرس ${current + 1} من ${flat().length}` : `Lesson ${current + 1} of ${flat().length}`}</div><h2>${text(lesson.title)}</h2>${media}<p class="lms-lesson-body">${escapeHtml(text(lesson.body))}</p>${lesson.diagram ? `<img class="lesson-diagram" src="${lesson.diagram}" alt="${lang === 'ar' ? 'مراحل المسار التعليمي' : 'Learning workflow'}">` : ''}${lesson.expected ? `<details><summary>${lang === 'ar' ? 'النتيجة المتوقعة ومعيار النجاح' : 'Expected result and success criteria'}</summary><p>${escapeHtml(text(lesson.expected))}</p></details>` : ''}<div class="lms-lesson-steps"><h3>${lang === 'ar' ? 'ماذا ستطبق؟' : 'What you will practice'}</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div><div class="lms-quiz"><h3>${lang === 'ar' ? 'اختبار قصير' : 'Quick quiz'}</h3>${quizHtml}<span id="quiz-result">${done ? (lang === 'ar' ? 'تم اجتياز هذا الدرس.' : 'Lesson completed.') : ''}</span></div>`;
     $('previous-lesson').disabled = current === 0;
     $('complete-lesson').disabled = done;
     $('complete-lesson').textContent = current === flat().length - 1 ? (lang === 'ar' ? 'إكمال الدورة' : 'Complete course') : (lang === 'ar' ? 'إكمال والانتقال للدرس التالي' : 'Complete and go to next');
@@ -218,6 +220,11 @@
         </div>
       </div>`;
       document.body.appendChild(modal);
+      modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true'); modal.setAttribute('aria-label',isAr?'لغة الشهادة':'Certificate language');
+      const cancel=document.createElement('button'); cancel.type='button'; cancel.textContent=isAr?'إلغاء':'Cancel';
+      cancel.onclick=()=>{modal.remove();resolve(null);};modal.querySelector('.certificate-actions-print').append(cancel);
+      modal.addEventListener('keydown',event=>{if(event.key==='Escape')cancel.click();});
+      modal.querySelector('select').focus();
       modal.querySelector('.confirm-certificate-options').onclick = () => {
         const language = modal.querySelector('.certificate-option-language').value;
         modal.remove();
@@ -250,8 +257,10 @@
     // they'd have to reissue afterwards. Theme is always 'light' now that
     // the dark template has been retired.
     let certificateOptions = { language: lang, theme: 'light' };
+    isCompleting = true;
     if (percent >= 100) {
       certificateOptions = await promptCertificateOptions();
+      if (!certificateOptions) { isCompleting = false; return; }
     }
 
     isCompleting = true;
@@ -265,6 +274,10 @@
           percent,
           lastSection: current + 1,
           quizScores,
+          lessonIndex: current,
+          answers: questions.map((q, i) => q.type === 'matching' || q.type === 'ordering'
+            ? [...document.querySelectorAll(q.type === 'matching' ? '[data-match-index="' + i + '"]' : '[data-order-index="' + i + '"]')].map(el => el.value === '' ? -1 : Number(el.value))
+            : Number(document.querySelector('input[name="lms-quiz-' + i + '"]:checked')?.value ?? -1)),
           language: certificateOptions.language,
           theme: certificateOptions.theme,
           courseName: text({ ar: course.ar, en: course.en }),
@@ -280,6 +293,7 @@
       return;
     } finally {
       isCompleting = false;
+      setCompletionBusy(false);
     }
 
     if (current < flat().length - 1) current += 1;
@@ -303,9 +317,9 @@
 
   $('previous-lesson').addEventListener('click', () => { if (current > 0) { current -= 1; render(); } });
   $('complete-lesson').addEventListener('click', completeLesson);
-  document.querySelectorAll('[data-course-lang]').forEach((button) => button.addEventListener('click', () => { lang = button.dataset.courseLang; localStorage.setItem('club-lang', lang); render(); }));
+  document.querySelectorAll('[data-course-lang]').forEach((button) => button.addEventListener('click', () => { window.i18n.setLanguage(button.dataset.courseLang); }));
   // The page-level language control is shared with the rest of the platform.
   // Re-render only the view; course/progress data remains untouched.
-  document.addEventListener('languagechange', (event) => { const next = event.detail?.lang; if (next === 'ar' || next === 'en') { lang = next; localStorage.setItem('club-lang', lang); render(); } });
+  document.addEventListener('languagechange', (event) => { const next = event.detail?.lang; if (next === 'ar' || next === 'en') { lang = next; render(); } });
   init();
 })();

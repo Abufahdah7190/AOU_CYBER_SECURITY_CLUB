@@ -12,7 +12,7 @@ require('dotenv').config();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const isProd = NODE_ENV === 'production';
 
-const required = ['DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'];
+const required = ['DATABASE_URL', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'FRONTEND_URL'];
 if (isProd) {
   for (const key of required) {
     if (!process.env[key]) {

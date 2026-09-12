@@ -31,6 +31,15 @@
     return false;
   }
 
+  function validatePasswordPolicy(form) {
+    if (form?.id !== 'register-form') return true;
+    const input = form.querySelector('input[name="password"]');
+    if (!input) return true;
+    const valid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,}$/.test(input.value);
+    input.setCustomValidity(valid ? '' : tr('auth.passwordHelp', 'يجب أن تتكون كلمة المرور من 10 أحرف على الأقل، وتتضمن حرفًا كبيرًا وحرفًا صغيرًا ورقمًا.'));
+    return valid;
+  }
+
   function setBusy(form, busy) {
     const button = form?.querySelector('button[type="submit"]');
     if (!button) return;
@@ -129,6 +138,7 @@
       }
       input.value = email;
     }
+    validatePasswordPolicy(form);
     if (!validateUniversityEmailForm(form) || !form.reportValidity()) return;
     const sb = getSupabase();
     if (!sb) return setMessage('خطأ في إعدادات الاتصال بقاعدة البيانات (Supabase غير متوفر).', 'error');
@@ -152,7 +162,7 @@
         });
       } else {
         const { data, error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: 'https://aou-cyber-security-club.onrender.com/reset-password.html',
+          redirectTo: new URL('/reset-password.html', location.origin).href,
         });
         if (error) throw error;
         setMessage(tr('auth.recoverySent', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.'), 'success');
@@ -160,7 +170,8 @@
         return;
       }
       if (result.error) throw result.error;
-      window.location.replace(new URL('index.html', window.location.href).href);
+      if (result.data?.session) window.location.replace('/profile.html');
+      else setMessage(tr('auth.confirmEmail', 'Check your email to confirm your account / تحقق من بريدك لتأكيد الحساب'), 'success');
     } catch (error) {
       setMessage(error?.message || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'), 'error');
     } finally {
@@ -174,8 +185,17 @@
     if (!sb) { showForms(); setMessage('تعذر تحميل خدمة المصادقة. تحقق من الاتصال وإعدادات Supabase ثم أعد تحميل الصفحة.', 'error'); return; }
     const { data: { session }, error } = await sb.auth.getSession();
     if (error) { showForms(); setMessage(error.message, 'error'); return; }
+    if (session?.user && /\/login\.html$/.test(location.pathname)) { location.replace('/profile.html'); return; }
     if (session?.user) showUser(session.user); else showForms();
-    sb.auth.onAuthStateChange((_event, currentSession) => currentSession?.user ? showUser(currentSession.user) : showForms());
+    sb.auth.onAuthStateChange((event, currentSession) => {
+      // Leave Supabase's auth lock before listeners perform API requests.
+      setTimeout(() => {
+        if (event === 'PASSWORD_RECOVERY') return; // Central client owns recovery navigation.
+        if (event === 'SIGNED_IN' && /\/login\.html$/.test(location.pathname)) { location.replace('/profile.html'); return; }
+        if (event === 'SIGNED_OUT') showForms();
+        else if (event === 'INITIAL_SESSION') currentSession?.user ? showUser(currentSession.user) : showForms();
+      }, 0);
+    });
   }
 
   async function handleLogout() {

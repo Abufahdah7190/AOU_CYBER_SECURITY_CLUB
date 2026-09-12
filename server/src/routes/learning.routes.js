@@ -1,7 +1,8 @@
 const express = require('express');
 const { body, param } = require('express-validator');
 const { pool } = require('../db/pool');
-const { requireAuth } = require('../middleware/auth');
+const requireAuth = require('../middleware/supabaseAuth');
+const { evaluate, courses } = require('../services/assessment');
 const { handleValidation } = require('../middleware/errors');
 const {
   studentFullName,
@@ -71,6 +72,12 @@ router.get('/progress', async (req, res, next) => {
        FROM student_course_certificates WHERE student_id = $1 ORDER BY issued_at DESC`,
       [req.user.id]
     );
+    const verified = await pool.query('SELECT course_slug,lesson_index FROM verified_lesson_results WHERE student_id=$1',[req.user.id]);
+    for (const progress of rows) {
+      const lessonCount=courses[progress.courseSlug]?.modules.flatMap(m=>m.lessons).length || 0;
+      const scores=Object.fromEntries(verified.rows.filter(r=>r.course_slug===progress.courseSlug).map(r=>[r.lesson_index,true]));
+      progress.quizScores=scores;progress.percent=lessonCount?Math.round(Object.keys(scores).length/lessonCount*100):0;
+    }
     return res.json({ progress: rows, certificates: certificates.rows });
   } catch (error) { return next(error); }
 });
@@ -90,19 +97,25 @@ router.put('/progress/:courseSlug', [
     }
 
     const { courseSlug } = req.params;
-    const percent = Number(req.body.percent);
+    const assessment = evaluate(courseSlug, req.body.lessonIndex, req.body.answers);
+    if (!assessment) return res.status(400).json({ error: 'Unknown lesson or invalid answers' });
+    if (!assessment.passed) return res.status(422).json({ error: 'At least 80% correct answers required' });
+    await pool.query('INSERT INTO verified_lesson_results(student_id,course_slug,lesson_index) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [req.user.id,courseSlug,req.body.lessonIndex]);
+    const verified = await pool.query('SELECT lesson_index FROM verified_lesson_results WHERE student_id=$1 AND course_slug=$2', [req.user.id,courseSlug]);
+    const trustedScores = Object.fromEntries(verified.rows.map(r => [r.lesson_index,true]));
+    const percent = Math.round(verified.rows.length / assessment.count * 100);
     const lastSection = Number(req.body.lastSection || 0);
-    const quizScores = req.body.quizScores || {};
+    const quizScores = trustedScores;
     const language = req.body.language || 'ar';
     const theme = req.body.theme || 'light';
-    const completedAt = percent >= 80 ? new Date() : null;
+    const completedAt = percent >= 100 ? new Date() : null;
     const { rows } = await pool.query(
       `INSERT INTO student_course_progress (student_id, course_slug, percent, last_section, last_accessed_at, quiz_scores, certificate_language, completed_at)
        VALUES ($1,$2,$3,$4,now(),$5,$6,$7)
        ON CONFLICT (student_id, course_slug) DO UPDATE SET percent=EXCLUDED.percent,
          last_section=EXCLUDED.last_section, last_accessed_at=now(), quiz_scores=EXCLUDED.quiz_scores,
          certificate_language=EXCLUDED.certificate_language,
-         completed_at=CASE WHEN EXCLUDED.percent >= 80 THEN COALESCE(student_course_progress.completed_at, now()) ELSE NULL END,
+         completed_at=CASE WHEN EXCLUDED.percent >= 100 THEN COALESCE(student_course_progress.completed_at, now()) ELSE NULL END,
          updated_at=now()
        RETURNING course_slug AS "courseSlug", percent, last_section AS "lastSection", last_accessed_at AS "lastAccessedAt", quiz_scores AS "quizScores", certificate_language AS language, completed_at AS "completedAt"`,
       [req.user.id, courseSlug, percent, lastSection, quizScores, language, completedAt]
@@ -151,11 +164,15 @@ router.post('/certificates/:courseSlug', [
       return res.status(401).json({ error: 'يجب تسجيل الدخول للمتابعة' });
     }
 
+    const lessons = courses[req.params.courseSlug]?.modules.flatMap(m => m.lessons);
+    if (!lessons) return res.status(404).json({ error: 'Unknown course' });
+    const verified = await pool.query('SELECT count(*)::int AS count FROM verified_lesson_results WHERE student_id=$1 AND course_slug=$2', [req.user.id, req.params.courseSlug]);
+    if (verified.rows[0].count !== lessons.length) return res.status(400).json({ error: 'Complete all verified lesson assessments first' });
     const progressResult = await pool.query(
       'SELECT percent FROM student_course_progress WHERE student_id=$1 AND course_slug=$2',
       [req.user.id, req.params.courseSlug]
     );
-    const completionPercent = Number(progressResult.rows[0]?.percent || 0);
+    const completionPercent = Math.round(verified.rows[0].count / lessons.length * 100);
     if (completionPercent < 100) {
       return res.status(400).json({ error: 'يجب إكمال جميع دروس الدورة بنسبة 100% للحصول على الشهادة' });
     }

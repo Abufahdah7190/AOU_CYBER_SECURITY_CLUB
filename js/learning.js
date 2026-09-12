@@ -18,7 +18,7 @@
   const getSaved = (slug) => state.progress.find((item) => item.courseSlug === slug) || { percent: 0, lastSection: 0, quizScores: {}, language: 'ar' };
 
   async function request(path, options = {}) {
-    const response = await fetch(`${API}${path}`, { credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
+    const response = await window.clubFetch(`${API}${path}`, { credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || 'تعذر الاتصال بالخادم');
     return data;
@@ -30,9 +30,11 @@
   }
 
   function render() {
+    const english = window.i18n?.lang === 'en';
+    const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const cards = [...document.querySelectorAll('[data-course-id]')];
     const values = cards.map((card) => Number(getSaved(card.dataset.courseId).percent || 0));
-    const completed = values.filter((value) => value >= 80).length;
+    const completed = values.filter((value) => value >= 100).length;
     const average = values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
     if (byId('learning-completed-count')) byId('learning-completed-count').textContent = completed;
     if (byId('learning-progress-percent')) byId('learning-progress-percent').textContent = `${average}%`;
@@ -45,10 +47,10 @@
       const button = card.querySelector('.course-action');
       if (bar) bar.style.width = `${value}%`;
       if (label) label.textContent = `${value}%`;
-      if (button) button.textContent = value >= 80 ? 'متابعة الدورة — الشهادة متاحة' : value ? 'متابعة الدورة' : 'ابدأ الدورة';
+      if (button) button.textContent = value >= 100 ? (english ? 'Review course — certificate available' : 'مراجعة الدورة — الشهادة متاحة') : value ? (english ? 'Continue course' : 'متابعة الدورة') : (english ? 'Start course' : 'ابدأ الدورة');
     });
     const list = byId('certificates-list');
-    if (list) list.innerHTML = state.certificates.length ? state.certificates.map((certificate) => `<div class="certificate-item"><span class="certificate-icon">✓</span><div><strong>${certificate.courseName}</strong><small>${certificate.language === 'en' ? 'English certificate' : 'شهادة عربية'} · ${certificate.certificateCode}</small></div><button type="button" class="btn ghost certificate-share" data-course-slug="${certificate.courseSlug}">مشاركة LinkedIn</button></div>`).join('') : '<span class="empty-state">أكمل 80% من دورة على الأقل لتظهر شهادتك هنا.</span>';
+    if (list) list.innerHTML = state.certificates.length ? state.certificates.map((certificate) => `<div class="certificate-item"><span class="certificate-icon">✓</span><div><strong>${escape(certificate.courseName)}</strong><small>${certificate.language === 'en' ? 'English certificate' : 'شهادة عربية'} · ${escape(certificate.certificateCode)}</small></div><button type="button" class="btn ghost certificate-share" data-course-slug="${escape(certificate.courseSlug)}">${english ? 'Share on LinkedIn' : 'مشاركة LinkedIn'}</button></div>`).join('') : `<span class="empty-state">${english ? 'Complete all lessons to earn a certificate.' : 'أكمل جميع دروس الدورة للحصول على الشهادة.'}</span>`;
     list?.querySelectorAll('.certificate-share').forEach((button) => button.addEventListener('click', () => shareCertificate(button.dataset.courseSlug)));
   }
 

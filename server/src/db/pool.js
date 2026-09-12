@@ -22,8 +22,10 @@ const useSsl = Boolean(rawDatabaseUrl) && (/sslmode=(require|prefer|verify-ca|ve
 
 const pool = new Pool({
   connectionString: normalizedDatabaseUrl,
-  ssl: useSsl ? { rejectUnauthorized: !isSupabasePooler } : false,
+  ssl: useSsl ? { rejectUnauthorized: true } : false,
   max: 10,
+  connectionTimeoutMillis: 10000,
+  statement_timeout: 15000,
   idleTimeoutMillis: 30000,
 });
 

@@ -5,7 +5,7 @@
   // Set window.CYBERCLUB_PROFILE_TABLE = 'users' only if your project uses that
   // table instead of the recommended public.profiles table.
   const PROFILE_TABLE = window.CYBERCLUB_PROFILE_TABLE || 'profiles';
-  const PROFILE_TABLES = [...new Set([PROFILE_TABLE, 'profiles', 'users'])];
+  const PROFILE_TABLES = ['profiles'];
   const SESSION_TIMEOUT_MS = 10000;
   const SESSION_RETRY_COUNT = 5;
   const SESSION_RETRY_DELAY_MS = 700;
@@ -84,6 +84,8 @@
     };
     for (const name of aliases[key] || [key]) {
       if (profile?.[name] !== undefined && profile?.[name] !== null) return profile[name];
+    }
+    for (const name of aliases[key] || [key]) {
       if (user?.user_metadata?.[name] !== undefined && user.user_metadata[name] !== null) return user.user_metadata[name];
     }
     return '';
@@ -120,7 +122,7 @@
     let lastError = null;
     for (const table of PROFILE_TABLES) {
       try {
-        const result = await sb.from(table).select('*').eq('id', user.id).maybeSingle();
+        const result = await withTimeout(sb.from(table).select('*').eq('id', user.id).maybeSingle(), SESSION_TIMEOUT_MS, text('unavailable'));
         if (!result.error) return { table, profile: result.data };
         lastError = result.error;
       } catch (error) { lastError = error; }
@@ -160,7 +162,7 @@
       const result = await queryProfile(sb, session.user);
       if (generation !== loadGeneration) return;
       state.table = result.table; state.profile = result.profile;
-      fillForm(result.profile || {}, session.user); renderEmptyDashboard();
+      fillForm(result.profile || {}, session.user); document.dispatchEvent(new Event('profile:loaded'));
       document.body.classList.remove('auth-locked');
       setMessage(result.profile ? '' : text('notFound'), result.profile ? '' : 'info');
     } catch (error) {
@@ -190,7 +192,7 @@
       if (!session?.user) throw new Error(text('expired'));
       const sb = getSupabase();
       if (!state.table) { const found = await queryProfile(sb, session.user); state.table = found.table; state.profile = found.profile; }
-      state.profile = await createOrUpdateProfile(sb, state.table, session.user, profilePayload());
+      state.profile = await withTimeout(createOrUpdateProfile(sb, state.table, session.user, profilePayload()), SESSION_TIMEOUT_MS, text('unavailable'));
       state.user = session.user; fillForm(state.profile, state.user); setMessage(text('updated'), 'success');
     } catch (error) { setMessage(normalizeError(error), 'error'); }
     finally { state.saving = false; setFormBusy(form, false); }
@@ -203,6 +205,7 @@
     try {
       const session = await getSession(); if (!session?.user) throw new Error(text('expired'));
       const currentPassword = String($('#current-password')?.value || ''); const newPassword = String($('#new-password')?.value || '');
+      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,}$/.test(newPassword)) throw new Error(lang() === 'en' ? 'Use 10+ characters, upper and lower case and a digit.' : 'استخدم 10 أحرف فأكثر وحرفاً كبيراً وصغيراً ورقماً.');
       const sb = getSupabase(); const login = await sb.auth.signInWithPassword({ email: session.user.email, password: currentPassword });
       if (login.error) throw new Error(text('passwordMismatch'));
       const updated = await sb.auth.updateUser({ password: newPassword }); if (updated.error) throw updated.error;
@@ -224,14 +227,21 @@
     if (!sb) { setMessage(text('unavailable'), 'error'); return; }
     try {
       const subscription = sb.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_OUT' || !session?.user) { document.body.classList.add('auth-locked'); redirectToLogin(); return; }
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'PASSWORD_RECOVERY') loadProfile({ allowRedirect: false }).catch((error) => setMessage(normalizeError(error), 'error'));
+        if (event === 'SIGNED_OUT') { ++loadGeneration; state.user = null; state.profile = null; document.body.classList.add('auth-locked'); redirectToLogin(); return; }
+        if (event === 'PASSWORD_RECOVERY') return; // Central client owns recovery navigation.
+        if (event === 'SIGNED_IN' && session?.user?.id !== state.user?.id) setTimeout(() => loadProfile({ allowRedirect: false }).catch((error) => setMessage(normalizeError(error), 'error')), 0);
       });
       authSubscription = subscription?.data?.subscription || null;
     } catch (error) { setMessage(normalizeError(error), 'error'); }
     loadProfile().catch((error) => setMessage(normalizeError(error), 'error'));
   }
 
+  document.addEventListener('languagechange', () => { if (state.user) {
+    const form = $('#profile-form');
+    const draft = [...form.elements].map(el => [el, el.value]);
+    fillForm(state.profile || {}, state.user);
+    draft.forEach(([el,value]) => { if (el.tagName !== 'BUTTON') el.value = value; });
+  } });
   window.addEventListener('beforeunload', () => authSubscription?.unsubscribe?.());
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();

@@ -30,7 +30,10 @@ create policy profiles_update_own on public.profiles
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
 grant usage on schema public to authenticated;
-grant select, insert, update on public.profiles to authenticated;
+revoke all on public.profiles from anon, authenticated;
+grant select on public.profiles to authenticated;
+grant insert (id, email, first_name, last_name, phone, major, gender, avatar_data, updated_at) on public.profiles to authenticated;
+grant update (email, first_name, last_name, phone, major, gender, avatar_data, updated_at) on public.profiles to authenticated;
 
 create or replace function public.set_profiles_updated_at()
 returns trigger

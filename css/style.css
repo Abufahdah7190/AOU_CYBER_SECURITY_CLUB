@@ -35,10 +35,10 @@
       transform: translateY(-2px) scale(1.01);
     }
     html, body {
-      height: 100%;
+      min-height: 100%;
       margin: 0;
       font-family: "Noto Naskh Arabic", "Tahoma", "Arial", sans-serif;
-      direction: rtl;
+      direction: inherit;
       background: radial-gradient(circle at top, #061a33, #030a1a);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
@@ -3153,3 +3153,8 @@ body.radar-paused .secure-grid { animation-play-state:paused; }
   .course-card:hover h3,.ctf-card:hover .ctf-name,.game-card:hover h3,
   .course-card:hover,.ctf-card:hover,.game-card:hover { animation:none!important; }
 }
+
+.lesson-diagram{display:block;width:100%;height:auto;margin:1.5rem 0}.lms-lesson-card details{padding:1rem;border:1px solid #617085;border-radius:12px}.lms-lesson-card summary{cursor:pointer;font-weight:bold}@media(max-width:600px){.lms-header{flex-wrap:wrap}.lms-shell{display:flex;flex-direction:column}.lms-sidebar,.lms-main{width:100%;min-width:0}.lms-bottom-nav{flex-wrap:wrap}}
+html[dir="rtl"]{direction:rtl}html[dir="ltr"]{direction:ltr}body>.lang-switcher{margin:12px;gap:8px}body>.lang-switcher button{background:#142d43;color:#edf9ff;border:1px solid #4aa9b8;border-radius:7px;padding:8px 16px;cursor:pointer}.lms-main,.lms-sidebar{box-sizing:border-box}
+
+@media print { @page{size:A4 landscape;margin:0} body:has(.verify-certificate-image) *{visibility:hidden!important}body:has(.verify-certificate-image) .verify-certificate-image{visibility:visible!important;position:fixed;inset:0;width:297mm;height:210mm;object-fit:contain;background:white} }

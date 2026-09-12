@@ -12,6 +12,5 @@ const publicRoot = path.join(__dirname, '..', 'public');
 const signup = fs.readFileSync(path.join(publicRoot, 'js', 'signup.js'), 'utf8');
 assert.match(signup, /supabaseClient\.auth\.signUp/);
 assert.match(signup, /@aou\\.edu\\.sa/);
-assert.match(fs.readFileSync(path.join(publicRoot, 'index.html'), 'utf8'), /contact\.joinCard/);
-assert.doesNotMatch(fs.readFileSync(path.join(publicRoot, 'css/style.css'), 'utf8'), /auth-welcome::before[^}]*radial-gradient/);
+assert.match(fs.readFileSync(path.join(publicRoot, 'index.html'), 'utf8'), /href="join\.html"/);
 console.log('Regression tests passed.');

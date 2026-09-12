@@ -105,6 +105,10 @@ app.use('/api/learning', learningRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/public', publicRoutes);
 
+app.get('/login.html', (req,res) => res.redirect('/index.html#tab-auth'));
+app.get('/js/supabase-config.js', (req, res) => {
+  res.type('application/javascript').set('Cache-Control', 'no-store').send('window.SUPABASE_URL=' + JSON.stringify(process.env.SUPABASE_URL || '') + ';window.SUPABASE_ANON_KEY=' + JSON.stringify(process.env.SUPABASE_ANON_KEY || '') + ';');
+});
 app.get('/api/health', (req, res) => res.json({ ok: true, env: env.NODE_ENV }));
 
 // Dedicated LMS classroom route. The client reads :courseId from the path.
@@ -119,6 +123,18 @@ app.get('/student/profile', sendStudentProfile);
 // `fallthrough: true` lets unknown document routes continue to the SPA
 // fallback, while real files such as /profile.html, /css/style.css,
 // /js/profile.js and /assets/* are served directly.
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  let decoded;
+  try { decoded = decodeURIComponent(req.path).replace(/\\/g, '/'); }
+  catch (_) { return res.sendStatus(400); }
+  if (decoded.split('/').some(part => part === '..' || part.startsWith('.'))) return res.sendStatus(404);
+  const publicAsset = /^\/(?:js|css|assets|locales)\//.test(decoded);
+  const publicDocument = /^\/(?:[a-z0-9-]+\.html)?$/i.test(decoded);
+  if (!publicAsset && !publicDocument && /\.[a-z0-9]+$/i.test(decoded)) return res.sendStatus(404);
+  if (/^\/(?:server|supabase|tests|docs|node_modules)(?:\/|$)/i.test(decoded)) return res.sendStatus(404);
+  next();
+});
 app.use(express.static(FRONTEND_ROOT, {
   index: 'index.html',
   fallthrough: true,

@@ -94,7 +94,7 @@ function imageUrlFor(certificateCode) {
 
 function generateCertificateCode() {
   const year = new Date().getFullYear();
-  const random = crypto.randomInt(1000, 9999);
+  const random = crypto.randomBytes(12).toString('hex');
   return `CSC-AOU-${year}-${random}`;
 }
 
@@ -124,7 +124,7 @@ function commonFields(certificate) {
     isEn,
     documentDirection: isEn ? 'ltr' : 'rtl',
     clubSub: isEn ? 'CYBER SECURITY CLUB — ARAB OPEN UNIVERSITY' : 'نادي الأمن السيبراني — الجامعة العربية المفتوحة',
-    title: isEn ? 'CERTIFICATE OF COMPLETION' : 'شهادة إتمام وتدريب معتمدة',
+    title: isEn ? 'CERTIFICATE OF COMPLETION' : 'شهادة إتمام التدريب',
     awardedTo: isEn ? 'This is proudly presented to' : 'تُمنح هذه الشهادة بكل فخر واعتزاز إلى المتدرب',
     statementLine1: isEn
       ? 'For successfully completing all rigorous training hours, practical labs, and requirements for:'

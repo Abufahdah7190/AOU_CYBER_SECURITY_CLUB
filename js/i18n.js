@@ -89,7 +89,7 @@
     if (lang !== 'ar' && lang !== 'en') lang = DEFAULT_LANG;
     dict = loadDict(lang);
     currentLang = lang;
-    localStorage.setItem(STORAGE_KEY, lang);
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (_) { /* Private mode: retain in-memory preference. */ }
     updateDocumentDirection(lang);
     applyStaticTranslations();
     updateLangSwitcher(lang);
@@ -105,7 +105,8 @@
   }
 
   function init() {
-    const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG;
+    let saved = navigator.language?.toLowerCase().startsWith('en') ? 'en' : DEFAULT_LANG;
+    try { saved = localStorage.getItem(STORAGE_KEY) || saved; } catch (_) {}
     initLangSwitcher();
     setLanguage(saved);
   }
