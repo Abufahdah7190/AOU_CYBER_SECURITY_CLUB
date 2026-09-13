@@ -11,6 +11,15 @@
     for (const cert of records.certificates) {
       const card = node('article', ''); card.className = 'card';
       card.append(node('h3', cert.courseName), node('p', cert.certificateCode));
+      const previewLink = node('a', '');
+      previewLink.href = '/certificate-verify.html?code=' + encodeURIComponent(cert.certificateCode);
+      previewLink.setAttribute('aria-label', en() ? 'View certificate' : 'عرض الشهادة');
+      const preview = document.createElement('img');
+      preview.src = `/api/learning/certificates/${encodeURIComponent(cert.certificateCode)}/image`;
+      preview.alt = (en() ? 'Certificate preview: ' : 'معاينة الشهادة: ') + cert.courseName;
+      preview.loading = 'lazy'; preview.width = 1600; preview.height = 1131;
+      preview.style.cssText = 'display:block;width:100%;height:auto;max-width:800px;margin:16px auto;border-radius:8px;background:white';
+      previewLink.append(preview); card.append(previewLink);
       const link = node('a', en() ? 'Download SVG / open certificate' : 'تنزيل SVG / فتح الشهادة');
       link.href = `/api/learning/certificates/${encodeURIComponent(cert.certificateCode)}/image`; link.target = '_blank'; link.rel = 'noopener';
       card.append(link);
