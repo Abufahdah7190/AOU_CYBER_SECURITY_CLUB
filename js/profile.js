@@ -136,11 +136,15 @@
       phone: values.phone || null, major: values.major || null, gender: values.gender || null,
       updated_at: new Date().toISOString()
     };
-    // Profiles normally use auth.users.id as their primary key. If a legacy table
-    // does not expose email/updated_at, retry with only the common profile fields.
-    let result = await sb.from(table).upsert(payload, { onConflict: 'id' }).select('*').single();
-    if (result.error && /column .* does not exist|schema cache/i.test(result.error.message || '')) {
-      result = await sb.from(table).upsert({ id: user.id, first_name: values.firstName, last_name: values.lastName, phone: values.phone || null, major: values.major || null, gender: values.gender || null }, { onConflict: 'id' }).select('*').single();
+    // The identity column is insert-only. An upsert also requests UPDATE(id),
+    // which correctly fails under the column-level grants used in production.
+    const { id, ...editable } = payload;
+    const updateOwn = () => sb.from(table).update(editable).eq('id', id).select('*').maybeSingle();
+    let result = await updateOwn();
+    if (!result.error && !result.data) {
+      result = await sb.from(table).insert(payload).select('*').single();
+      // A new-user trigger or another tab may have created the row meanwhile.
+      if (result.error?.code === '23505') result = await updateOwn();
     }
     if (result.error) throw result.error;
     return result.data;
