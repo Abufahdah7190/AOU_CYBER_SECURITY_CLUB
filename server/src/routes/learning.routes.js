@@ -12,6 +12,7 @@ const {
   queueCertificateEmail,
   withQrDataUrl,
   courseTitleFor,
+  certificateInLanguage,
 } = require('../services/certificate.service');
 
 const router = express.Router();
@@ -21,15 +22,11 @@ const certificateCodeParam = param('certificateCode').trim().isLength({ min: 5, 
 // Public verification endpoint: exposes only certificate verification data.
 router.get('/verify/:certificateCode', async (req, res, next) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT certificate_code AS "certificateCode", course_name AS "courseName", student_name AS "studentName",
-              language, theme, issued_at AS "issuedAt", 'valid' AS status
-       FROM student_course_certificates
-       WHERE certificate_code = $1`,
-      [req.params.certificateCode]
-    );
-    if (!rows[0]) return res.status(404).json({ valid: false, error: 'الشهادة غير موجودة أو غير صالحة' });
-    return res.json({ valid: true, certificate: rows[0] });
+    if (req.query.lang !== undefined && !['ar','en'].includes(req.query.lang)) return res.status(400).json({error:'Invalid language'});
+    const certificate = await findByCode(req.params.certificateCode);
+    if (!certificate) return res.status(404).json({ valid: false, error: 'الشهادة غير موجودة أو غير صالحة' });
+    res.setHeader('Cache-Control', 'no-store');
+    return res.json({ valid: true, certificate: {...certificateInLanguage(certificate, req.query.lang), status:'valid'} });
   } catch (error) { return next(error); }
 });
 
@@ -39,9 +36,10 @@ router.get('/verify/:certificateCode', async (req, res, next) => {
 // data beyond what /verify already exposes.
 router.get('/certificates/:certificateCode/image', [certificateCodeParam], handleValidation, async (req, res, next) => {
   try {
+    if (req.query.lang !== undefined && !['ar','en'].includes(req.query.lang)) return res.status(400).send('Invalid language');
     const certificate = await findByCode(req.params.certificateCode);
     if (!certificate) return res.status(404).send('Certificate not found');
-    const svg = await renderCertificateSvg(certificate);
+    const svg = await renderCertificateSvg(certificateInLanguage(certificate, req.query.lang));
     res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
     // A learner may reissue the same certificate code in a different language
     // or theme. Do not let a browser keep the earlier SVG for an hour.

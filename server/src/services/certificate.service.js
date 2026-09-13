@@ -234,10 +234,24 @@ const CERTIFICATE_COLUMNS = `course_slug AS "courseSlug", course_name AS "course
 
 async function findByCode(certificateCode) {
   const { rows } = await pool.query(
-    `SELECT ${CERTIFICATE_COLUMNS} FROM student_course_certificates WHERE certificate_code = $1`,
+    `SELECT ${CERTIFICATE_COLUMNS},
+       (SELECT NULLIF(TRIM(CONCAT_WS(' ', p.first_name, p.last_name)), '')
+        FROM public.profiles p
+        WHERE p.id = COALESCE((SELECT l.auth_user_id FROM public.supabase_identity_links l
+                               WHERE l.student_id = c.student_id), c.student_id)) AS "profileName"
+     FROM student_course_certificates c WHERE certificate_code = $1`,
     [certificateCode]
   );
-  return rows[0] || null;
+  if (!rows[0]) return null;
+  const { profileName, ...certificate } = rows[0];
+  return { ...certificate, studentName: profileName || certificate.studentName };
+}
+
+function certificateInLanguage(certificate, language) {
+  const selected = language || certificate.language || 'ar';
+  if (!['ar', 'en'].includes(selected)) throw new Error('Unsupported certificate language');
+  return { ...certificate, language: selected,
+    courseName: courseTitleFor(certificate.courseSlug, selected, certificate.courseName) };
 }
 
 async function findExisting(studentId, courseSlug) {
@@ -380,6 +394,7 @@ module.exports = {
   courseTitleFor,
   issueCertificate,
   findByCode,
+  certificateInLanguage,
   renderCertificateSvg,
   withQrDataUrl,
   queueCertificateEmail,
