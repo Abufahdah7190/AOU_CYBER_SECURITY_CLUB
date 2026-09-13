@@ -139,9 +139,11 @@ app.use(express.static(FRONTEND_ROOT, {
   index: 'index.html',
   fallthrough: true,
   etag: true,
-  maxAge: env.isProd ? '1d' : 0,
+  maxAge: 0,
   setHeaders: (res, filePath) => {
-    if (/\.(?:css|js|svg|png|jpe?g|webp|woff2?)$/i.test(filePath)) {
+    if (/\.(?:html|css|js)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    } else if (/\.(?:svg|png|jpe?g|webp|woff2?)$/i.test(filePath)) {
       res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
     }
   },
