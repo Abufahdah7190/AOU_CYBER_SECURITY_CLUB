@@ -1,13 +1,11 @@
 'use strict';
 
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
-// `pg` interprets sslmode=require in a connection URI itself. In recent
-// versions that value can override the `ssl` object below and turn it into
-// verify-full, which rejects Supabase's pooled IPv4 certificate chain on
-// Render. Normalise only the URI option, then supply the TLS policy here.
-// Encryption remains mandatory; the narrow exception is limited to the
-// Supabase pooler endpoint (whose proxy chain is not publicly rooted).
+// Supply the provider CA explicitly while retaining certificate and hostname
+// verification. URI SSL options must not override this verified TLS policy.
 const rawDatabaseUrl = process.env.DATABASE_URL || '';
 let normalizedDatabaseUrl = rawDatabaseUrl;
 let databaseHost = '';
@@ -19,10 +17,14 @@ try {
 } catch (_) { /* env validation reports malformed URLs elsewhere */ }
 const isSupabasePooler = /(^|\.)pooler\.supabase\.com$/i.test(databaseHost);
 const useSsl = Boolean(rawDatabaseUrl) && (/sslmode=(require|prefer|verify-ca|verify-full)/i.test(rawDatabaseUrl) || process.env.PGSSL === 'true' || isSupabasePooler);
+const ssl = useSsl ? { rejectUnauthorized: true } : false;
+if (ssl && isSupabasePooler) {
+  ssl.ca = fs.readFileSync(path.join(__dirname, '../../certs/supabase-ca.crt'), 'utf8');
+}
 
 const pool = new Pool({
   connectionString: normalizedDatabaseUrl,
-  ssl: useSsl ? { rejectUnauthorized: true } : false,
+  ssl,
   max: 10,
   connectionTimeoutMillis: 10000,
   statement_timeout: 15000,
