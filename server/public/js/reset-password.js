@@ -80,10 +80,16 @@
 
   const sb = getSupabase();
   let recoverySessionReady = false;
+  const recoveryParams = new URLSearchParams(window.location.hash.slice(1));
+  let tokenHash = recoveryParams.get('token_hash');
+  const tokenRecovery = Boolean(tokenHash);
+  const activation = document.getElementById('activate-recovery');
+  form.hidden = true;
+  if (tokenRecovery) history.replaceState(null, '', window.location.pathname);
   const hasAuthCallback = /(?:^#|&)access_token=|(?:^#|&)type=recovery|(?:^\?|&)code=/.test(window.location.hash + window.location.search);
 
   function markSessionReady(session) {
-    if (session) { recoverySessionReady = true; form.hidden = false; showMessage('', ''); }
+    if (session && (!tokenRecovery || !tokenHash)) { recoverySessionReady = true; form.hidden = false; showMessage('', ''); }
   }
 
   if (!sb) {
@@ -94,7 +100,22 @@
       if (event === 'SIGNED_OUT') { recoverySessionReady = false; form.hidden = true; showMessage(text('invalid'), 'error'); }
       else if (session) markSessionReady(session);
     });
-    sb.auth.getSession().then(({ data, error }) => {
+    if (tokenRecovery) {
+      activation.hidden = false;
+      showMessage(en() ? 'Press Continue to securely open the password form.' : 'اضغط متابعة لفتح نموذج تعيين كلمة المرور بأمان.', '');
+      activation.addEventListener('click', async () => {
+        activation.disabled = true;
+        try {
+          const { data, error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
+          if (error || !data?.session) throw error || new Error('Missing recovery session');
+          tokenHash = null;
+          markSessionReady(data.session);
+          activation.hidden = true;
+        } catch (error) {
+          showMessage(error?.status >= 500 || error?.name === 'AbortError' ? text('unavailable') : text('invalid'), 'error');
+        } finally { activation.disabled = false; }
+      });
+    } else sb.auth.getSession().then(({ data, error }) => {
       if (error) throw error;
       if (data.session) markSessionReady(data.session);
       else if (!hasAuthCallback) { form.hidden = true; showMessage(text('invalid'), 'error'); }
