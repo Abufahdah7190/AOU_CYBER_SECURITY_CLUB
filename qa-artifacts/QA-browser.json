@@ -1,0 +1,20 @@
+{
+  "passed": [
+    "Profile loads database fields over metadata",
+    "AR/EN switching preserves session and unsaved profile",
+    "Token refresh preserves draft without auth lock reentry",
+    "Profile mobile no horizontal overflow",
+    "Password reset redirects to profile",
+    "Password login redirects to profile",
+    "Recovery event opens password form",
+    "Course English content and diagram render on mobile",
+    "Server source SQL and missing assets return 404",
+    "Signed out profile redirects to login",
+    "Anonymous profile blocked and invalid reset link shows error",
+    "Hanging profile query exits loading with error within deadline",
+    "Certificate verification supports SVG download and PDF print",
+    "Failed verification never resurrects previous certificate on language change",
+    "Additional public pages switch document language and direction"
+  ],
+  "errors": []
+}

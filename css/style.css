@@ -3160,3 +3160,47 @@ html[dir="rtl"]{direction:rtl}html[dir="ltr"]{direction:ltr}body>.lang-switcher{
 @media print { @page{size:A4 landscape;margin:0} body:has(.verify-certificate-image) *{visibility:hidden!important}body:has(.verify-certificate-image) .verify-certificate-image{visibility:visible!important;position:fixed;inset:0;width:297mm;height:210mm;object-fit:contain;background:white} }
 
 @media print { body:has(.verify-certificate-image) > main { display:block!important; margin:0!important; padding:0!important; width:100%!important; max-width:none!important; border:0!important; box-shadow:none!important; } body:has(.verify-certificate-image) .verify-certificate-image { max-width:none!important; margin:0!important; border:0!important; border-radius:0!important; box-shadow:none!important; } }
+/* Interface QA: comfortable touch targets and visible keyboard navigation. */
+.lang-btn, .lang-switcher > button, .auth-card .auth-switch,
+.auth-card .auth-link, .lms-back, .verify-back {
+  min-block-size:44px;
+  box-sizing:border-box;
+}
+.lang-btn, .lang-switcher > button { font-size:12px; }
+.lms-back, .verify-back { display:inline-flex; align-items:center; }
+:where(button,a,input,select,textarea,summary):focus-visible {
+  outline:2px solid #69e8ff;
+  outline-offset:3px;
+}
+.lang-switcher > button[aria-pressed="true"] {
+  background:#164c60;
+  box-shadow:inset 0 0 0 1px #69e8ff;
+}
+@media (max-width:600px) {
+  .lms-header { grid-template-columns:minmax(0,1fr); }
+  .lms-course-heading { grid-column:1; grid-row:1; }
+  .lms-back { grid-column:1; grid-row:2; }
+  .lms-progress-box { grid-column:1; grid-row:3; }
+  .course-language { grid-column:1; grid-row:4; display:flex; gap:8px; }
+  .course-language .lang-btn { min-width:80px; }
+  .verify-page { min-height:calc(100dvh - 80px); }
+  .verify-card { min-width:0; width:100%; box-sizing:border-box; }
+  .verify-card h1 { overflow-wrap:anywhere; }
+}
+.lesson-workshop pre {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  max-width:100%;
+  box-sizing:border-box;
+  padding:16px;
+  background:#05101f;
+  color:#d5f4ff;
+  border:1px solid #31536c;
+  border-radius:8px;
+  line-height:1.7;
+  text-align:start;
+}
+.btn, #verify-form input { min-block-size:44px; box-sizing:border-box; }
+
+/* Preserve aligned workshop columns on narrow screens. */
+.lesson-workshop pre { white-space:pre; overflow-x:auto; overflow-wrap:normal; }

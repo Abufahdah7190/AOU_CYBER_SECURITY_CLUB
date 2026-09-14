@@ -120,7 +120,7 @@
       return;
     }
     root.innerHTML = (course.modules || []).map((module, moduleIndex) => `<details class="lms-module" ${lessons[current]?.moduleIndex === moduleIndex ? 'open' : ''}><summary><span>${text(module.title)}</span><small>${module.lessons.length} ${lang === 'ar' ? 'دروس' : 'lessons'}</small></summary><div class="lms-module-lessons">${module.lessons.map((lesson, lessonIndex) => { const global = course.modules.slice(0, moduleIndex).reduce((sum, item) => sum + item.lessons.length, 0) + lessonIndex; const done = Boolean(saved.quizScores?.[global]); return `<button class="lms-lesson-link ${global === current ? 'active' : ''}" data-index="${global}" type="button"><span class="lms-check ${done ? 'done' : ''}">${done ? '✓' : ''}</span><span>${text(lesson.title)}</span><small>${text(lesson.typeLabel)}</small></button>`; }).join('')}</div></details>`).join('');
-    root.querySelectorAll('[data-index]').forEach((button) => button.addEventListener('click', () => { current = Number(button.dataset.index); render(); }));
+    root.querySelectorAll('[data-index]').forEach((button) => button.addEventListener('click', () => { if (isCompleting) return; current = Number(button.dataset.index); render(); }));
   }
 
   function quizQuestions(lesson) {
@@ -155,6 +155,13 @@
     const answer = document.querySelector(`input[name="lms-quiz-${questionIndex}"]:checked`);
     return Boolean(answer) && Number(answer.value) === Number(question.correct);
   }
+  function renderWorkshop(lesson) {
+    const w = lesson.workshop;
+    if (!w) return '';
+    const ar = lang === 'ar';
+    const task = w.stage === 0 ? (ar ? 'قبل قراءة الحل، استخرج الحقائق والافتراضات من البيانات.' : 'Before reading the explanation, separate facts from assumptions in the data.') : w.stage === 1 ? (ar ? 'نفذ التمرين وسجل المتوقع والفعلي وسبب أي اختلاف.' : 'Perform the exercise and record expected versus actual results and explain differences.') : (ar ? 'راجع الحل كمدقق مستقل: حدد نتيجة مدعومة وحداً لا يمكن استنتاجه من البيانات.' : 'Review as an independent auditor: state one supported conclusion and one limitation.');
+    return '<section class="lesson-workshop"><h3>' + (ar ? 'ورشة تطبيقية — بيانات تدريبية' : 'Practical workshop — synthetic data') + '</h3><p>' + task + '</p><pre dir="ltr">' + escapeHtml(w.data) + '</pre><details><summary>' + (ar ? 'شرح التحليل' : 'Worked analysis') + '</summary><p>' + escapeHtml(text(w.explanation)) + '</p></details><h4>' + (ar ? 'اختبار النتيجة' : 'Validate the result') + '</h4><p>' + escapeHtml(text(w.validation)) + '</p></section>';
+  }
   function renderLesson() {
     const item = flat()[current];
     const content = $('lesson-content');
@@ -171,7 +178,7 @@
     const media = `<div class="lms-article-placeholder"><strong>${lang === 'ar' ? 'درس مقالي' : 'Article lesson'}</strong><small>${lang === 'ar' ? 'اقرأ المحتوى التالي ثم أجب عن أسئلة الاختبار.' : 'Read the lesson content below, then answer the five-question quiz.'}</small></div>`;
     $('lesson-breadcrumb').textContent = `${text(item.module.title)} / ${text(lesson.title)}`;
     const quizHtml = questions.length ? questions.map((question, questionIndex) => renderQuestion(question, questionIndex, done)).join('') : `<p>${lang === 'ar' ? 'لا توجد أسئلة لهذا الدرس حاليًا.' : 'No questions are currently available for this lesson.'}</p>`;
-    content.innerHTML = `<div class="lms-lesson-kicker">${text(lesson.typeLabel)} · ${lang === 'ar' ? `الدرس ${current + 1} من ${flat().length}` : `Lesson ${current + 1} of ${flat().length}`}</div><h2>${text(lesson.title)}</h2>${media}<p class="lms-lesson-body">${escapeHtml(text(lesson.body))}</p>${lesson.diagram ? `<img class="lesson-diagram" src="${lesson.diagram}" alt="${lang === 'ar' ? 'مراحل المسار التعليمي' : 'Learning workflow'}">` : ''}${lesson.expected ? `<details><summary>${lang === 'ar' ? 'النتيجة المتوقعة ومعيار النجاح' : 'Expected result and success criteria'}</summary><p>${escapeHtml(text(lesson.expected))}</p></details>` : ''}<div class="lms-lesson-steps"><h3>${lang === 'ar' ? 'ماذا ستطبق؟' : 'What you will practice'}</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div><div class="lms-quiz"><h3>${lang === 'ar' ? 'اختبار قصير' : 'Quick quiz'}</h3>${quizHtml}<span id="quiz-result">${done ? (lang === 'ar' ? 'تم اجتياز هذا الدرس.' : 'Lesson completed.') : ''}</span></div>`;
+    content.innerHTML = `<div class="lms-lesson-kicker">${text(lesson.typeLabel)} · ${lang === 'ar' ? `الدرس ${current + 1} من ${flat().length}` : `Lesson ${current + 1} of ${flat().length}`}</div><h2>${text(lesson.title)}</h2>${media}${renderWorkshop(lesson)}<p class="lms-lesson-body">${escapeHtml(text(lesson.body))}</p>${lesson.diagram ? `<img class="lesson-diagram" src="${lesson.diagram}" alt="${lang === 'ar' ? 'مراحل المسار التعليمي' : 'Learning workflow'}">` : ''}${lesson.expected ? `<details><summary>${lang === 'ar' ? 'النتيجة المتوقعة ومعيار النجاح' : 'Expected result and success criteria'}</summary><p>${escapeHtml(text(lesson.expected))}</p></details>` : ''}<div class="lms-lesson-steps"><h3>${lang === 'ar' ? 'ماذا ستطبق؟' : 'What you will practice'}</h3><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div><div class="lms-quiz"><h3>${lang === 'ar' ? 'اختبار قصير' : 'Quick quiz'}</h3>${quizHtml}<span id="quiz-result">${done ? (lang === 'ar' ? 'تم اجتياز هذا الدرس.' : 'Lesson completed.') : ''}</span></div>`;
     $('previous-lesson').disabled = current === 0;
     $('complete-lesson').disabled = done;
     $('complete-lesson').textContent = current === flat().length - 1 ? (lang === 'ar' ? 'إكمال الدورة' : 'Complete course') : (lang === 'ar' ? 'إكمال والانتقال للدرس التالي' : 'Complete and go to next');
@@ -183,7 +190,7 @@
     if (certificate) {
       const imageUrl = certificate.imageUrl || `/api/learning/certificates/${encodeURIComponent(certificate.certificateCode)}/image`;
       const verifyUrl = certificate.verificationUrl || `/certificate-verify.html?code=${encodeURIComponent(certificate.certificateCode)}`;
-      const intro = lang === 'ar' ? `تهانينا! أتممت الدورة بنسبة 100%. صدرَت شهادتك برمز <strong>${certificate.certificateCode || ''}</strong> وسيتم إرسالها تلقائيًا إلى بريدك الجامعي.` : `Congratulations! You completed the course with 100%. Your certificate ID is <strong>${certificate.certificateCode || ''}</strong> and it will be emailed automatically to your university address.`;
+      const intro = lang === 'ar' ? `تهانينا! أتممت الدورة بنسبة 100%. صدرَت شهادتك برمز <strong>${certificate.certificateCode || ''}</strong> ويمكنك عرضها وتنزيلها من ملفك الشخصي.` : `Congratulations! You completed the course with 100%. Your certificate ID is <strong>${certificate.certificateCode || ''}</strong> and you can view or download it from your profile.`;
       message.innerHTML = `<p>${intro}</p><img class="course-certificate-preview" src="${imageUrl}" alt="${lang === 'ar' ? 'معاينة الشهادة' : 'Certificate preview'}"><p><a href="${verifyUrl}" target="_blank" rel="noopener">${lang === 'ar' ? 'فتح صفحة التحقق' : 'Open verification page'}</a> · <a href="/profile.html">${lang === 'ar' ? 'إدارة الشهادات من ملف الطالب' : 'Manage certificates from your profile'}</a></p>`;
       return;
     }
@@ -252,6 +259,10 @@
     const quizScores = { ...(saved.quizScores || {}), [current]: true };
     const percent = Math.round(Object.values(quizScores).filter(Boolean).length / flat().length * 100);
 
+    const submittedIndex = current;
+    const submittedAnswers = questions.map((q, i) => q.type === 'matching' || q.type === 'ordering'
+      ? [...document.querySelectorAll(q.type === 'matching' ? '[data-match-index="' + i + '"]' : '[data-order-index="' + i + '"]')].map(el => el.value === '' ? -1 : Number(el.value))
+      : Number(document.querySelector('input[name="lms-quiz-' + i + '"]:checked')?.value ?? -1));
     // Completing the final lesson issues the certificate immediately, so the
     // learner picks its language first instead of getting a silent default
     // they'd have to reissue afterwards. Theme is always 'light' now that
@@ -275,9 +286,7 @@
           lastSection: current + 1,
           quizScores,
           lessonIndex: current,
-          answers: questions.map((q, i) => q.type === 'matching' || q.type === 'ordering'
-            ? [...document.querySelectorAll(q.type === 'matching' ? '[data-match-index="' + i + '"]' : '[data-order-index="' + i + '"]')].map(el => el.value === '' ? -1 : Number(el.value))
-            : Number(document.querySelector('input[name="lms-quiz-' + i + '"]:checked')?.value ?? -1)),
+          answers: submittedAnswers,
           language: certificateOptions.language,
           theme: certificateOptions.theme,
           courseName: text({ ar: course.ar, en: course.en }),
@@ -306,6 +315,7 @@
     try {
       const result = await request('/progress');
       saved = result.progress?.find((item) => item.courseSlug === slug) || saved;
+      certificate = result.certificates?.find((item) => item.courseSlug === slug) || null;
       current = Math.min(Math.max(Number(saved.lastSection || 0), 0), Math.max(flat().length - 1, 0));
       render();
     } catch (_) {
@@ -315,7 +325,7 @@
     }
   }
 
-  $('previous-lesson').addEventListener('click', () => { if (current > 0) { current -= 1; render(); } });
+  $('previous-lesson').addEventListener('click', () => { if (isCompleting) return; if (current > 0) { current -= 1; render(); } });
   $('complete-lesson').addEventListener('click', completeLesson);
   document.querySelectorAll('[data-course-lang]').forEach((button) => button.addEventListener('click', () => { window.i18n.setLanguage(button.dataset.courseLang); }));
   // The page-level language control is shared with the rest of the platform.

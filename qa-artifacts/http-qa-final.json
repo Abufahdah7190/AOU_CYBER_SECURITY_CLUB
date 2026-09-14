@@ -1,0 +1,60 @@
+{
+  "passed": [
+    {
+      "url": "/api/health",
+      "status": 200
+    },
+    {
+      "url": "/index.html",
+      "status": 200
+    },
+    {
+      "url": "/course.html?course=network-defense",
+      "status": 200
+    },
+    {
+      "url": "/profile.html",
+      "status": 200
+    },
+    {
+      "url": "/certificate-verify.html",
+      "status": 200
+    },
+    {
+      "url": "/reset-password.html",
+      "status": 200
+    },
+    {
+      "url": "/js/course.js",
+      "status": 200
+    },
+    {
+      "url": "/css/style.css",
+      "status": 200
+    },
+    {
+      "url": "/assets/courses/network-defense-flow.svg",
+      "status": 200
+    },
+    {
+      "url": "/api/learning/progress",
+      "status": 401
+    },
+    {
+      "url": "/.env",
+      "status": 404
+    },
+    {
+      "url": "/server/src/app.js",
+      "status": 404
+    },
+    {
+      "url": "/supabase/profile-setup.sql",
+      "status": 404
+    },
+    {
+      "url": "/missing.js",
+      "status": 404
+    }
+  ]
+}

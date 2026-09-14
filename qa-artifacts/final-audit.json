@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-14T17:21:54.950Z",
+  "syntax": 90,
+  "mirrors": 53,
+  "missing": [],
+  "courses": [
+    {
+      "slug": "cyber-basics",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/cyber-basics-flow.svg"
+    },
+    {
+      "slug": "digital-literacy",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/digital-literacy-flow.svg"
+    },
+    {
+      "slug": "network-defense",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/network-defense-flow.svg"
+    },
+    {
+      "slug": "digital-forensics",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/digital-forensics-flow.svg"
+    },
+    {
+      "slug": "secure-coding",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/secure-coding-flow.svg"
+    },
+    {
+      "slug": "ethical-hacking",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/ethical-hacking-flow.svg"
+    },
+    {
+      "slug": "cloud-security",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/cloud-security-flow.svg"
+    },
+    {
+      "slug": "soc-analyst",
+      "lessons": 9,
+      "workshops": 9,
+      "diagram": "/assets/courses/soc-analyst-flow.svg"
+    }
+  ],
+  "tests": []
+}
