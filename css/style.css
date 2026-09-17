@@ -3204,3 +3204,195 @@ html[dir="rtl"]{direction:rtl}html[dir="ltr"]{direction:ltr}body>.lang-switcher{
 
 /* Preserve aligned workshop columns on narrow screens. */
 .lesson-workshop pre { white-space:pre; overflow-x:auto; overflow-wrap:normal; }
+
+
+/* --------------------------------------------------------------------------
+   Accessible light-theme overrides
+   Keep these rules last: several legacy visual layers above were designed for
+   the dark cyber theme and otherwise override the semantic theme variables.
+   -------------------------------------------------------------------------- */
+:root.theme-light body,
+:root.theme-light body.auth-locked {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+:root.theme-light body.auth-locked .topbar-inner { border-bottom-color: rgba(15, 23, 42, .12); }
+:root.theme-light body.auth-locked .site-brand,
+:root.theme-light body.auth-locked .site-brand b { color: var(--text) !important; }
+:root.theme-light body.auth-locked #tab-auth {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef4f9 100%) !important;
+}
+:root.theme-light .auth-heading h1,
+:root.theme-light .auth-heading h2,
+:root.theme-light .auth-heading p,
+:root.theme-light .auth-kicker { color: var(--text) !important; }
+:root.theme-light .auth-kicker { color: var(--accent) !important; text-shadow: none; }
+:root.theme-light .auth-heading p { color: var(--muted) !important; }
+:root.theme-light .auth-card,
+:root.theme-light .auth-card.register-mode {
+  border-color: rgba(43, 108, 176, .28) !important;
+  background: #ffffff !important;
+  box-shadow: 0 20px 55px rgba(15, 23, 42, .14) !important;
+}
+:root.theme-light .auth-card::after { border-color: rgba(15, 23, 42, .06); background: linear-gradient(110deg, rgba(43,108,176,.025), transparent 22% 80%, rgba(49,130,206,.035)); }
+:root.theme-light .auth-form-stage,
+:root.theme-light .auth-card.register-mode .auth-form-stage {
+  background: #ffffff !important;
+}
+:root.theme-light .auth-card .auth-switch { color: #526174 !important; }
+:root.theme-light .auth-card .auth-switch:hover,
+:root.theme-light .auth-card .auth-switch.active { color: var(--accent) !important; }
+:root.theme-light .auth-card .auth-field label { color: var(--text) !important; }
+:root.theme-light .auth-card .auth-field input,
+:root.theme-light .auth-card .auth-select-shell,
+:root.theme-light .auth-card .auth-select-shell select { color: var(--text) !important; border-color: rgba(15, 23, 42, .24); }
+:root.theme-light .auth-card .auth-field input::placeholder { color: #718096 !important; }
+:root.theme-light .auth-card .auth-field small,
+:root.theme-light .auth-card .auth-choice-help { color: #526174 !important; }
+:root.theme-light .auth-card .auth-field input:-webkit-autofill,
+:root.theme-light .auth-card .auth-field input:-webkit-autofill:hover,
+:root.theme-light .auth-card .auth-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text) !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+:root.theme-light .auth-card .auth-link,
+:root.theme-light .auth-back-home a { color: #245b9a !important; }
+:root.theme-light .auth-card .auth-message { color: #526174; }
+:root.theme-light .auth-card .auth-message.success { color: #087443; }
+:root.theme-light .auth-card .auth-message.error { color: #b42318; }
+:root.theme-light .auth-card .auth-user { background: #eff6ff; border-color: #93c5fd; }
+:root.theme-light .auth-card .auth-user strong { color: #245b9a; }
+:root.theme-light .auth-card .auth-field.field-invalid > label { color: #b42318; }
+:root.theme-light .auth-card .auth-field.field-invalid small { color: #b42318; }
+
+/* Shared content modules that had dark-only decorative colors. */
+:root.theme-light .secure-hero,
+:root.theme-light .secure-console,
+:root.theme-light .org-structure,
+:root.theme-light .lms-header,
+:root.theme-light .lms-sidebar {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  border-color: rgba(15, 23, 42, .14) !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, .07) !important;
+}
+:root.theme-light .secure-hero::before,
+:root.theme-light .secure-grid { opacity: .08; }
+:root.theme-light .secure-hero h2,
+:root.theme-light .home-mission > h2,
+:root.theme-light .about-card .title,
+:root.theme-light .console-metrics dd { color: var(--text) !important; }
+:root.theme-light .secure-description,
+:root.theme-light .about-lead,
+:root.theme-light .console-head,
+:root.theme-light .console-metrics dt { color: var(--muted) !important; }
+:root.theme-light .course-image { background: #f1f5f9; }
+:root.theme-light .primary-nav .tab,
+:root.theme-light .mobile-nav-toggle { color: var(--text); }
+:root.theme-light .primary-nav { background: #ffffff; border-color: rgba(15,23,42,.14); }
+
+/* Public join/suggestions pages use club-forms.css, but also inherit this flag. */
+:root.theme-light .form-page { color: var(--text); background: #f4f7fb; background-image: none; }
+:root.theme-light .form-page .form-header { border-bottom-color: rgba(15,23,42,.12); }
+:root.theme-light .form-page .form-brand,
+:root.theme-light .form-page .form-brand small,
+:root.theme-light .form-page .back-link { color: var(--text) !important; }
+:root.theme-light .form-page .form-brand small,
+:root.theme-light .form-page .form-intro > p,
+:root.theme-light .form-page .intro-note small,
+:root.theme-light .form-page .form-card-heading p,
+:root.theme-light .form-page .field small,
+:root.theme-light .form-page .privacy-note,
+:root.theme-light .form-page .form-footer { color: var(--muted) !important; }
+:root.theme-light .form-page .form-card { background: #ffffff; border-color: #d7e0ea; box-shadow: 0 18px 45px rgba(15,23,42,.10); }
+:root.theme-light .form-page .form-card-heading { border-bottom-color: #d7e0ea; }
+:root.theme-light .form-page .field input,
+:root.theme-light .form-page .field textarea { color: var(--text); background: #f8fafc; border-color: #b8c5d3; }
+:root.theme-light .form-page .field textarea::placeholder { color: #64748b; }
+:root.theme-light .form-page .club-action { color: #16324f !important; background: #ffffff; border-color: rgba(var(--glow), .65); }
+:root.theme-light .form-page .club-action small { color: #526174; }
+:root.theme-light .form-page .form-footer { border-top-color: rgba(15,23,42,.12); }
+
+
+/* LMS light theme: override the later SOC presentation layer as well. */
+:root.theme-light html,
+:root.theme-light body.lms-page,
+:root.theme-light body.profile-page,
+:root.theme-light body:has(.verify-page),
+:root.theme-light body:has(.auth-page) {
+  color: var(--text) !important;
+  background: #f4f7fb !important;
+  background-image: none !important;
+}
+:root.theme-light .lms-header,
+:root.theme-light .profile-dashboard-head {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  border-color: rgba(15,23,42,.14) !important;
+}
+:root.theme-light .lms-course-heading h1,
+:root.theme-light .profile-dashboard-head h1,
+:root.theme-light .lms-lesson-card h1,
+:root.theme-light .lms-lesson-card h2,
+:root.theme-light .lms-lesson-card h3,
+:root.theme-light .lms-lesson-card h4,
+:root.theme-light .lms-lesson-card strong,
+:root.theme-light .lms-lesson-card label,
+:root.theme-light .lms-lesson-card summary,
+:root.theme-light .lms-sidebar-title { color: var(--text) !important; }
+:root.theme-light .lms-course-heading p,
+:root.theme-light .lms-lesson-card p,
+:root.theme-light .lms-lesson-card li,
+:root.theme-light .lms-lesson-card .lms-breadcrumb,
+:root.theme-light .lms-sidebar small,
+:root.theme-light .lms-sidebar .lesson-type { color: var(--muted) !important; }
+:root.theme-light .lms-progress-box,
+:root.theme-light .lms-sidebar,
+:root.theme-light .lms-lesson-card,
+:root.theme-light .student-overview,
+:root.theme-light .student-stats > div {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  border-color: rgba(15,23,42,.14) !important;
+  box-shadow: 0 10px 28px rgba(15,23,42,.08) !important;
+}
+:root.theme-light .lms-lesson-card::before,
+:root.theme-light .student-overview::before { border-color: rgba(43,108,176,.08); }
+:root.theme-light .lms-lesson-card details { background: #f8fafc; border-color: #b8c5d3; }
+:root.theme-light .lms-lesson-card pre { color: #1e293b; background: #eef3f8; border-color: #cbd5e1; }
+:root.theme-light .lms-sidebar .lesson-item,
+:root.theme-light .lms-sidebar button { color: var(--text) !important; background: transparent; }
+:root.theme-light .lms-sidebar .lesson-item.active,
+:root.theme-light .lms-sidebar button.active { background: #e8f2fb !important; color: #245b9a !important; }
+:root.theme-light .course-language .lang-btn,
+:root.theme-light body > .lang-switcher button,
+:root.theme-light .lang-switcher > button { color: var(--text) !important; background: #ffffff !important; border-color: #b8c5d3 !important; }
+:root.theme-light .course-language .lang-btn.active,
+:root.theme-light body > .lang-switcher button.active,
+:root.theme-light .lang-switcher > button.active { color: #174a7c !important; background: #dcecf9 !important; border-color: #6aa6d8 !important; }
+:root.theme-light .auth-panel .club-action { color: #16324f !important; background: #ffffff !important; }
+:root.theme-light .auth-panel .club-action small { color: #526174 !important; }
+
+
+/* Student profile controls must remain readable while auth data is loading. */
+:root.theme-light .profile-page .auth-field input,
+:root.theme-light .profile-page .auth-field select,
+:root.theme-light .profile-page .auth-select-shell,
+:root.theme-light .profile-page input,
+:root.theme-light .profile-page select {
+  color: var(--text) !important;
+  background: #ffffff !important;
+  border-color: #b8c5d3 !important;
+}
+:root.theme-light .profile-page input:disabled,
+:root.theme-light .profile-page select:disabled {
+  color: #526174 !important;
+  background: #f8fafc !important;
+  opacity: 1 !important;
+}
+:root.theme-light .profile-page #profile-logout {
+  color: #b42318 !important;
+  background: #fff1f2 !important;
+  border-color: #fda4af !important;
+}
+:root.theme-light .profile-page #profile-logout:hover { background: #ffe4e6 !important; }
