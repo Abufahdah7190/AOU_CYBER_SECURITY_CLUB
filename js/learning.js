@@ -33,9 +33,13 @@
     const english = window.i18n?.lang === 'en';
     const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const cards = [...document.querySelectorAll('[data-course-id]')];
-    const values = cards.map((card) => Number(getSaved(card.dataset.courseId).percent || 0));
-    const completed = values.filter((value) => value >= 100).length;
-    const average = values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
+    // Use the full progress list from the server for the summary stats
+    // (state.progress covers every course the student ever started, not
+    // just the handful of sample cards shown on this page) so this stays
+    // consistent with the numbers shown on profile.html. Only the
+    // per-card progress bars below need the homepage's own card list.
+    const completed = state.progress.filter((item) => Number(item.percent) === 100).length;
+    const average = state.progress.length ? Math.round(state.progress.reduce((sum, item) => sum + Number(item.percent || 0), 0) / state.progress.length) : 0;
     if (byId('learning-completed-count')) byId('learning-completed-count').textContent = completed;
     if (byId('learning-progress-percent')) byId('learning-progress-percent').textContent = `${average}%`;
     if (byId('learning-certificates-count')) byId('learning-certificates-count').textContent = state.certificates.length;
