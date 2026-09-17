@@ -173,7 +173,15 @@
       if (result.data?.session) window.location.replace('/profile.html');
       else setMessage(tr('auth.confirmEmail', 'Check your email to confirm your account / تحقق من بريدك لتأكيد الحساب'), 'success');
     } catch (error) {
-      setMessage(error?.message || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'), 'error');
+      // Supabase wraps a rejected auth.users trigger (see
+      // supabase/enforce-university-email.sql) in a generic
+      // "Database error saving new user" message instead of passing
+      // our Arabic message through. Detect that case and show the
+      // real reason instead of a confusing generic error.
+      const raw = String(error?.message || '');
+      const isDbRejection = /database error/i.test(raw);
+      const message = isDbRejection ? universityEmailMessage() : (raw || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'));
+      setMessage(message, 'error');
     } finally {
       delete form.dataset.submitting;
       setBusy(form, false);
