@@ -130,7 +130,9 @@
    * }
    */
   function analyzePassword(password) {
-    const length = password.length;
+    password = typeof password === 'string' ? password.slice(0,1024) : '';
+    const length = Array.from(password).length;
+    const repeatedBlock = /^(.{1,32})\1+$/u.test(password);
     const poolSize = poolSizeFor(password);
     const entropyBits = length ? length * Math.log2(poolSize || 1) : 0;
 
@@ -138,7 +140,7 @@
     const { full: normalizedFull, stripped: normalizedStripped } = normalizeForDictionary(password);
     const isCommon =
       COMMON_PASSWORDS.has(lower) || COMMON_PASSWORDS.has(normalizedFull) || COMMON_PASSWORDS.has(normalizedStripped);
-    const repeats = hasRepeatedRun(password);
+    const repeats = hasRepeatedRun(password) || repeatedBlock;
     const sequential = hasSequentialRun(password);
     const keyboardWalk = hasKeyboardWalk(password);
     const digitsOnly = length > 0 && /^[0-9]+$/.test(password);
@@ -162,7 +164,9 @@
       if (keyboardWalk) effectiveEntropyBits -= 10;
       if (digitsOnly) effectiveEntropyBits = Math.min(effectiveEntropyBits, length * Math.log2(10));
     }
-    effectiveEntropyBits = Math.max(0, effectiveEntropyBits);
+    if (repeatedBlock) effectiveEntropyBits = Math.min(effectiveEntropyBits,18);
+    if (length < 12) effectiveEntropyBits = Math.min(effectiveEntropyBits,34);
+    effectiveEntropyBits = Math.max(0, Math.min(512,effectiveEntropyBits));
 
     const guesses = effectiveEntropyBits ? Math.pow(2, effectiveEntropyBits - 1) : (length ? 1 : 0);
 

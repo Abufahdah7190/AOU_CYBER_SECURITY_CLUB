@@ -17,7 +17,7 @@
   const EXECUTABLE_EXTENSIONS = [
     'exe', 'bat', 'cmd', 'scr', 'pif', 'com', 'msi', 'jar', 'vbs', 'vbe',
     'js', 'jse', 'wsf', 'wsh', 'ps1', 'psm1', 'hta', 'msc', 'reg', 'apk',
-    'sh', 'command', 'app',
+    'sh', 'command', 'app', 'dll', 'lnk', 'url', 'iso', 'img', 'dmg', 'svg', 'html', 'htm', 'xll', 'sys', 'cpl',
   ];
 
   const MACRO_OFFICE_EXTENSIONS = ['docm', 'xlsm', 'pptm', 'dotm', 'xltm', 'potm'];
@@ -52,6 +52,8 @@
     return new Promise((resolve) => {
       const sampleSize = Math.min(file.size, 256 * 1024);
       const reader = new FileReader();
+      let finished=false; const finish=value=>{if(finished)return;finished=true;clearTimeout(timer);resolve(value);};
+      const timer=setTimeout(()=>{finish({signature:null,entropy:0,readFailed:true});try{reader.abort();}catch(_){}},5000);
       reader.onload = () => {
         const bytes = new Uint8Array(reader.result);
         let signature = null;
@@ -61,12 +63,12 @@
             break;
           }
         }
-        if (!bytes.length) return resolve({ signature, entropy: 0 });
+        if (!bytes.length) return finish({ signature, entropy: 0 });
         const counts = new Uint32Array(256);
         for (let i = 0; i < bytes.length; i++) counts[bytes[i]]++;
         let entropy = 0;
         for (let i = 0; i < 256; i++) if (counts[i]) { const p = counts[i] / bytes.length; entropy -= p * Math.log2(p); }
-        resolve({ signature, entropy });
+        finish({ signature, entropy, sampleText: new TextDecoder().decode(bytes.subarray(0,65536)) });
       };
       reader.onerror = () => resolve({ signature: null, entropy: 0 });
       reader.readAsArrayBuffer(file.slice(0, sampleSize));
@@ -102,7 +104,8 @@
    * }
    */
   async function analyzeFile(file) {
-    const extensions = getExtensionParts(file.name);
+    if (!file || typeof file.name !== 'string' || !Number.isFinite(file.size) || file.size < 0 || typeof file.slice !== 'function') throw new TypeError('Invalid file');
+    const extensions = getExtensionParts(file.name.trim().replace(/[. ]+$/, ''));
     const finalExt = extensions[extensions.length - 1] || '';
     const isExecutableExt = EXECUTABLE_EXTENSIONS.includes(finalExt);
     const isMacroOffice = MACRO_OFFICE_EXTENSIONS.includes(finalExt);
@@ -117,7 +120,7 @@
 
     const isTooLarge = file.size > 25 * 1024 * 1024;
 
-    const { signature, entropy } = await readSample(file);
+    const { signature, entropy, readFailed, sampleText = '' } = file.size > 25*1024*1024 ? {signature:null,entropy:0,readFailed:true} : await readSample(file);
     // A mismatch worth flagging: the file's real binary signature is an
     // executable format, but the extension doesn't say so (extension lied,
     // or was stripped/renamed).
@@ -130,6 +133,13 @@
       riskScore += points;
     };
 
+    if (readFailed || file.size === 0) add('incompleteScan',40,'warn');
+    if (/[\u202a-\u202e\u2066-\u2069\u0000-\u001f]/.test(file.name) || /[. ]$/.test(file.name)) add('disguisedName',45,'high');
+    if (signature?.kind === 'executable') add('executableContent',45,'high');
+    if (signature?.kind === 'ole') add('macroOffice',25,'warn');
+    if (signature?.kind === 'zip' || signature?.kind === 'archive' || isArchiveExt) add('uninspectedArchive',25,'warn');
+    if (/<script\b|<iframe\b|onload\s*=|javascript:|\/(?:JavaScript|JS|Launch|OpenAction)\b|^#!/im.test(sampleText)) add('activeContent',45,'high');
+    if (!signature && file.size > 0 && !readFailed) add('unknownContent',15,'warn');
     if (signatureMismatch) {
       add('signatureMismatch', 45, 'high', signature.format);
     }
@@ -137,7 +147,7 @@
       add('doubleExtension', 40, 'high', extensions.join('.'));
     }
     if (isExecutableExt && !isDoubleExtensionTrick) {
-      add('executableExt', 30, 'high', finalExt);
+      add('executableExt', 45, 'high', finalExt);
     }
     if (isMacroOffice) {
       add('macroOffice', 20, 'warn', finalExt);

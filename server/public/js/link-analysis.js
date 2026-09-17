@@ -134,7 +134,9 @@
    * caller can localize messages; this module stays language-agnostic.
    */
   function analyzeUrl(rawUrl) {
-    let input = (rawUrl || '').trim();
+    if (typeof rawUrl !== 'string' || rawUrl.length > 4096 || /[\u0000-\u0020\u007f\u202a-\u202e\u2066-\u2069\\]/.test(rawUrl.trim())) return {valid:false,malformed:true};
+    let input = rawUrl.trim();
+    if (/^[a-z][a-z0-9+.-]*:/i.test(input) && !/^https?:\/\//i.test(input) && !/^[^/:]+:\d+(?:\/|$)/.test(input)) return {valid:false,malformed:true};
     if (!input) {
       return { valid: false, empty: true };
     }
@@ -150,7 +152,9 @@
       return { valid: false, malformed: true };
     }
 
-    const host = parsed.hostname.toLowerCase();
+    if (!['http:', 'https:'].includes(parsed.protocol)) return {valid:false,malformed:true};
+    const host = parsed.hostname.toLowerCase().replace(/\.$/, '');
+    if (!host || host.length > 253) return {valid:false,malformed:true};
     const findings = [];
     let riskScore = 0;
 
@@ -159,6 +163,7 @@
       riskScore += points;
     };
 
+    if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.includes(':') || /^(127\.|10\.|192\.168\.|169\.254\.|0\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)) add('localAddress',45,'high');
     if (!hasScheme) {
       add('noScheme', 5, 'info');
     } else if (parsed.protocol === 'http:') {
@@ -256,6 +261,7 @@
       add('veryLong', 8, 'info');
     }
 
+    if (findings.some(f => ['atTrick','fakeSubdomainChain','directDownload'].includes(f.id))) riskScore = Math.max(45,riskScore);
     riskScore = Math.max(0, Math.min(100, riskScore));
     let riskLevel = 'low';
     if (riskScore >= 45) riskLevel = 'high';

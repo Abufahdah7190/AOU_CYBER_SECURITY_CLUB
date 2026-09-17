@@ -224,11 +224,19 @@
     catch (error) { setMessage(normalizeError(error), 'error'); if (button) button.disabled = false; }
   }
 
+  function showUnavailableProfile() {
+    setMessage(text('unavailable'), 'error');
+    const name = $('#profile-full-name'); if (name) name.textContent = lang() === 'en' ? 'Profile unavailable' : 'تعذر تحميل الملف';
+    const summary = $('#profile-certificates-summary'); if (summary) summary.textContent = lang() === 'en' ? 'Sign in to load your certificates.' : 'سجّل الدخول لتحميل شهاداتك.';
+    for (const id of ['profile-form', 'password-form']) {
+      const form = $('#' + id); if (form) for (const control of form.querySelectorAll('input,select,button')) control.disabled = true;
+    }
+  }
   function init() {
     if (initialized) return; initialized = true;
     $('#profile-form')?.addEventListener('submit', saveProfile); $('#password-form')?.addEventListener('submit', changePassword); $('#profile-logout')?.addEventListener('click', logout);
     const sb = getSupabase();
-    if (!sb) { setMessage(text('unavailable'), 'error'); return; }
+    if (!sb) { showUnavailableProfile(); return; }
     try {
       const subscription = sb.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') { ++loadGeneration; state.user = null; state.profile = null; document.body.classList.add('auth-locked'); redirectToLogin(); return; }

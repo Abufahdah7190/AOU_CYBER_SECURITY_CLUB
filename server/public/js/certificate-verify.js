@@ -26,7 +26,7 @@
     print.disabled=true;
     const artwork=result.querySelector('img');
     artwork.addEventListener('load',()=>{print.disabled=false;});
-    artwork.addEventListener('error',()=>{print.disabled=true;});
+    artwork.addEventListener('error',()=>{print.disabled=true; const warning=document.createElement('p');warning.setAttribute('role','alert');warning.textContent=english()?'Certificate artwork could not load. Reload the page to try again.':'تعذر تحميل صورة الشهادة. أعد تحميل الصفحة للمحاولة مجدداً.';actions.append(warning);});
     if(artwork.complete && artwork.naturalWidth)print.disabled=false;
     actions.append(download,print);result.append(actions);
   }

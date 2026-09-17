@@ -1,3 +1,10 @@
+
+function strictFinding(finding) {
+ const labels={localAddress:['عنوان محلي أو داخلي؛ لا يثبت موثوقية الوجهة.','Local/internal destination; trust is not established.'],incompleteScan:['الفحص غير مكتمل: الملف فارغ أو يتجاوز 25MB أو تعذرت قراءته.','Incomplete scan: empty file, over 25MB, or read failure.'],disguisedName:['اسم الملف يحتوي محارف تمويه أو نهاية مضللة.','Filename contains disguise characters or a misleading ending.'],executableContent:['توقيع ملف قابل للتنفيذ؛ لا تشغله دون تحقق مستقل.','Executable signature; do not run without independent verification.'],uninspectedArchive:['حاوية أو أرشيف: الملفات الداخلية لم تُفحص ولم يُفك الضغط.','Container/archive: inner files were not scanned or decompressed.'],activeContent:['ظهرت مؤشرات محتوى نشط أو أوامر؛ تحتاج مراجعة مستقلة.','Active-content or command indicators need independent review.'],unknownContent:['لم يُتعرف على توقيع المحتوى؛ لا يمكن إثبات سلامته.','Unknown content signature; safety cannot be established.']};
+ return labels[finding.id]?.[window.i18n?.lang==='en'?1:0];
+}
+function strictVerdict(result) { const en=window.i18n?.lang==='en';return result.riskLevel==='high'?(en?'High-risk indicators':'مؤشرات خطر مرتفعة'):result.riskLevel==='medium'?(en?'Needs further review':'يحتاج فحصاً إضافياً'):(en?'Few indicators — not a safety guarantee':'مؤشرات قليلة — ليست ضمان أمان'); }
+function strictLimit() {return window.i18n?.lang==='en'?'Local heuristic check only; no live reputation, execution, or antivirus scan.':'فحص مؤشرات محلي فقط؛ لا يفحص السمعة الحية ولا يشغّل الملفات ولا يستبدل مضاد الفيروسات.';}
 'use strict';
 
 /**
@@ -137,6 +144,7 @@ function initLinkChecker() {
   };
 
   function findingMessage(finding) {
+    if (strictFinding(finding)) return strictFinding(finding);
     const template = D(`link.findings.${finding.id}`);
     if (typeof template === 'function') return template(escapeHtml(finding.extra));
     return template || finding.id;
@@ -150,12 +158,12 @@ function initLinkChecker() {
 
     const colors = VERDICT_COLORS[result.verdict] || { text: 'var(--muted)', bg: 'rgba(185,203,224,0.12)' };
     const verdictColor = colors.text;
-    const verdictLabel = D('link.verdicts')[result.verdict];
+    const verdictLabel = strictVerdict(result);
     const levelLabel = D('link.riskLevels')[result.riskLevel];
 
     const verdictBanner = `<div style="display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:12px; border-radius:10px; background:${colors.bg}; border:1px solid ${verdictColor};">
       <span style="font-size:1.3em; font-weight:800; color:${verdictColor};">${verdictLabel}</span>
-      <span style="color:${verdictColor}; font-weight:700;">${D('link.safetyPercent')} ${result.safetyScore}%</span>
+      <span style="color:${verdictColor}; font-weight:700;">${strictLimit()}</span>
     </div>`;
 
     const header = `<div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
@@ -164,7 +172,7 @@ function initLinkChecker() {
     </div>`;
 
     if (result.findings.length === 0) {
-      container.innerHTML = `${verdictBanner}${header}<p style="color: var(--good);">${D('link.noFindingsSafe')}</p>`;
+      container.innerHTML = `${verdictBanner}${header}<p style="color: var(--good);">${strictLimit()}</p>`;
       return;
     }
 
@@ -263,6 +271,7 @@ function initFileScanner() {
   };
 
   function fileFindingMessage(finding) {
+    if (strictFinding(finding)) return strictFinding(finding);
     const template = D(`file.findings.${finding.id}`);
     if (typeof template === 'function') return template(escapeHtml(finding.extra));
     return template || finding.id;
@@ -271,12 +280,12 @@ function initFileScanner() {
   function renderFileResult(result) {
     const colors = VERDICT_COLORS_FILE[result.verdict] || { text: 'var(--muted)', bg: 'rgba(185,203,224,0.12)' };
     const verdictColor = colors.text;
-    const verdictLabel = D('file.verdicts')[result.verdict];
+    const verdictLabel = strictVerdict(result);
     const levelLabel = D('file.riskLevels')[result.riskLevel];
 
     const verdictBanner = `<div style="display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:12px; border-radius:10px; background:${colors.bg}; border:1px solid ${verdictColor};">
       <span style="font-size:1.3em; font-weight:800; color:${verdictColor};">${verdictLabel}</span>
-      <span style="color:${verdictColor}; font-weight:700;">${D('file.safetyPercent')} ${result.safetyScore}%</span>
+      <span style="color:${verdictColor}; font-weight:700;">${strictLimit()}</span>
     </div>`;
 
     const detectedType = result.signature ? result.signature.format : D('file.unknownType');
@@ -288,7 +297,7 @@ function initFileScanner() {
       <div style="margin-bottom:10px; color: var(--muted); font-size: 0.9em;">${D('file.entropyLabel')} ${result.entropy.toFixed(2)} / 8</div>`;
 
     if (result.findings.length === 0) {
-      fileScanResult.innerHTML = `${verdictBanner}${header}<p style="color: var(--good);">${D('file.safe')}</p>`;
+      fileScanResult.innerHTML = `${verdictBanner}${header}<p style="color: var(--good);">${strictLimit()}</p>`;
       return;
     }
 
@@ -302,7 +311,8 @@ function initFileScanner() {
     fileScanResult.innerHTML = `${verdictBanner}${header}<div><strong>${D('file.warningsTitle')}</strong><ul style="margin-top: 8px; padding-inline-start: 18px;">${items}</ul></div>`;
   }
 
-  let lastFileResult = null;
+  let lastFileResult = null; let fileGeneration=0;
+  fileInput?.addEventListener('change',()=>{fileGeneration++;lastFileResult=null;if(fileScanResult)fileScanResult.textContent='';});
 
   fileScanBtn?.addEventListener('click', async () => {
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
