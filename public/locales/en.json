@@ -525,7 +525,8 @@
     "email": "University email",
     "password": "Password",
     "secureLogin": "Secure sign in",
-    "forgot": "Forgot your password?",
+    "loginHelp": "Having trouble signing in?",
+    "loginHelpLink": "Send us a request via the Suggestions & Complaints page for help.",
     "protected": "Account protection active",
     "welcomeBack": "Welcome back",
     "welcomeBackCopy": "Sign in and continue building your cybersecurity path.",
@@ -537,10 +538,6 @@
     "requestFailed": "We could not complete the request.",
     "loginSuccess": "Signed in successfully. Opening the platform...",
     "registerSuccess": "Account created. Opening the platform...",
-    "recoveryFormTitle": "Recover your password",
-    "recoveryFormCopy": "Enter your university email and we will send a secure password reset link.",
-    "sendRecovery": "Send reset link",
-    "backToLogin": "Back to sign in",
     "universityEmailTitle": "This platform is available only to Arab Open University students using an official university email.",
     "firstName": "First name",
     "lastName": "Last name",
@@ -563,8 +560,7 @@
     "createAccount": "Create account",
     "requiredFields": "Please complete every required field before creating your account.",
     "passwordMismatch": "Password confirmation does not match.",
-    "logoutSuccess": "You have been signed out.",
-    "recoverySent": "A password reset link has been sent to your email."
+    "logoutSuccess": "You have been signed out."
   },
   "footer": {
     "suggestions": "Suggestions & Inquiries",

@@ -77,7 +77,6 @@
     if ($('#auth-user')) $('#auth-user').hidden = false;
     if ($('#login-form')) $('#login-form').hidden = true;
     if ($('#register-form')) $('#register-form').hidden = true;
-    if ($('#forgot-form')) $('#forgot-form').hidden = true;
     const switcher = document.querySelector('.auth-switcher'); if (switcher) switcher.hidden = true;
     document.dispatchEvent(new CustomEvent('auth:ready', { detail: { user } }));
   }
@@ -98,10 +97,8 @@
     const login = view === 'login';
     const card = document.querySelector('[data-auth-card]');
     card?.classList.toggle('register-mode', !login);
-    card?.classList.remove('forgot-mode');
     if ($('#login-form')) $('#login-form').hidden = !login;
     if ($('#register-form')) $('#register-form').hidden = login;
-    if ($('#forgot-form')) $('#forgot-form').hidden = true;
     document.querySelectorAll('[data-auth-view]').forEach((button) => {
       const active = button.dataset.authView === view;
       button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
@@ -111,33 +108,10 @@
     setMessage('');
   }
 
-  function showForgotForm(event) {
-    event?.preventDefault();
-    const card = document.querySelector('[data-auth-card]');
-    card?.classList.add('forgot-mode');
-    if ($('#login-form')) $('#login-form').hidden = true;
-    if ($('#register-form')) $('#register-form').hidden = true;
-    if ($('#forgot-form')) $('#forgot-form').hidden = false;
-    document.querySelectorAll('[data-auth-view]').forEach((button) => { button.classList.remove('active'); button.setAttribute('aria-selected', 'false'); });
-    const email = $('#login-email')?.value;
-    if (email && $('#forgot-email')) $('#forgot-email').value = email;
-    setMessage('');
-  }
-
   async function handleAuthSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
     if (form.dataset.submitting === 'true') return;
-    if (form.id === 'forgot-form') {
-      const input = form.querySelector('input[name="email"]');
-      const email = String(input?.value || '').trim().toLowerCase();
-      if (!email) {
-        setMessage(tr('auth.emailRequired', 'يرجى إدخال بريدك الإلكتروني.'), 'error');
-        input?.focus();
-        return;
-      }
-      input.value = email;
-    }
     validatePasswordPolicy(form);
     if (!validateUniversityEmailForm(form) || !form.reportValidity()) return;
     const sb = getSupabase();
@@ -160,14 +134,6 @@
           password: values.password,
           options: { data: { firstName: values.firstName, lastName: values.lastName, phone: values.phone, major: values.major, gender: values.gender } }
         });
-      } else {
-        const { data, error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: new URL('/reset-password.html', location.origin).href,
-        });
-        if (error) throw error;
-        setMessage(tr('auth.recoverySent', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.'), 'success');
-        form.reset();
-        return;
       }
       if (result.error) throw result.error;
       if (result.data?.session) window.location.replace('/profile.html');
@@ -214,12 +180,10 @@
   }
 
   function initAuth() {
-    ['login-form', 'register-form', 'forgot-form'].forEach((id) => document.getElementById(id)?.addEventListener('submit', handleAuthSubmit));
+    ['login-form', 'register-form'].forEach((id) => document.getElementById(id)?.addEventListener('submit', handleAuthSubmit));
     $('#logout-button')?.addEventListener('click', handleLogout);
     $('#header-logout-button')?.addEventListener('click', handleLogout);
     document.querySelectorAll('[data-auth-view]').forEach((button) => button.addEventListener('click', () => switchView(button.dataset.authView)));
-    $('[data-auth-forgot]')?.addEventListener('click', showForgotForm);
-    $('[data-auth-forgot-back]')?.addEventListener('click', (event) => { event.preventDefault(); switchView('login'); });
     document.querySelectorAll('input[name="email"]').forEach((input) => input.addEventListener('input', () => validateUniversityEmailField(input)));
     lockSite();
     loadCurrentUser().catch(() => { showForms(); setMessage('تعذر الاتصال بخدمة المصادقة. أعد المحاولة.', 'error'); });
