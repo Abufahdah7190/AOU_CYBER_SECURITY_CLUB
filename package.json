@@ -8,7 +8,7 @@
     "dev": "nodemon src/server.js",
     "migrate": "node src/db/migrate.js",
     "seed:learning-foundation": "node src/db/seedLearningFoundation.js",
-    "test": "node tests/regression.test.js && node tests/smoke-updates.js && node tests/release.test.js",
+    "test": "node tests/regression.test.js && node tests/smoke-updates.js && node tests/release.test.js && node tests/certificate-language.test.cjs && node tests/profile-write.test.cjs && node tests/recovery.test.cjs && node tests/detectors-strict.test.cjs",
     "test:concurrency": "node tests/concurrency-certificates.js"
   },
   "keywords": [],
@@ -22,18 +22,22 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "express-rate-limit": "^8.6.2",
     "express-validator": "^7.3.2",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.11.0",
-    "nodemailer": "^7.0.3",
+    "morgan": "^1.12.1",
+    "nodemailer": "^10.0.10",
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",
     "uuid": "^14.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "body-parser": "1.20.8",
+    "qs": "6.16.0"
   }
 }
