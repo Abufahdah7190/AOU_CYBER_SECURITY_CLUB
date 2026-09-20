@@ -109,7 +109,7 @@ app.get('/login.html', (req,res) => res.redirect('/index.html#tab-auth'));
 app.get('/js/supabase-config.js', (req, res) => {
   res.type('application/javascript').set('Cache-Control', 'no-store').send('window.SUPABASE_URL=' + JSON.stringify(process.env.SUPABASE_URL || '') + ';window.SUPABASE_ANON_KEY=' + JSON.stringify(process.env.SUPABASE_ANON_KEY || '') + ';');
 });
-app.get('/api/health', (req, res) => res.json({ ok: true, env: env.NODE_ENV }));
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // Dedicated LMS classroom route. The client reads :courseId from the path.
 const sendLmsPage = (req, res) => res.sendFile(path.join(FRONTEND_ROOT, 'course.html'));

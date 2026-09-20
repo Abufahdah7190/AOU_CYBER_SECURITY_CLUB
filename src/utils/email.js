@@ -16,6 +16,10 @@ function getTransporter() {
       connectionTimeout: 5000,
       greetingTimeout: 5000,
       socketTimeout: 5000,
+      // Email content is built by the application. Never let Nodemailer
+      // resolve attachment paths or remote URLs supplied through message data.
+      disableFileAccess: true,
+      disableUrlAccess: true,
     });
   }
   return transporter;
@@ -78,6 +82,8 @@ async function sendViaGmailSmtp({ to, subject, html, attachments }) {
     subject,
     html,
     attachments: normalizeAttachments(attachments),
+    disableFileAccess: true,
+    disableUrlAccess: true,
   });
   return { success: true, messageId: info.messageId };
 }
