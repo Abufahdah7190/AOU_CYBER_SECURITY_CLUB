@@ -3205,6 +3205,33 @@ html[dir="rtl"]{direction:rtl}html[dir="ltr"]{direction:ltr}body>.lang-switcher{
 /* Preserve aligned workshop columns on narrow screens. */
 .lesson-workshop pre { white-space:pre; overflow-x:auto; overflow-wrap:normal; }
 
+/* Topbar without the compact corner brand: navigation gets the available width. */
+.topbar-inner { grid-template-columns:minmax(0,1fr) auto; }
+.topbar-inner > .primary-nav { grid-column:1; }
+.topbar-inner > .actions { grid-column:2; }
+
+/* Arabic display type needs breathing room around joins and diacritics. */
+.secure-hero h2 {
+  max-width: 660px;
+  font-size: clamp(2.4rem, 4.8vw, 4.6rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+.secure-hero h2 em { display:inline-block; }
+
+@media (max-width:820px) {
+  .topbar-inner > .primary-nav { grid-column:1 / -1; grid-row:2; }
+}
+
+@media (max-width:760px) {
+  .topbar-inner { grid-template-columns:minmax(0,1fr) max-content; }
+  .topbar-inner > .mobile-nav-toggle { grid-column:1; grid-row:1; justify-self:start; }
+  .topbar-inner > .actions { grid-column:2; grid-row:1; }
+  .topbar-inner > .primary-nav { grid-column:1 / -1; grid-row:2; }
+  .secure-hero h2 { font-size:clamp(2.1rem, 11vw, 3.25rem); line-height:1.4; }
+}
+
 
 /* --------------------------------------------------------------------------
    Accessible light-theme overrides
@@ -3286,6 +3313,15 @@ html[dir="rtl"]{direction:rtl}html[dir="ltr"]{direction:ltr}body>.lang-switcher{
 :root.theme-light .about-lead,
 :root.theme-light .console-head,
 :root.theme-light .console-metrics dt { color: var(--muted) !important; }
+:root.theme-light .about-card .desc,
+:root.theme-light .about-card p,
+:root.theme-light .about-card li,
+:root.theme-light .card .small { color: #425466 !important; }
+:root.theme-light .muted,
+:root.theme-light [style*="color:var(--muted)"],
+:root.theme-light [style*="color: var(--muted)"],
+:root.theme-light [style*="color:var(--muted2)"],
+:root.theme-light [style*="color: var(--muted2)"] { color: #526174 !important; }
 :root.theme-light .course-image { background: #f1f5f9; }
 :root.theme-light .primary-nav .tab,
 :root.theme-light .mobile-nav-toggle { color: var(--text); }
