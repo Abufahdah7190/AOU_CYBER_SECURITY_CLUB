@@ -1,11 +1,1 @@
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at top right,#5922a0,#10162f 70%);color:#fff;font-family:Tahoma,Arial,sans-serif}main{width:min(100%,580px);padding:clamp(24px,6vw,48px);border:1px solid #ffffff30;border-radius:24px;background:#ffffff08;text-align:center;box-shadow:0 24px 70px #0004}small{letter-spacing:3px;color:#d5b9ff}h1{font-size:clamp(24px,5vw,34px);line-height:1.5}p{line-height:1.9;color:#ded6ed;overflow-wrap:anywhere}#verify-status{color:#fff;min-height:2em}button,a{display:block;margin:20px auto 0;font:inherit}button{padding:14px 24px;background:#8146dc;color:white;border:1px solid #b788fb;border-radius:10px;cursor:pointer}button:disabled{opacity:.6;cursor:wait}a{color:#dbc5ff}a:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:4px}[hidden]{display:none!important}
-
-
-/* Keep the standalone verification page readable in the shared light theme. */
-:root.theme-light body { background: #f4f7fb; color: #1a202c; }
-:root.theme-light main { background: #fff; border-color: #d7e0ea; box-shadow: 0 20px 55px rgba(15,23,42,.12); }
-:root.theme-light small { color: #6541a8; }
-:root.theme-light p { color: #526174; }
-:root.theme-light #verify-status { color: #1a202c; }
-:root.theme-light a { color: #245b9a; }
-:root.theme-light button { color: #fff; background: #2563a8; border-color: #1d4f86; }
