@@ -15,7 +15,7 @@ try {
   ) {
     window.supabaseClient = window.supabase.createClient(url, anonKey, { global: { fetch: (input, options = {}) => fetch(input, { ...options, signal: options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(12000)]) : AbortSignal.timeout(12000) }) } });
     window.supabaseClient.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' && location.pathname !== '/reset-password.html') setTimeout(() => location.replace('/reset-password.html'), 0);
+      if (event === 'PASSWORD_RECOVERY' && location.pathname !== '/reset-password.html') setTimeout(() => location.replace('/suggestions.html'), 0);
     });
   } else {
     console.error('Supabase client not initialized: check SUPABASE_URL / SUPABASE_ANON_KEY in js/supabase-config.js');

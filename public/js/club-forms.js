@@ -31,8 +31,8 @@
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      if (typeof SUPABASE_URL !== 'string' || typeof SUPABASE_ANON_KEY !== 'string') throw new Error('config');
-      const response = await fetch(`${SUPABASE_URL.replace(/\/$/,'')}/rest/v1/${form.dataset.table}`, {method:'POST',headers:{apikey:SUPABASE_ANON_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(data),signal:controller.signal});
+      if (!['suggestions', 'join_applications'].includes(form.dataset.table)) throw new Error('config');
+      const response = await fetch('/api/public/' + form.dataset.table, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:controller.signal});
       if (!response.ok) throw new Error('send');
       form.reset();
       show(form.dataset.table === 'suggestions' ? 'وصلت رسالتك بنجاح. شكرًا لمشاركتك، ويسعدنا التواصل معك عبر بياناتك.' : 'وصل طلب انضمامك بنجاح. شكرًا لاهتمامك بالنادي، وسنتواصل معك عبر بياناتك.', 'success');

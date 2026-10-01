@@ -15,8 +15,8 @@
       form.email.focus();
       return;
     }
-    if (password.length < 10) {
-      setStatus('يجب أن تتكون كلمة المرور من 10 أحرف على الأقل.', 'error');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,}$/.test(password)) {
+      setStatus('استخدم 10 أحرف على الأقل مع حرف كبير وحرف صغير ورقم.', 'error');
       form.password.focus();
       return;
     }
@@ -25,16 +25,16 @@
       return;
     }
     submit.disabled = true;
-    setStatus('جارٍ إنشاء الحساب وإرسال رابط التحقق…');
+    setStatus('جارٍ إنشاء الحساب…');
     try {
-      const { error } = await window.supabaseClient.auth.signUp({
+      const { data, error } = await window.supabaseClient.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: `${window.location.origin}/index.html` },
       });
       if (error) throw error;
-      form.reset();
-      setStatus('تم إنشاء الحساب. تحقق من بريدك الجامعي لتفعيل الحساب.', 'success');
+      if (data?.session) { window.location.replace('/index.html'); return; }
+      setStatus('لم تبدأ جلسة الدخول. تواصل مع الإدارة عبر الاقتراحات والشكاوى لمراجعة إعداد التسجيل.', 'error');
     } catch (error) {
       setStatus(error?.message || 'تعذر إنشاء الحساب. حاول مرة أخرى.', 'error');
     } finally {

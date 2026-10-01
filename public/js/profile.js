@@ -163,17 +163,19 @@
       if (!session?.user) { setMessage(text('expired'), 'error'); if (allowRedirect) window.setTimeout(redirectToLogin, 250); return; }
       state.user = session.user;
       const sb = getSupabase();
+      document.body.classList.remove('auth-locked');
+      document.dispatchEvent(new Event('profile:loaded'));
       const result = await queryProfile(sb, session.user);
       if (generation !== loadGeneration) return;
       state.table = result.table; state.profile = result.profile;
-      fillForm(result.profile || {}, session.user); document.dispatchEvent(new Event('profile:loaded'));
+      fillForm(result.profile || {}, session.user);
       document.body.classList.remove('auth-locked');
       setMessage(result.profile ? '' : text('notFound'), result.profile ? '' : 'info');
     } catch (error) {
       if (generation !== loadGeneration) return;
       const message = normalizeError(error);
       setMessage(message, 'error');
-      if (/session|token|authentication|unavailable/i.test(message) && allowRedirect) window.setTimeout(redirectToLogin, 700);
+      if (message === text('expired') && allowRedirect) window.setTimeout(redirectToLogin, 700);
     } finally {
       if (generation === loadGeneration) state.loading = false;
     }

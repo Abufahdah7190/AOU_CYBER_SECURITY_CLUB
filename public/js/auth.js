@@ -77,6 +77,7 @@
     if ($('#auth-user')) $('#auth-user').hidden = false;
     if ($('#login-form')) $('#login-form').hidden = true;
     if ($('#register-form')) $('#register-form').hidden = true;
+    if ($('#forgot-form')) $('#forgot-form').hidden = true;
     const switcher = document.querySelector('.auth-switcher'); if (switcher) switcher.hidden = true;
     document.dispatchEvent(new CustomEvent('auth:ready', { detail: { user } }));
   }
@@ -97,8 +98,10 @@
     const login = view === 'login';
     const card = document.querySelector('[data-auth-card]');
     card?.classList.toggle('register-mode', !login);
+    card?.classList.remove('forgot-mode');
     if ($('#login-form')) $('#login-form').hidden = !login;
     if ($('#register-form')) $('#register-form').hidden = login;
+    if ($('#forgot-form')) $('#forgot-form').hidden = true;
     document.querySelectorAll('[data-auth-view]').forEach((button) => {
       const active = button.dataset.authView === view;
       button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
@@ -107,6 +110,7 @@
     const copy = $('[data-auth-welcome-copy]'); if (copy) copy.textContent = login ? tr('auth.welcomeBackCopy', 'سجّل دخولك وواصل بناء مسارك في الأمن السيبراني.') : tr('auth.welcomeNewCopy', 'أنشئ حسابك الجامعي وانضم إلى مجتمع النادي السيبراني.');
     setMessage('');
   }
+
 
   async function handleAuthSubmit(event) {
     event.preventDefault();
@@ -134,10 +138,11 @@
           password: values.password,
           options: { data: { firstName: values.firstName, lastName: values.lastName, phone: values.phone, major: values.major, gender: values.gender } }
         });
+
       }
       if (result.error) throw result.error;
-      if (result.data?.session) window.location.replace('/profile.html');
-      else setMessage(tr('auth.confirmEmail', 'Check your email to confirm your account / تحقق من بريدك لتأكيد الحساب'), 'success');
+      if (result.data?.session) window.location.replace('/index.html');
+      else setMessage('لم تبدأ جلسة الدخول. تواصل مع الإدارة عبر الاقتراحات والشكاوى لمراجعة إعداد التسجيل.', 'error');
     } catch (error) {
       // Supabase wraps a rejected auth.users trigger (see
       // supabase/enforce-university-email.sql) in a generic
@@ -146,7 +151,7 @@
       // real reason instead of a confusing generic error.
       const raw = String(error?.message || '');
       const isDbRejection = /database error/i.test(raw);
-      const message = isDbRejection ? universityEmailMessage() : (raw || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'));
+      const message = isDbRejection ? 'تعذر حفظ الحساب. تواصل مع الإدارة عبر الاقتراحات والشكاوى.' : (raw || tr('auth.requestFailed', 'تعذر تنفيذ الطلب.'));
       setMessage(message, 'error');
     } finally {
       delete form.dataset.submitting;
@@ -159,13 +164,13 @@
     if (!sb) { showForms(); setMessage('تعذر تحميل خدمة المصادقة. تحقق من الاتصال وإعدادات Supabase ثم أعد تحميل الصفحة.', 'error'); return; }
     const { data: { session }, error } = await sb.auth.getSession();
     if (error) { showForms(); setMessage(error.message, 'error'); return; }
-    if (session?.user && /\/login\.html$/.test(location.pathname)) { location.replace('/profile.html'); return; }
+    if (session?.user && /\/login\.html$/.test(location.pathname)) { location.replace('/index.html'); return; }
     if (session?.user) showUser(session.user); else showForms();
     sb.auth.onAuthStateChange((event, currentSession) => {
       // Leave Supabase's auth lock before listeners perform API requests.
       setTimeout(() => {
         if (event === 'PASSWORD_RECOVERY') return; // Central client owns recovery navigation.
-        if (event === 'SIGNED_IN' && /\/login\.html$/.test(location.pathname)) { location.replace('/profile.html'); return; }
+        if (event === 'SIGNED_IN' && /\/login\.html$/.test(location.pathname)) { location.replace('/index.html'); return; }
         if (event === 'SIGNED_OUT') showForms();
         else if (event === 'INITIAL_SESSION') currentSession?.user ? showUser(currentSession.user) : showForms();
       }, 0);

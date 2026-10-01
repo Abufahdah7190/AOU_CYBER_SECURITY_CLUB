@@ -16,7 +16,7 @@
     validStatus: english() ? 'Verified and valid' : 'معتمدة وصالحة', revoked: english() ? 'Revoked' : 'ملغاة', invalid: english() ? 'Certificate is invalid' : 'الشهادة غير صالحة'
   }[key]);
   function renderCertificate(c) {
-    const imageUrl = `/api/learning/certificates/${encodeURIComponent(c.certificateCode)}/image?lang=${c.language}`;
+    const imageUrl = `/api/learning/certificates/${encodeURIComponent(c.certificateCode)}/image?lang=${c.language === 'en' ? 'en' : 'ar'}`;
     result.className = 'verify-success';
     const displayLocale = english() ? 'en-GB' : 'ar-SA';
     result.innerHTML = `<strong class="verify-verdict">✓ ${copy('valid')}</strong><img class="verify-certificate-image" src="${imageUrl}" alt="${copy('valid')} ${escapeHtml(c.studentName)}"><dl><dt>${copy('student')}</dt><dd dir="auto">${escapeHtml(c.studentName)}</dd><dt>${copy('course')}</dt><dd dir="auto">${escapeHtml(c.courseName)}</dd><dt>${copy('serial')}</dt><dd dir="ltr" class="verify-code">${escapeHtml(c.certificateCode)}</dd><dt>${copy('status')}</dt><dd>${c.status === 'valid' ? copy('validStatus') : copy('revoked')}</dd><dt>${copy('issued')}</dt><dd>${new Date(c.issuedAt).toLocaleDateString(displayLocale)}</dd></dl>`;

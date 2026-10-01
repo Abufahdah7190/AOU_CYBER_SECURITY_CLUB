@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   'use strict';
 
   const API = '/api/learning';
@@ -71,7 +71,21 @@
   }
 
   const fallback = fallbackCourse(slug);
-  const rawCourse = window.CYBERCLUB_LMS_BY_SLUG?.[slug];
+  let rawCourse;
+  try {
+    const sb = window.supabaseClient;
+    const session = sb && await sb.auth.getSession();
+    if (!session?.data?.session) { location.replace('/index.html#tab-auth'); return; }
+    const response = await window.clubFetch(`${API}/courses/${encodeURIComponent(slug)}`, { cache: 'no-store' });
+    if (response.status === 401) { location.replace('/index.html#tab-auth'); return; }
+    if (!response.ok) throw new Error('Course unavailable');
+    rawCourse = (await response.json()).course;
+  } catch (_) {
+    $('course-loading').hidden = true;
+    $('complete-lesson').disabled = true;
+    $('course-message').textContent = 'تعذر تحميل الدورة. تحقق من الاتصال وحاول مجددًا. / Unable to load course. Please retry.';
+    return;
+  }
   if (!rawCourse) { document.getElementById('course-title').textContent = 'Course not found / الدورة غير موجودة'; document.getElementById('course-loading').hidden=true; document.getElementById('complete-lesson').disabled=true; return; }
   const containsArabic = (value) => typeof value === 'string' && /[\u0600-\u06FF]/.test(value);
   const mergeEnglish = (source, backup) => {
@@ -319,8 +333,8 @@
       current = Math.min(Math.max(Number(saved.lastSection || 0), 0), Math.max(flat().length - 1, 0));
       render();
     } catch (_) {
-      // Course content must remain visible even when progress/auth API is unavailable.
-      $('course-message').textContent = lang === 'ar' ? 'يتم عرض المحتوى التجريبي. سجّل الدخول لحفظ تقدمك.' : 'Preview content is shown. Sign in to save your progress.';
+      // Course content was authenticated before rendering; report progress outages separately.
+      $('course-message').textContent = lang === 'ar' ? 'تعذر تحميل تقدمك المحفوظ. أعد تحميل الصفحة قبل متابعة الدروس.' : 'Saved progress could not be loaded. Reload before continuing.';
       render();
     }
   }

@@ -26,7 +26,7 @@
       const verify=node('a',en()?' Verify / Print PDF ':' تحقق / طباعة PDF ');verify.href='/certificate-verify.html?code='+encodeURIComponent(cert.certificateCode);card.append(verify);
       const select = document.createElement('select'); select.setAttribute('aria-label', en() ? 'Certificate language' : 'لغة الشهادة');
       for (const [value,label] of [['ar','العربية'],['en','English']]) { const option = node('option',label); option.value=value; select.append(option); }
-      select.value = window.i18n.lang;
+      select.value = window.i18n?.lang || 'ar';
       const button = node('a', en() ? 'View / Print in selected language' : 'عرض / طباعة باللغة المختارة'); button.className='btn';
       const status = node('p',''); status.setAttribute('role','status');
       function switchCertificateLanguage(){
@@ -39,12 +39,14 @@
       card.append(select,button,status); list.append(card);
     }
   }
+  let generation = 0;
   async function load(){
+    const current = ++generation;
     try{
       const response=await window.clubFetch('/api/learning/progress');
       const data=await response.json();if(!response.ok)throw Error(data.error);
-      records=data;render();
-    }catch(error){document.getElementById('profile-certificates-summary').textContent=(en()?'Certificate history unavailable: ':'تعذر تحميل سجل الشهادات: ')+error.message;}
+      if (current !== generation) return; records=data;render();
+    }catch(error){if (current !== generation) return; document.getElementById('profile-certificates-summary').textContent=(en()?'Certificate history unavailable: ':'تعذر تحميل سجل الشهادات: ')+error.message;}
   }
   document.addEventListener('profile:loaded',load);
   document.addEventListener('languagechange',render);
