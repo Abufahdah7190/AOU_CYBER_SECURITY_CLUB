@@ -97,17 +97,6 @@ async function register(req, res, next) {
     await issueSession(res, user, req);
     await recordAudit({ actorId: user.id, action: 'user.register', entityType: 'user', entityId: user.id, req });
 
-    sendEmail({
-      to: user.email,
-      subject: 'مرحبًا بك في نادي الأمن السيبراني',
-      html: `<div dir="rtl" style="font-family: Tahoma, sans-serif;">
-        <h2>أهلًا ${user.first_name}!</h2>
-        <p>تم إنشاء حسابك بنجاح في منصة نادي الأمن السيبراني - الجامعة العربية المفتوحة (فرع الرياض).</p>
-      </div>`,
-    }).then((result) => {
-      if (!result.success) console.error('Failed to send welcome email:', result.error);
-    });
-
     return res.status(201).json({ user: publicUser(user) });
   } catch (err) {
     return next(err);

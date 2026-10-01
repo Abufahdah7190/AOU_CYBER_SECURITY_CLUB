@@ -20,7 +20,7 @@ const courseParam = param('courseSlug').trim().isSlug().isLength({ max: 80 });
 const certificateCodeParam = param('certificateCode').trim().isLength({ min: 5, max: 60 });
 
 // Public verification endpoint: exposes only certificate verification data.
-router.get('/verify/:certificateCode', async (req, res, next) => {
+router.get('/verify/:certificateCode', [certificateCodeParam], handleValidation, async (req, res, next) => {
   try {
     if (req.query.lang !== undefined && !['ar','en'].includes(req.query.lang)) return res.status(400).json({error:'Invalid language'});
     const certificate = await findByCode(req.params.certificateCode);
@@ -49,6 +49,12 @@ router.get('/certificates/:certificateCode/image', [certificateCodeParam], handl
 });
 
 router.use(requireAuth);
+
+router.get('/courses/:courseSlug', [courseParam], handleValidation, (req, res) => {
+  const course = Object.hasOwn(courses, req.params.courseSlug) ? courses[req.params.courseSlug] : null;
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  return res.set('Cache-Control', 'no-store').json({ course });
+});
 
 router.get('/progress', async (req, res, next) => {
   try {

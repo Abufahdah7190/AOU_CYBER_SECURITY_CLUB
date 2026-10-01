@@ -26,6 +26,8 @@ function handleValidation(req, res, next) {
  * معلومات حساسة في responses") — those go to the server log only.
  */
 function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
+  if (err?.type === 'entity.too.large') return res.status(413).json({ error: 'Request too large' });
+  if (err?.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON' });
   const tlsError = Boolean(err && (err.code === 'DEPTH_ZERO_SELF_SIGNED_CERT' || err.code === 'SELF_SIGNED_CERT_IN_CHAIN' || /self-signed certificate|certificate verify failed|unable to verify/i.test(String(err.message || ''))));
   console.error('Unhandled request error:', { code: err && err.code, name: err && err.name, tlsError });
   const databaseError = Boolean(tlsError || (err && (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === '57P01' || /^08/.test(String(err.code || '')))));

@@ -50,7 +50,8 @@ const app = express();
 
 // Render/Railway/most PaaS sit behind a reverse proxy — needed for
 // req.ip and secure cookies to work correctly.
-app.set('trust proxy', 1);
+app.set('trust proxy', env.isProd ? 1 : false);
+app.disable('x-powered-by');
 
 app.use(
   helmet({
@@ -99,6 +100,15 @@ if (!env.isProd) {
   app.use(morgan('dev'));
 }
 
+// Lesson data is available only through the authenticated course endpoint.
+app.use((req, res, next) => {
+  let pathname;
+  try { pathname = decodeURIComponent(req.path).replace(/\\/g, '/'); }
+  catch (_) { return res.sendStatus(400); }
+  if (/(?:^|\/)lms-data\.js(?:\/|$)/i.test(pathname)) return res.status(404).set('Cache-Control', 'no-store').end();
+  next();
+});
+
 app.use('/api', generalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/learning', learningRoutes);
@@ -131,11 +141,11 @@ app.use((req, res, next) => {
   if (decoded.split('/').some(part => part === '..' || part.startsWith('.'))) return res.sendStatus(404);
   const publicAsset = /^\/(?:js|css|assets|locales)\//.test(decoded);
   const publicDocument = /^\/(?:[a-z0-9-]+\.html)?$/i.test(decoded);
-  if (!publicAsset && !publicDocument && /\.[a-z0-9]+$/i.test(decoded)) return res.sendStatus(404);
+  if (!publicAsset && !publicDocument) return next();
   if (/^\/(?:server|supabase|tests|docs|node_modules)(?:\/|$)/i.test(decoded)) return res.sendStatus(404);
   next();
 });
-app.use(express.static(FRONTEND_ROOT, {
+const serveFrontend = express.static(FRONTEND_ROOT, {
   index: 'index.html',
   fallthrough: true,
   etag: true,
@@ -147,12 +157,18 @@ app.use(express.static(FRONTEND_ROOT, {
       res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
     }
   },
-}));
+});
+app.use((req, res, next) => {
+  let decoded;
+  try { decoded = decodeURIComponent(req.path); } catch (_) { return res.sendStatus(400); }
+  if (!/^\/(?:js|css|assets|locales)\//.test(decoded) && !/^\/(?:[a-z0-9-]+\.html)?$/i.test(decoded)) return next();
+  return serveFrontend(req, res, next);
+});
 
 // Explicitly serve .html documents from the resolved frontend directory.
 // This makes direct navigation/refresh of pages such as /profile.html
 // independent from the catch-all route below.
-app.get('/*.html', (req, res, next) => {
+app.get(/^\/[a-z0-9-]+\.html$/i, (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
 
   const relativePath = req.path.replace(/^\/+/, '');

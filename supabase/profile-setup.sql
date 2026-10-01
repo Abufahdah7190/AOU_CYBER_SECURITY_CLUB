@@ -18,6 +18,15 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
+-- Remove historical permissive policies as PostgreSQL ORs policies together.
+do $$
+declare p record;
+begin
+  for p in select policyname from pg_policies where schemaname='public' and tablename='profiles' loop
+    execute format('drop policy %I on public.profiles',p.policyname);
+  end loop;
+end $$;
+
 drop policy if exists profiles_select_own on public.profiles;
 drop policy if exists profiles_insert_own on public.profiles;
 drop policy if exists profiles_update_own on public.profiles;
@@ -30,7 +39,14 @@ create policy profiles_update_own on public.profiles
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
 grant usage on schema public to authenticated;
-revoke all on public.profiles from anon, authenticated;
+revoke all on public.profiles from public, anon, authenticated;
+do $$
+declare cols text;
+begin
+  select string_agg(quote_ident(column_name), ', ') into cols from information_schema.columns
+    where table_schema='public' and table_name='profiles';
+  execute format('revoke select (%s), insert (%s), update (%s), references (%s) on public.profiles from public, anon, authenticated',cols,cols,cols,cols);
+end $$;
 grant select on public.profiles to authenticated;
 grant insert (id, email, first_name, last_name, phone, major, gender, avatar_data, updated_at) on public.profiles to authenticated;
 grant update (email, first_name, last_name, phone, major, gender, avatar_data, updated_at) on public.profiles to authenticated;

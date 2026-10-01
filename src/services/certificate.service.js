@@ -317,8 +317,21 @@ async function issueCertificate({ studentId, courseSlug, courseName, studentName
     const certificate = await updateCertificate({ studentId, courseSlug, courseName, studentName, language, theme });
     return { created: false, certificate };
   }
-  const certificate = await insertCertificate({ studentId, courseSlug, courseName, studentName, language, theme });
-  return { created: true, certificate };
+  try {
+    const certificate = await insertCertificate({ studentId, courseSlug, courseName, studentName, language, theme });
+    return { created: true, certificate };
+  } catch (error) {
+    // Two tabs/retried completion requests can both observe no certificate.
+    // The database uniqueness constraint chooses a winner; return that record
+    // to the other request without issuing another code or reporting failure.
+    if (error.code !== '23505') throw error;
+    const winner = await findExisting(studentId, courseSlug);
+    if (!winner) throw error;
+    const certificate = updateExisting
+      ? await updateCertificate({ studentId, courseSlug, courseName, studentName, language, theme })
+      : winner;
+    return { created: false, certificate };
+  }
 }
 
 // ---------------------------------------------------------------------

@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express');
 const { pool } = require('../db/pool');
-const { requireAuth } = require('../middleware/auth');
+const requireAuth = require('../middleware/supabaseAuth');
 const QRCode = require('qrcode');
 const env = require('../config/env');
 const router = express.Router();
