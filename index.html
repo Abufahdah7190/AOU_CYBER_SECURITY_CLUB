@@ -116,14 +116,9 @@
       <div class="auth-field"><label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="login-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa"></div>
       <div class="auth-field"><label for="login-password" data-i18n="auth.password">كلمة المرور</label><input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="10"></div>
       <button class="btn primary auth-submit" type="submit" data-i18n="auth.secureLogin">دخول آمن</button>
-      <button class="auth-link" type="button" data-auth-forgot data-i18n="auth.forgot">نسيت كلمة المرور؟</button>
+      <a class="auth-link" href="/suggestions.html">مساعدة الحساب — الاقتراحات والشكاوى</a>
     </form>
-    <form class="auth-form" id="forgot-form" hidden novalidate>
-      <div class="auth-form-intro"><h3 data-i18n="auth.recoveryFormTitle">استعادة كلمة المرور</h3><p data-i18n="auth.recoveryFormCopy">أدخل بريدك الإلكتروني الجامعي وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p></div>
-      <div class="auth-field"><label for="forgot-email" data-i18n="auth.email">البريد الإلكتروني</label><input id="forgot-email" name="email" type="email" autocomplete="email" required placeholder="student@aou.edu.sa" pattern="[^\s@]+@(aou\.edu\.sa|aou\.edu)" data-i18n-title="auth.universityEmailTitle" title="الموقع متاح فقط لطلاب الجامعة العربية المفتوحة بالبريد الجامعي الرسمي"></div>
-      <button class="btn primary auth-submit" type="submit" data-i18n="auth.sendRecovery">إرسال رابط الاستعادة</button>
-      <button class="auth-link" type="button" data-auth-forgot-back data-i18n="auth.backToLogin">العودة إلى تسجيل الدخول</button>
-    </form>
+    
     <form class="auth-form" id="register-form" role="tabpanel" aria-labelledby="auth-register-tab" hidden novalidate>
       <div class="auth-grid">
         <div class="auth-field"><label for="register-first-name" data-i18n="auth.firstName">الاسم الأول</label><input id="register-first-name" name="firstName" type="text" autocomplete="given-name" required minlength="2"></div>
